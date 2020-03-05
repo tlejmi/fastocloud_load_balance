@@ -7,7 +7,7 @@ ENV APP_NAME fastocloud_load_balance
 ENV PROJECT_DIR=/usr/src/fastocloud_load_balance
 RUN groupadd -r $USER && useradd -r -g $USER $USER
 
-COPY . /usr/src/fastocloud_load_balance
+COPY . $PROJECT_DIR
 
 RUN set -ex; \
   BUILD_DEPS='ca-certificates git python3 python3-pip'; \
@@ -15,11 +15,9 @@ RUN set -ex; \
   apt-get update; \
   apt-get install -y $BUILD_DEPS --no-install-recommends; \
   # rm -rf /var/lib/apt/lists/*; \
-  \
   pip3 install setuptools; \
   PYFASTOGT_DIR=/usr/src/pyfastogt; \
   mkdir -p $PYFASTOGT_DIR && git clone https://github.com/fastogt/pyfastogt $PYFASTOGT_DIR && cd $PYFASTOGT_DIR && python3 setup.py install; \
-  \
   cd $PROJECT_DIR/build && ./build_env.py --prefix=$PREFIX; \
   cd $PROJECT_DIR/build && PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig python3 build.py release $PREFIX; \
 rm -rf $PYFASTOGT_DIR $PROJECT_DIR # && apt-get purge -y --auto-remove $BUILD_DEPS

@@ -116,6 +116,11 @@ SET(SERVER_DAEMON_HEADERS
   ${CMAKE_SOURCE_DIR}/src/daemon/server.h
   ${CMAKE_SOURCE_DIR}/src/daemon/commands.h
   ${CMAKE_SOURCE_DIR}/src/daemon/commands_factory.h
+
+  ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/details/shots.h
+  ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/server_info.h
+  ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/prepare_info.h
+  ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/get_log_info.h
 )
 
 SET(SERVER_DAEMON_SOURCES
@@ -123,6 +128,11 @@ SET(SERVER_DAEMON_SOURCES
   ${CMAKE_SOURCE_DIR}/src/daemon/server.cpp
   ${CMAKE_SOURCE_DIR}/src/daemon/commands.cpp
   ${CMAKE_SOURCE_DIR}/src/daemon/commands_factory.cpp
+
+  ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/details/shots.cpp
+  ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/server_info.cpp
+  ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/prepare_info.cpp
+  ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/get_log_info.cpp
 )
 
 SET(SERVER_HEADERS
@@ -130,6 +140,7 @@ SET(SERVER_HEADERS
   ${CMAKE_SOURCE_DIR}/src/base/server_auth_info.h
   ${CMAKE_SOURCE_DIR}/src/base/subscriber_info.h
   ${CMAKE_SOURCE_DIR}/src/base/isubscribers_manager.h
+  ${CMAKE_SOURCE_DIR}/src/base/utils.h
 
   ${CMAKE_SOURCE_DIR}/src/process_slave_wrapper.h
   ${CMAKE_SOURCE_DIR}/src/config.h
@@ -144,6 +155,7 @@ SET(SERVER_SOURCES
   ${CMAKE_SOURCE_DIR}/src/base/server_auth_info.cpp
   ${CMAKE_SOURCE_DIR}/src/base/subscriber_info.cpp
   ${CMAKE_SOURCE_DIR}/src/base/isubscribers_manager.cpp
+  ${CMAKE_SOURCE_DIR}/src/base/utils.cpp
 
   ${CMAKE_SOURCE_DIR}/src/process_slave_wrapper.cpp
   ${CMAKE_SOURCE_DIR}/src/config.cpp

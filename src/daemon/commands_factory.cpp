@@ -113,13 +113,15 @@ common::Error PingServiceResponceFail(fastotv::protocol::sequance_id_t id,
   return common::Error();
 }
 
-common::Error ActivateResponse(fastotv::protocol::sequance_id_t id, fastotv::protocol::response_t* resp) {
+common::Error ActivateResponse(fastotv::protocol::sequance_id_t id,
+                               const std::string& result,
+                               fastotv::protocol::response_t* resp) {
   if (!resp) {
     return common::make_error_inval();
   }
 
-  *resp =
-      fastotv::protocol::response_t::MakeMessage(id, common::protocols::json_rpc::JsonRPCMessage::MakeSuccessMessage());
+  *resp = fastotv::protocol::response_t::MakeMessage(
+      id, common::protocols::json_rpc::JsonRPCMessage::MakeSuccessMessage(result));
   return common::Error();
 }
 
@@ -132,6 +134,26 @@ common::Error ActivateResponseFail(fastotv::protocol::sequance_id_t id,
 
   *resp = fastotv::protocol::response_t::MakeError(
       id, common::protocols::json_rpc::JsonRPCError::MakeServerErrorFromText(error_text));
+  return common::Error();
+}
+
+common::Error PrepareServiceResponceSuccess(fastotv::protocol::sequance_id_t id, fastotv::protocol::response_t* resp) {
+  if (!resp) {
+    return common::make_error_inval();
+  }
+
+  *resp =
+      fastotv::protocol::response_t::MakeMessage(id, common::protocols::json_rpc::JsonRPCMessage::MakeSuccessMessage());
+  return common::Error();
+}
+
+common::Error GetLogServiceResponseSuccess(fastotv::protocol::sequance_id_t id, fastotv::protocol::response_t* resp) {
+  if (!resp) {
+    return common::make_error_inval();
+  }
+
+  *resp =
+      fastotv::protocol::response_t::MakeMessage(id, common::protocols::json_rpc::JsonRPCMessage::MakeSuccessMessage());
   return common::Error();
 }
 

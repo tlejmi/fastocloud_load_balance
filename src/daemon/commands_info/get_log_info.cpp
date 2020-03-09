@@ -12,36 +12,42 @@
     along with fastocloud.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "daemon/commands.h"
+#include "daemon/commands_info/get_log_info.h"
+
+#include <string>
+
+#define GET_LOG_INFO_PATH_FIELD "path"
 
 namespace fastocloud {
 namespace server {
+namespace service {
 
-common::Error CatchupCreatedBroadcast(const fastotv::commands_info::CatchupInfo& params,
-                                      fastotv::protocol::request_t* req) {
-  if (!req) {
-    return common::make_error_inval();
-  }
+GetLogInfo::GetLogInfo() : base_class(), path_() {}
 
-  std::string catchup;
-  common::Error err_ser = params.SerializeToString(&catchup);
-  if (err_ser) {
-    return err_ser;
-  }
+GetLogInfo::GetLogInfo(const url_t& path) : path_(path) {}
 
-  *req = fastotv::protocol::request_t::MakeNotification(DAEMON_SERVER_CATCHUP_CREATED, catchup);
+common::Error GetLogInfo::SerializeFields(json_object* out) const {
+  const std::string path_str = path_.GetUrl();
+  json_object_object_add(out, GET_LOG_INFO_PATH_FIELD, json_object_new_string(path_str.c_str()));
   return common::Error();
 }
 
-common::Error StatisitcServiceBroadcast(fastotv::protocol::serializet_params_t params,
-                                        fastotv::protocol::request_t* req) {
-  if (!req) {
-    return common::make_error_inval();
+common::Error GetLogInfo::DoDeSerialize(json_object* serialized) {
+  GetLogInfo inf;
+  json_object* jpath = nullptr;
+  json_bool jpath_exists = json_object_object_get_ex(serialized, GET_LOG_INFO_PATH_FIELD, &jpath);
+  if (jpath_exists) {
+    inf.path_ = url_t(json_object_get_string(jpath));
   }
 
-  *req = fastotv::protocol::request_t::MakeNotification(STREAM_STATISTIC_SERVICE, params);
+  *this = inf;
   return common::Error();
 }
 
+GetLogInfo::url_t GetLogInfo::GetLogPath() const {
+  return path_;
+}
+
+}  // namespace service
 }  // namespace server
 }  // namespace fastocloud

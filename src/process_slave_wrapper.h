@@ -36,7 +36,7 @@ class ISubscribersManager;
 
 class ProcessSlaveWrapper : public common::libev::IoLoopObserver, public subscribers::ISubscribersHandlerObserver {
  public:
-  enum { ping_timeout_clients_seconds = 60 };
+  enum { ping_timeout_clients_seconds = 60, node_stats_send_seconds = 10 };
   typedef fastotv::protocol::protocol_client_t stream_client_t;
 
   explicit ProcessSlaveWrapper(const Config& config);
@@ -77,17 +77,23 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver, public subscri
   common::ErrnoError DaemonDataReceived(ProtocoledDaemonClient* dclient) WARN_UNUSED_RESULT;
 
   // service
+  common::ErrnoError HandleRequestClientPrepareService(ProtocoledDaemonClient* dclient,
+                                                       const fastotv::protocol::request_t* req) WARN_UNUSED_RESULT;
   common::ErrnoError HandleRequestClientActivate(ProtocoledDaemonClient* dclient,
                                                  const fastotv::protocol::request_t* req) WARN_UNUSED_RESULT;
   common::ErrnoError HandleRequestClientPingService(ProtocoledDaemonClient* dclient,
                                                     const fastotv::protocol::request_t* req) WARN_UNUSED_RESULT;
   common::ErrnoError HandleRequestClientStopService(ProtocoledDaemonClient* dclient,
                                                     const fastotv::protocol::request_t* req) WARN_UNUSED_RESULT;
+  common::ErrnoError HandleRequestClientGetLogService(ProtocoledDaemonClient* dclient,
+                                                      const fastotv::protocol::request_t* req) WARN_UNUSED_RESULT;
 
   common::ErrnoError HandleResponcePingService(ProtocoledDaemonClient* dclient,
                                                const fastotv::protocol::response_t* resp) WARN_UNUSED_RESULT;
   common::ErrnoError HandleResponceCatchupCreatedService(ProtocoledDaemonClient* dclient,
                                                          const fastotv::protocol::response_t* resp) WARN_UNUSED_RESULT;
+
+  std::string MakeServiceStats(common::time64_t expiration_time) const;
 
   const Config config_;
 
@@ -100,7 +106,12 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver, public subscri
   common::libev::IoLoopObserver* http_handler_;
 
   base::ISubscribersManager* sub_manager_;
+
   common::libev::timer_id_t ping_client_timer_;
+  common::libev::timer_id_t node_stats_timer_;
+
+  struct NodeStats;
+  NodeStats* node_stats_;
 };
 
 }  // namespace server

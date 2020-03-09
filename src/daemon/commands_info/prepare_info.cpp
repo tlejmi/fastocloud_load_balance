@@ -12,36 +12,25 @@
     along with fastocloud.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "daemon/commands.h"
+#include "daemon/commands_info/prepare_info.h"
 
 namespace fastocloud {
 namespace server {
+namespace service {
 
-common::Error CatchupCreatedBroadcast(const fastotv::commands_info::CatchupInfo& params,
-                                      fastotv::protocol::request_t* req) {
-  if (!req) {
-    return common::make_error_inval();
-  }
+PrepareInfo::PrepareInfo() : base_class() {}
 
-  std::string catchup;
-  common::Error err_ser = params.SerializeToString(&catchup);
-  if (err_ser) {
-    return err_ser;
-  }
-
-  *req = fastotv::protocol::request_t::MakeNotification(DAEMON_SERVER_CATCHUP_CREATED, catchup);
+common::Error PrepareInfo::SerializeFields(json_object* out) const {
   return common::Error();
 }
 
-common::Error StatisitcServiceBroadcast(fastotv::protocol::serializet_params_t params,
-                                        fastotv::protocol::request_t* req) {
-  if (!req) {
-    return common::make_error_inval();
-  }
+common::Error PrepareInfo::DoDeSerialize(json_object* serialized) {
+  PrepareInfo inf;
 
-  *req = fastotv::protocol::request_t::MakeNotification(STREAM_STATISTIC_SERVICE, params);
+  *this = inf;
   return common::Error();
 }
 
+}  // namespace service
 }  // namespace server
 }  // namespace fastocloud

@@ -25,17 +25,23 @@
 #define DAEMON_ACTIVATE "activate_request"  // {"key": "XXXXXXXXXXXXXXXXXX"}
 #define DAEMON_STOP_SERVICE "stop_service"  // {"delay": 0 }
 #define DAEMON_PING_SERVICE "ping_service"
+#define DAEMON_PREPARE_SERVICE "prepare_service"
+#define DAEMON_GET_LOG_SERVICE "get_log_service"
 
 #define DAEMON_SERVER_PING "ping_client"
 
 // Broadcast
 #define DAEMON_SERVER_CATCHUP_CREATED "catchup_created"
+#define STREAM_STATISTIC_SERVICE "statistic_service"
 
 namespace fastocloud {
 namespace server {
 
 common::Error CatchupCreatedBroadcast(const fastotv::commands_info::CatchupInfo& params,
                                       fastotv::protocol::request_t* req);
+
+common::Error StatisitcServiceBroadcast(fastotv::protocol::serializet_params_t params,
+                                        fastotv::protocol::request_t* req);
 
 }  // namespace server
 }  // namespace fastocloud

@@ -36,7 +36,7 @@ class ISubscribersManager;
 
 class ProcessSlaveWrapper : public common::libev::IoLoopObserver, public subscribers::ISubscribersHandlerObserver {
  public:
-  enum { ping_timeout_clients_seconds = 60, node_stats_send_seconds = 10 };
+  enum { ping_timeout_clients_seconds = 60, node_stats_send_seconds = 10, check_license_timeout_seconds = 600 };
   typedef fastotv::protocol::protocol_client_t stream_client_t;
 
   explicit ProcessSlaveWrapper(const Config& config);
@@ -68,10 +68,12 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver, public subscri
   virtual common::ErrnoError HandleResponceServiceCommand(ProtocoledDaemonClient* dclient,
                                                           const fastotv::protocol::response_t* resp) WARN_UNUSED_RESULT;
 
-  virtual void CatchupCreated(subscribers::SubscribersHandler* handler,
-                              const fastotv::commands_info::CatchupInfo& chan) override;
+  void CatchupCreated(subscribers::SubscribersHandler* handler,
+                      const fastotv::commands_info::CatchupInfo& chan) override;
 
  private:
+  void StopImpl();
+
   void BroadcastClients(const fastotv::protocol::request_t& req);
 
   common::ErrnoError DaemonDataReceived(ProtocoledDaemonClient* dclient) WARN_UNUSED_RESULT;
@@ -93,6 +95,8 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver, public subscri
   common::ErrnoError HandleResponceCatchupCreatedService(ProtocoledDaemonClient* dclient,
                                                          const fastotv::protocol::response_t* resp) WARN_UNUSED_RESULT;
 
+  void CheckLicenseExpired();
+
   std::string MakeServiceStats(common::time64_t expiration_time) const;
 
   const Config config_;
@@ -109,6 +113,7 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver, public subscri
 
   common::libev::timer_id_t ping_client_timer_;
   common::libev::timer_id_t node_stats_timer_;
+  common::libev::timer_id_t check_license_timer_;
 
   struct NodeStats;
   NodeStats* node_stats_;

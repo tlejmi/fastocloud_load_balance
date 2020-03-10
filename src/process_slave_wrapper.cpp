@@ -60,6 +60,7 @@ ProcessSlaveWrapper::ProcessSlaveWrapper(const Config& config)
       http_handler_(nullptr),
       ping_client_timer_(INVALID_TIMER_ID),
       node_stats_timer_(INVALID_TIMER_ID),
+      check_license_timer_(INVALID_TIMER_ID),
       node_stats_(new NodeStats) {
   loop_ = new DaemonServer(config.host, this);
   loop_->SetName("client_server");
@@ -176,6 +177,7 @@ finished:
 void ProcessSlaveWrapper::PreLooped(common::libev::IoLoop* server) {
   ping_client_timer_ = server->CreateTimer(ping_timeout_clients_seconds, true);
   node_stats_timer_ = server->CreateTimer(node_stats_send_seconds, true);
+  check_license_timer_ = server->CreateTimer(check_license_timeout_seconds, true);
 }
 
 void ProcessSlaveWrapper::Accepted(common::libev::IoClient* client) {
@@ -218,6 +220,8 @@ void ProcessSlaveWrapper::TimerEmited(common::libev::IoLoop* server, common::lib
     }
 
     BroadcastClients(req);
+  } else if (check_license_timer_ == id) {
+    CheckLicenseExpired();
   }
 }
 
@@ -234,6 +238,12 @@ void ProcessSlaveWrapper::ChildStatusChanged(common::libev::IoChild* child, int 
   UNUSED(child);
   UNUSED(status);
   UNUSED(signal);
+}
+
+void ProcessSlaveWrapper::StopImpl() {
+  subscribers_server_->Stop();
+  http_server_->Stop();
+  loop_->Stop();
 }
 
 void ProcessSlaveWrapper::BroadcastClients(const fastotv::protocol::request_t& req) {
@@ -313,6 +323,10 @@ void ProcessSlaveWrapper::PostLooped(common::libev::IoLoop* server) {
     server->RemoveTimer(node_stats_timer_);
     node_stats_timer_ = INVALID_TIMER_ID;
   }
+  if (check_license_timer_ != INVALID_TIMER_ID) {
+    server->RemoveTimer(check_license_timer_);
+    check_license_timer_ = INVALID_TIMER_ID;
+  }
 }
 
 common::ErrnoError ProcessSlaveWrapper::HandleRequestClientStopService(ProtocoledDaemonClient* dclient,
@@ -342,9 +356,7 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientStopService(Protocole
     }
 
     common::ErrnoError err = dclient->StopSuccess(req->id);
-    subscribers_server_->Stop();
-    http_server_->Stop();
-    loop_->Stop();
+    StopImpl();
     return err;
   }
 
@@ -569,6 +581,29 @@ void ProcessSlaveWrapper::CatchupCreated(subscribers::SubscribersHandler* handle
   }
 
   loop_->ExecInLoopThread([this, req]() { BroadcastClients(req); });
+}
+
+void ProcessSlaveWrapper::CheckLicenseExpired() {
+  const auto license = config_.license_key;
+  if (!license) {
+    WARNING_LOG() << "You have an invalid license, service stopped";
+    StopImpl();
+    return;
+  }
+
+  common::time64_t tm;
+  bool is_valid = common::license::GetExpireTimeFromKey(PROJECT_NAME_LOWERCASE, *license, &tm);
+  if (!is_valid) {
+    WARNING_LOG() << "You have an invalid license, service stopped";
+    StopImpl();
+    return;
+  }
+
+  if (tm < common::time::current_utc_mstime()) {
+    WARNING_LOG() << "Your license have expired, service stopped";
+    StopImpl();
+    return;
+  }
 }
 
 std::string ProcessSlaveWrapper::MakeServiceStats(common::time64_t expiration_time) const {

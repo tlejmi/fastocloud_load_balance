@@ -600,7 +600,8 @@ std::string ProcessSlaveWrapper::MakeServiceStats(common::time64_t expiration_ti
       daemons_client_count++;
     }
   }
-  service::OnlineUsers online(daemons_client_count, static_cast<http::HttpHandler*>(http_handler_)->GetOnlineClients());
+  service::OnlineUsers online(daemons_client_count, static_cast<http::HttpHandler*>(http_handler_)->GetOnlineClients(),
+                              static_cast<subscribers::SubscribersHandler*>(subscribers_handler_)->GetOnlineClients());
   service::ServerInfo stat(cpu_load, uptime_str, mem_shot, hdd_shot, bytes_recv / ts_diff, bytes_send / ts_diff, sshot,
                            current_time, online);
 

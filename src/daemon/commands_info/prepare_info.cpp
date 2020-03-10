@@ -21,12 +21,14 @@ namespace service {
 PrepareInfo::PrepareInfo() : base_class() {}
 
 common::Error PrepareInfo::SerializeFields(json_object* out) const {
+  UNUSED(out);
   return common::Error();
 }
 
 common::Error PrepareInfo::DoDeSerialize(json_object* serialized) {
-  PrepareInfo inf;
+  UNUSED(serialized);
 
+  PrepareInfo inf;
   *this = inf;
   return common::Error();
 }

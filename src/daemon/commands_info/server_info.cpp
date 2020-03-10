@@ -37,14 +37,15 @@
 
 #define ONLINE_USERS_DAEMON_FIELD "daemon"
 #define ONLINE_USERS_HTTP_FIELD "http"
+#define ONLINE_USERS_SUBSCRIBERS_FIELD "subscribers"
 
 namespace fastocloud {
 namespace server {
 namespace service {
 
-OnlineUsers::OnlineUsers() : OnlineUsers(0, 0) {}
+OnlineUsers::OnlineUsers() : OnlineUsers(0, 0, 0) {}
 
-OnlineUsers::OnlineUsers(size_t daemon, size_t http) : daemon_(daemon), http_(http) {}
+OnlineUsers::OnlineUsers(size_t daemon, size_t http, size_t subscribers) : daemon_(daemon), http_(http) {}
 
 common::Error OnlineUsers::DoDeSerialize(json_object* serialized) {
   OnlineUsers inf;
@@ -60,6 +61,12 @@ common::Error OnlineUsers::DoDeSerialize(json_object* serialized) {
     inf.http_ = json_object_get_int64(jhttp);
   }
 
+  json_object* jsubscribers = nullptr;
+  json_bool jsubscribers_exists = json_object_object_get_ex(serialized, ONLINE_USERS_SUBSCRIBERS_FIELD, &jsubscribers);
+  if (jsubscribers_exists) {
+    inf.subscribers_ = json_object_get_int64(jsubscribers);
+  }
+
   *this = inf;
   return common::Error();
 }
@@ -67,6 +74,7 @@ common::Error OnlineUsers::DoDeSerialize(json_object* serialized) {
 common::Error OnlineUsers::SerializeFields(json_object* out) const {
   json_object_object_add(out, ONLINE_USERS_DAEMON_FIELD, json_object_new_int64(daemon_));
   json_object_object_add(out, ONLINE_USERS_HTTP_FIELD, json_object_new_int64(http_));
+  json_object_object_add(out, ONLINE_USERS_SUBSCRIBERS_FIELD, json_object_new_int64(subscribers_));
   return common::Error();
 }
 

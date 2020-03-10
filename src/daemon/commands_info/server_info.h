@@ -32,7 +32,7 @@ class OnlineUsers : public common::serializer::JsonSerializer<OnlineUsers> {
  public:
   typedef JsonSerializer<OnlineUsers> base_class;
   OnlineUsers();
-  explicit OnlineUsers(size_t daemon, size_t http);
+  explicit OnlineUsers(size_t daemon, size_t http, size_t subscribers);
 
  protected:
   common::Error DoDeSerialize(json_object* serialized) override;
@@ -41,6 +41,7 @@ class OnlineUsers : public common::serializer::JsonSerializer<OnlineUsers> {
  private:
   size_t daemon_;
   size_t http_;
+  size_t subscribers_;
 };
 
 class ServerInfo : public common::serializer::JsonSerializer<ServerInfo> {

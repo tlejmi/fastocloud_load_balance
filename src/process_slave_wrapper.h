@@ -42,7 +42,7 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver, public subscri
   explicit ProcessSlaveWrapper(const Config& config);
   ~ProcessSlaveWrapper() override;
 
-  static int SendStopDaemonRequest(const Config& config);
+  static common::ErrnoError SendStopDaemonRequest(const Config& config);
   common::net::HostAndPort GetServerHostAndPort();
 
   int Exec() WARN_UNUSED_RESULT;

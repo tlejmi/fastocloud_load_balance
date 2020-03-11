@@ -25,7 +25,7 @@ class OperationSystem(metaclass=ABCMeta):
 
 class Debian(OperationSystem):
     def get_required_exec(self) -> list:
-        return ['git', 'yasm', 'nasm', 'gcc', 'g++', 'make', 'ninja-build', 'cmake', 'python3-pip']
+        return ['git', 'yasm', 'nasm', 'gcc', 'g++', 'make', 'ninja-build', 'cmake', 'python3-pip', 'libz-dev']
 
     def get_build_exec(self) -> list:
         return ['autoconf', 'automake', 'libtool', 'pkg-config', 'libudev-dev', 'libmongoc-dev', 'libbson-dev', 'libssl-dev']
@@ -33,7 +33,7 @@ class Debian(OperationSystem):
 
 class RedHat(OperationSystem):
     def get_required_exec(self) -> list:
-        return ['git', 'yasm', 'nasm', 'gcc', 'gcc-c++', 'make', 'ninja-build', 'cmake', 'python3-pip']
+        return ['git', 'yasm', 'nasm', 'gcc', 'gcc-c++', 'make', 'ninja-build', 'cmake', 'python3-pip', 'libz-devel']
 
     def get_build_exec(self) -> list:
         return ['autoconf', 'automake', 'libtool', 'pkgconfig', 'libudev-devel', 'libmongoc-devel', 'openssl-devel']
@@ -41,7 +41,7 @@ class RedHat(OperationSystem):
 
 class Arch(OperationSystem):
     def get_required_exec(self) -> list:
-        return ['git', 'yasm', 'nasm', 'gcc', 'make', 'ninja', 'cmake', 'python3-pip']
+        return ['git', 'yasm', 'nasm', 'gcc', 'make', 'ninja', 'cmake', 'python3-pip', 'libz']
 
     def get_build_exec(self) -> list:
         return ['autoconf', 'automake', 'libtool', 'pkgconfig', 'udev', 'libmongoc-dev', 'openssl']
@@ -49,7 +49,7 @@ class Arch(OperationSystem):
 
 class FreeBSD(OperationSystem):
     def get_required_exec(self) -> list:
-        return ['git', 'yasm', 'nasm', 'gcc', 'make', 'ninja', 'cmake', 'python3-pip']
+        return ['git', 'yasm', 'nasm', 'gcc', 'make', 'ninja', 'cmake', 'python3-pip', 'libz']
 
     def get_build_exec(self) -> list:
         return ['autoconf', 'automake', 'libtool', 'pkgconfig', 'libudev-devd', 'libmongoc-dev', 'openssl']
@@ -76,7 +76,7 @@ class Windows32(OperationSystem):
 
 class MacOSX(OperationSystem):
     def get_required_exec(self) -> list:
-        return ['git', 'yasm', 'nasm', 'make', 'ninja', 'cmake', 'python3-pip']
+        return ['git', 'yasm', 'nasm', 'make', 'ninja', 'cmake', 'python3-pip', 'libz-dev']
 
     def get_build_exec(self) -> list:
         return ['autoconf', 'automake', 'libtool', 'pkgconfig']

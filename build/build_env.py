@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 import argparse
 import subprocess
-import contextlib
-import os
 from abc import ABCMeta, abstractmethod
 import sys
 
-from pyfastogt import system_info, build_utils
+from pyfastogt import system_info, build_utils, utils
 
 # Script for building environment on clean machine
 
@@ -133,11 +131,7 @@ class BuildRequest(build_utils.BuildRequest):
         return dep_libs
 
     def prepare_docker(self):
-        with contextlib.suppress(FileNotFoundError):
-            os.remove('/var/lib/dbus/machine-id')
-        with contextlib.suppress(FileNotFoundError):
-            os.remove('/etc/machine-id')
-        subprocess.call(['dbus-uuidgen', '--ensure'])
+        utils.regenerate_dbus_machine_id()
 
     def install_system(self):
         dep_libs = self.get_system_libs()
@@ -216,7 +210,7 @@ if __name__ == "__main__":
     parser.add_argument('--prefix', help='prefix path (default: None)', default=None)
     parser.add_argument('--docker', help='docker build (default: False)', dest='docker', action='store_true',
                         default=False)
-    
+
     parser.add_argument('--install-other-packages',
                         help='install other packages (--with-system, --with-tools --with-meson --with-jsonc --with-libev) (default: True)',
                         dest='install_other_packages', type=str2bool, default=True)

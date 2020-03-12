@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 import subprocess
+import contextlib
+import os
 from abc import ABCMeta, abstractmethod
 import sys
 
@@ -28,7 +30,8 @@ class Debian(OperationSystem):
         return ['git', 'yasm', 'nasm', 'gcc', 'g++', 'make', 'ninja-build', 'cmake', 'python3-pip', 'libz-dev']
 
     def get_build_exec(self) -> list:
-        return ['autoconf', 'automake', 'libtool', 'pkg-config', 'libudev-dev', 'libmongoc-dev', 'libbson-dev', 'libssl-dev']
+        return ['autoconf', 'automake', 'libtool', 'pkg-config', 'libudev-dev', 'libmongoc-dev', 'libbson-dev',
+                'libssl-dev']
 
 
 class RedHat(OperationSystem):
@@ -68,7 +71,8 @@ class Windows64(OperationSystem):
 class Windows32(OperationSystem):
     def get_required_exec(self) -> list:
         return ['git', 'mingw-w64-i686-yasm', 'mingw-w64-i686-nasm', 'mingw-w64-i686-gcc', 'make',
-                'mingw-w64-i686-ninja', 'mingw-w64-i686-cmake', 'mingw-w64-i686-python3-pip', 'mingw-w64-i686-pkg-config']
+                'mingw-w64-i686-ninja', 'mingw-w64-i686-cmake', 'mingw-w64-i686-python3-pip',
+                'mingw-w64-i686-pkg-config']
 
     def get_build_exec(self) -> list:
         return []
@@ -127,6 +131,13 @@ class BuildRequest(build_utils.BuildRequest):
             raise NotImplementedError("Unknown platform '%s'" % platform_name)
 
         return dep_libs
+
+    def prepare_docker(self):
+        with contextlib.suppress(FileNotFoundError):
+            os.remove('/var/lib/dbus/machine-id')
+        with contextlib.suppress(FileNotFoundError):
+            os.remove('/etc/machine-id')
+        subprocess.call(['dbus-uuidgen', '--ensure'])
 
     def install_system(self):
         dep_libs = self.get_system_libs()
@@ -215,11 +226,14 @@ if __name__ == "__main__":
 
     arg_platform = argv.platform
     arg_prefix_path = argv.prefix
+    argv_docker = argv.docker
     arg_architecture = argv.architecture
     arg_install_other_packages = argv.install_other_packages
     arg_install_fastogt_packages = argv.install_fastogt_packages
 
     request = BuildRequest(arg_platform, arg_architecture, 'build_' + arg_platform + '_env', arg_prefix_path)
+    if argv_docker:
+        request.prepare_docker()
     if argv.with_system and arg_install_other_packages:
         request.install_system()
 

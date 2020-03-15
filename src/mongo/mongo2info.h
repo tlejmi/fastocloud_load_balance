@@ -31,6 +31,7 @@
 #define STREAM_CREATE_DATE_FIELD "created_date"
 #define STREAM_GROUP_FIELD "group"
 #define STREAM_IARC_FIELD "iarc"
+#define STREAM_VIEW_COUNT_FIELD "view_count"
 #define STREAM_NAME_FIELD "name"
 #define STREAM_CLS_FIELD "_cls"
 #define STREAM_HAVE_VIDEO_FIELD "have_video"

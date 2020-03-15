@@ -1248,11 +1248,11 @@ common::Error SubscribersManager::SetRecent(const base::ServerDBAuthInfo& auth,
   }
 
   fastotv::StreamType st = MongoStreamType2StreamType(bson_iter_utf8(&bcls, NULL));
+  bson_error_t error;
   if (IsVod(st)) {
     const unique_ptr_bson_t query(BCON_NEW("_id", BCON_OID(&oid), USER_VODS_FIELD ".sid", BCON_OID(&sid)));
     const unique_ptr_bson_t update_query(
         BCON_NEW("$set", "{", USER_VODS_FIELD ".$." RECENT_FIELD, BCON_DATE_TIME(recent.GetTimestamp()), "}"));
-    bson_error_t error;
     if (!mongoc_collection_update(subscribers_, MONGOC_UPDATE_NONE, query.get(), update_query.get(), NULL, &error)) {
       DEBUG_LOG() << "Failed to set recent error: " << error.message;
     }
@@ -1260,7 +1260,6 @@ common::Error SubscribersManager::SetRecent(const base::ServerDBAuthInfo& auth,
     const unique_ptr_bson_t query(BCON_NEW("_id", BCON_OID(&oid), USER_CATCHUPS_FIELD ".sid", BCON_OID(&sid)));
     const unique_ptr_bson_t update_query(
         BCON_NEW("$set", "{", USER_CATCHUPS_FIELD ".$." RECENT_FIELD, BCON_DATE_TIME(recent.GetTimestamp()), "}"));
-    bson_error_t error;
     if (!mongoc_collection_update(subscribers_, MONGOC_UPDATE_NONE, query.get(), update_query.get(), NULL, &error)) {
       DEBUG_LOG() << "Failed to set recent error: " << error.message;
     }
@@ -1268,10 +1267,14 @@ common::Error SubscribersManager::SetRecent(const base::ServerDBAuthInfo& auth,
     const unique_ptr_bson_t query(BCON_NEW("_id", BCON_OID(&oid), USER_STREAMS_FIELD ".sid", BCON_OID(&sid)));
     const unique_ptr_bson_t update_query(
         BCON_NEW("$set", "{", USER_STREAMS_FIELD ".$." RECENT_FIELD, BCON_DATE_TIME(recent.GetTimestamp()), "}"));
-    bson_error_t error;
     if (!mongoc_collection_update(subscribers_, MONGOC_UPDATE_NONE, query.get(), update_query.get(), NULL, &error)) {
       DEBUG_LOG() << "Failed to set recent error: " << error.message;
     }
+  }
+
+  const unique_ptr_bson_t inc_query(BCON_NEW("$inc", "{", STREAM_VIEW_COUNT_FIELD, 1, "}"));
+  if (!mongoc_collection_update(streams_, MONGOC_UPDATE_NONE, stream_query.get(), inc_query.get(), NULL, &error)) {
+    DEBUG_LOG() << "Can't increment view count: " << error.message;
   }
 
   return common::Error();
@@ -1705,7 +1708,7 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   fastotv::commands_info::CatchupInfo copy(based_on.GetStreamID(), based_on.GetGroup(), based_on.GetIARC(),
                                            based_on.GetFavorite(), based_on.GetRecent(), based_on.GetInterruptionTime(),
                                            epg, based_on.IsEnableAudio(), based_on.IsEnableVideo(), based_on.GetParts(),
-                                           start, stop);
+                                           0, start, stop);
 
   const auto parts = based_on.GetParts();
   if (!parts.empty()) {
@@ -1824,6 +1827,7 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   BSON_APPEND_BOOL(doc.get(), STREAM_VISIBLE_FIELD, visible);
   int iarc = copy.GetIARC();
   BSON_APPEND_INT32(doc.get(), STREAM_IARC_FIELD, iarc);
+  BSON_APPEND_INT32(doc.get(), STREAM_VIEW_COUNT_FIELD, 0);
   const unique_ptr_bson_t bparts(bson_new());
   BSON_APPEND_ARRAY(doc.get(), STREAM_PARTS_FIELD, bparts.get());
   std::vector<common::uri::Url> true_catchups_urls = details::MakeUrlsFromOutput(

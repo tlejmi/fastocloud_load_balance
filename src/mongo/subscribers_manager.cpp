@@ -1272,9 +1272,8 @@ common::Error SubscribersManager::SetRecent(const base::ServerDBAuthInfo& auth,
     }
   }
 
-  const unique_ptr_bson_t stream_query_inc(BCON_NEW("_id", BCON_OID(&sid)));
-  const unique_ptr_bson_t inc_query(BCON_NEW("$inc", "{", STREAM_VIEW_COUNT_FIELD, 1, "}"));
-  if (!mongoc_collection_update(streams_, MONGOC_UPDATE_NONE, stream_query_inc.get(), inc_query.get(), NULL, &error)) {
+  const unique_ptr_bson_t inc_query(BCON_NEW("$inc", "{", STREAM_VIEW_COUNT_FIELD, BCON_INT32(1), "}"));
+  if (!mongoc_collection_update(streams_, MONGOC_UPDATE_NONE, stream_query.get(), inc_query.get(), NULL, &error)) {
     DEBUG_LOG() << "Can't increment view count: " << error.message;
   }
 

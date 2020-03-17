@@ -45,7 +45,8 @@ namespace service {
 
 OnlineUsers::OnlineUsers() : OnlineUsers(0, 0, 0) {}
 
-OnlineUsers::OnlineUsers(size_t daemon, size_t http, size_t subscribers) : daemon_(daemon), http_(http) {}
+OnlineUsers::OnlineUsers(size_t daemon, size_t http, size_t subscribers)
+    : daemon_(daemon), http_(http), subscribers_(subscribers) {}
 
 common::Error OnlineUsers::DoDeSerialize(json_object* serialized) {
   OnlineUsers inf;

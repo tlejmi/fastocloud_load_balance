@@ -20,9 +20,8 @@
 #include <common/daemon/commands/activate_info.h>
 #include <common/daemon/commands/stop_info.h>
 #include <common/license/expire_license.h>
+#include <common/net/http_client.h>
 #include <common/net/net.h>
-
-#include "base/utils.h"
 
 #include "daemon/client.h"
 #include "daemon/commands.h"
@@ -85,7 +84,7 @@ common::ErrnoError ProcessSlaveWrapper::SendStopDaemonRequest(const Config& conf
   }
 
   common::net::HostAndPort host = config.host;
-  if (host.GetHost() == PROJECT_NAME_LOWERCASE) { // docker image
+  if (host.GetHost() == PROJECT_NAME_LOWERCASE) {  // docker image
     host = common::net::HostAndPort::CreateLocalHost(host.GetPort());
   }
 
@@ -393,7 +392,7 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientGetLogService(Protoco
 
     const auto remote_log_path = get_log_info.GetLogPath();
     if (remote_log_path.GetScheme() == common::uri::Url::http) {
-      fastocloud::base::PostHttpFile(common::file_system::ascii_file_string_path(config_.log_path), remote_log_path);
+      common::net::PostHttpFile(common::file_system::ascii_file_string_path(config_.log_path), remote_log_path);
     } else if (remote_log_path.GetScheme() == common::uri::Url::https) {
     }
 

@@ -93,6 +93,7 @@ struct UserStreamInfo {
   fastotv::timestamp_t recent = 0;
   fastotv::timestamp_t interruption_time = 0;
   bool priv = false;
+  bool locked = false;
 };
 
 bool MakeVodInfo(const bson_t* sdoc,

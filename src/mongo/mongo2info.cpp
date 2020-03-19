@@ -183,7 +183,7 @@ bool MakeVodInfo(const bson_t* sdoc,
   }
 
   *cinf = fastotv::commands_info::VodInfo(sid_str, group, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
-                                          mov, have_video, have_audio, parts, view_count);
+                                          mov, have_video, have_audio, parts, uinfo.locked, view_count);
   return true;
 }  // namespace mongo
 
@@ -315,7 +315,7 @@ bool MakeCatchupInfo(const bson_t* sdoc,
 
   *cinf =
       fastotv::commands_info::CatchupInfo(sid_str, group, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
-                                          epg, have_video, have_audio, parts, view_count, start, stop);
+                                          epg, have_video, have_audio, parts, view_count, uinfo.locked, start, stop);
   return true;
 }
 
@@ -433,8 +433,9 @@ bool MakeChannelInfo(const bson_t* sdoc,
     }
   }
 
-  *cinf = fastotv::commands_info::ChannelInfo(sid_str, group, iarc, uinfo.favorite, uinfo.recent,
-                                              uinfo.interruption_time, epg, have_video, have_audio, parts, view_count);
+  *cinf =
+      fastotv::commands_info::ChannelInfo(sid_str, group, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
+                                          epg, have_video, have_audio, parts, uinfo.locked, view_count);
   return true;
 }
 

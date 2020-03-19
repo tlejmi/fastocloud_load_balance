@@ -50,6 +50,7 @@
 #define FAVORITE_FIELD "favorite"
 #define RECENT_FIELD "recent"
 #define PRIVATE_FIELD "private"
+#define LOCKED_FIELD "locked"
 #define INTERRUPTION_TIME_FIELD "interruption_time"
 #define USER_STREAM_ID_FIELD "sid"
 #define USER_STREAMS_FIELD "streams"
@@ -230,6 +231,9 @@ UserStreamInfo makeUserStreamInfo(bson_iter_t* iter) {
   }
   if (bson_iter_find(iter, PRIVATE_FIELD)) {
     uinf.priv = bson_iter_bool(iter);
+  }
+  if (bson_iter_find(iter, LOCKED_FIELD)) {
+    uinf.locked = bson_iter_bool(iter);
   }
   if (bson_iter_find(iter, RECENT_FIELD)) {
     uinf.recent = bson_iter_date_time(iter);
@@ -1708,7 +1712,7 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   fastotv::commands_info::CatchupInfo copy(based_on.GetStreamID(), based_on.GetGroup(), based_on.GetIARC(),
                                            based_on.GetFavorite(), based_on.GetRecent(), based_on.GetInterruptionTime(),
                                            epg, based_on.IsEnableAudio(), based_on.IsEnableVideo(), based_on.GetParts(),
-                                           0, start, stop);
+                                           0, false, start, stop);
 
   const auto parts = based_on.GetParts();
   if (!parts.empty()) {

@@ -29,6 +29,7 @@
 #include "daemon/commands_info/get_log_info.h"
 #include "daemon/commands_info/prepare_info.h"
 #include "daemon/commands_info/server_info.h"
+#include "daemon/commands_info/sync_info.h"
 #include "daemon/server.h"
 
 #include "http/handler.h"
@@ -430,6 +431,34 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientPrepareService(Protoc
   return common::make_errno_error_inval();
 }
 
+common::ErrnoError ProcessSlaveWrapper::HandleRequestClientSyncService(ProtocoledDaemonClient* dclient,
+                                                                       const fastotv::protocol::request_t* req) {
+  CHECK(loop_->IsLoopThread());
+  if (!dclient->IsVerified()) {
+    return common::make_errno_error_inval();
+  }
+
+  if (req->params) {
+    const char* params_ptr = req->params->c_str();
+    json_object* jservice_state = json_tokener_parse(params_ptr);
+    if (!jservice_state) {
+      return common::make_errno_error_inval();
+    }
+
+    service::SyncInfo sync_info;
+    common::Error err_des = sync_info.DeSerialize(jservice_state);
+    json_object_put(jservice_state);
+    if (err_des) {
+      const std::string err_str = err_des->GetDescription();
+      return common::make_errno_error(err_str, EAGAIN);
+    }
+
+    return dclient->SyncServiceSuccess(req->id);
+  }
+
+  return common::make_errno_error_inval();
+}
+
 common::ErrnoError ProcessSlaveWrapper::HandleRequestClientActivate(ProtocoledDaemonClient* dclient,
                                                                     const fastotv::protocol::request_t* req) {
   CHECK(loop_->IsLoopThread());
@@ -547,6 +576,8 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestServiceCommand(ProtocoledDa
     return HandleRequestClientActivate(dclient, req);
   } else if (req->method == DAEMON_PREPARE_SERVICE) {
     return HandleRequestClientPrepareService(dclient, req);
+  } else if (req->method == DAEMON_SYNC_SERVICE) {
+    return HandleRequestClientSyncService(dclient, req);
   } else if (req->method == DAEMON_GET_LOG_SERVICE) {
     return HandleRequestClientGetLogService(dclient, req);
   }

@@ -118,6 +118,16 @@ common::ErrnoError ProtocoledDaemonClient::PrepareServiceSuccess(fastotv::protoc
   return WriteResponse(resp);
 }
 
+common::ErrnoError ProtocoledDaemonClient::SyncServiceSuccess(fastotv::protocol::sequance_id_t id) {
+  fastotv::protocol::response_t resp;
+  common::Error err_ser = SyncServiceResponceSuccess(id, &resp);
+  if (err_ser) {
+    return common::make_errno_error(err_ser->GetDescription(), EAGAIN);
+  }
+
+  return WriteResponse(resp);
+}
+
 common::ErrnoError ProtocoledDaemonClient::GetLogServiceSuccess(fastotv::protocol::sequance_id_t id) {
   fastotv::protocol::response_t resp;
   common::Error err_ser = GetLogServiceResponseSuccess(id, &resp);

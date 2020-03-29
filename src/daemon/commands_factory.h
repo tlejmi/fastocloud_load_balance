@@ -54,6 +54,7 @@ common::Error ActivateResponseFail(fastotv::protocol::sequance_id_t id,
                                    fastotv::protocol::response_t* resp);
 
 common::Error PrepareServiceResponceSuccess(fastotv::protocol::sequance_id_t id, fastotv::protocol::response_t* resp);
+common::Error SyncServiceResponceSuccess(fastotv::protocol::sequance_id_t id, fastotv::protocol::response_t* resp);
 common::Error GetLogServiceResponseSuccess(fastotv::protocol::sequance_id_t id, fastotv::protocol::response_t* resp);
 }  // namespace server
 }  // namespace fastocloud

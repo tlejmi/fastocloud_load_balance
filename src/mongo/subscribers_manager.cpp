@@ -350,16 +350,18 @@ common::Error RemoveStreamFromUserCatchupsArray(mongoc_collection_t* subscribers
 
 }  // namespace
 
-SubscribersManager::SubscribersManager(const common::net::HostAndPort& catchup_host,
-                                       const common::file_system::ascii_directory_string_path& catchups_http_root)
+SubscribersManager::SubscribersManager()
     : connections_mutex_(),
       connections_(),
       client_(nullptr),
       subscribers_(nullptr),
       servers_(nullptr),
       streams_(nullptr),
-      catchup_host_(catchup_host),
-      catchups_http_root_(catchups_http_root) {}
+      catchup_endpoint_() {}
+
+void SubscribersManager::SetupCatchupsEndpoint(const base::CatchupEndpointInfo& info) {
+  catchup_endpoint_ = info;
+}
 
 common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mongodb_url) {
   mongoc_client_t* client = MongoEngine::GetInstance().Connect(mongodb_url);
@@ -1762,6 +1764,10 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
     }
   }
 
+  if (!catchup_endpoint_.IsValid()) {
+    return common::make_error("Service not prepared for catchups, skiping request");
+  }
+
   const std::string sid = based_on.GetStreamID();
   bson_oid_t bsid;
   if (!common::ConvertFromString(sid, &bsid)) {
@@ -1834,8 +1840,8 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   BSON_APPEND_INT32(doc.get(), STREAM_VIEW_COUNT_FIELD, 0);
   const unique_ptr_bson_t bparts(bson_new());
   BSON_APPEND_ARRAY(doc.get(), STREAM_PARTS_FIELD, bparts.get());
-  std::vector<common::uri::Url> true_catchups_urls = details::MakeUrlsFromOutput(
-      CreateCatchupOutputUrl(doc.get(), output_urls, st, cid_str, catchup_host_, catchups_http_root_));
+  std::vector<common::uri::Url> true_catchups_urls = details::MakeUrlsFromOutput(CreateCatchupOutputUrl(
+      doc.get(), output_urls, st, cid_str, catchup_endpoint_.catchups_host, catchup_endpoint_.catchups_http_root));
   int log_level = common::logging::LOG_LEVEL_INFO;
   BSON_APPEND_INT32(doc.get(), STREAM_LOG_LEVEL_FIELD, log_level);
   std::vector<fastotv::InputUri> catchup_inputs;

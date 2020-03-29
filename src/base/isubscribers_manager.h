@@ -17,6 +17,7 @@
 #include <string>
 
 #include <common/file_system/path.h>
+#include <common/net/types.h>
 
 #include <fastotv/commands_info/catchups_info.h>
 #include <fastotv/commands_info/channels_info.h>
@@ -32,9 +33,18 @@ namespace fastocloud {
 namespace server {
 namespace base {
 
+struct CatchupEndpointInfo {
+  bool IsValid() const;
+
+  common::net::HostAndPort catchups_host;
+  common::file_system::ascii_directory_string_path catchups_http_root;
+};
+
 class ISubscribersManager {
  public:
   typedef common::file_system::ascii_directory_string_path http_directory_t;
+
+  virtual void SetupCatchupsEndpoint(const CatchupEndpointInfo& info) = 0;
 
   virtual common::Error RegisterInnerConnectionByHost(SubscriberInfo* client,
                                                       const ServerDBAuthInfo& info) WARN_UNUSED_RESULT = 0;

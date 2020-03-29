@@ -64,8 +64,7 @@ ProcessSlaveWrapper::ProcessSlaveWrapper(const Config& config)
   loop_ = new DaemonServer(config.host, this);
   loop_->SetName("client_server");
 
-  mongo::SubscribersManager* sub_manager =
-      new mongo::SubscribersManager(config.catchup_host, config.catchups_http_root);
+  mongo::SubscribersManager* sub_manager = new mongo::SubscribersManager;
   sub_manager->ConnectToDatabase(config.mongodb_url);
   sub_manager_ = sub_manager;
 
@@ -424,6 +423,7 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientPrepareService(Protoc
       return common::make_errno_error(err_str, EAGAIN);
     }
 
+    sub_manager_->SetupCatchupsEndpoint({state_info.GetCatchupsHost(), state_info.GetCatchupsHttpRoot()});
     return dclient->PrepareServiceSuccess(req->id);
   }
 

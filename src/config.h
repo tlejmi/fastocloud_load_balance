@@ -17,7 +17,6 @@
 #include <string>
 
 #include <common/error.h>
-#include <common/file_system/path.h>
 #include <common/license/types.h>
 #include <common/net/types.h>
 #include <common/uri/url.h>
@@ -31,7 +30,6 @@ struct Config {
   Config();
 
   static common::net::HostAndPort GetDefaultHost();
-  static common::net::HostAndPort GetCatchupDefaultHost();
 
   bool IsValid() const;
 
@@ -42,8 +40,6 @@ struct Config {
   common::net::HostAndPort http_host;
   std::string mongodb_url;
   common::uri::Url epg_url;
-  common::net::HostAndPort catchup_host;
-  common::file_system::ascii_directory_string_path catchups_http_root;
   license_t license_key;
 };
 

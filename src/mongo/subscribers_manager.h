@@ -34,8 +34,9 @@ namespace mongo {
 class SubscribersManager : public base::ISubscribersManager {
  public:
   typedef std::unordered_map<fastotv::user_id_t, std::vector<base::SubscriberInfo*>> inner_connections_t;
-  SubscribersManager(const common::net::HostAndPort& catchup_host,
-                     const common::file_system::ascii_directory_string_path& catchups_http_root);
+  SubscribersManager();
+
+  void SetupCatchupsEndpoint(const base::CatchupEndpointInfo& info) override;
 
   common::ErrnoError ConnectToDatabase(const std::string& mongodb_url) WARN_UNUSED_RESULT;
   common::ErrnoError Disconnect() WARN_UNUSED_RESULT;
@@ -126,8 +127,8 @@ class SubscribersManager : public base::ISubscribersManager {
   mongoc_collection_t* subscribers_;
   mongoc_collection_t* servers_;
   mongoc_collection_t* streams_;
-  const common::net::HostAndPort catchup_host_;
-  const common::file_system::ascii_directory_string_path catchups_http_root_;
+
+  base::CatchupEndpointInfo catchup_endpoint_;
 };
 
 }  // namespace mongo

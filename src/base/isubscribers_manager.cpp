@@ -18,6 +18,10 @@ namespace fastocloud {
 namespace server {
 namespace base {
 
+bool CatchupEndpointInfo::IsValid() const {
+  return catchups_host.IsValid() && catchups_http_root.IsValid();
+}
+
 ISubscribersManager::~ISubscribersManager() {}
 
 }  // namespace base

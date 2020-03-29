@@ -27,8 +27,6 @@
 #define SERVICE_SUBSCRIBERS_HOST_FIELD "subscribers_host"
 #define SERVICE_MONGODB_URL_FIELD "mongodb_url"
 #define SERVICE_EPG_URL_FIELD "epg_url"
-#define SERVICE_CATCHUP_HOST_FIELD "catchups_host"
-#define SERVICE_CATCHUP_HTTP_ROOT_FIELD "catchups_http_root"
 #define SERVICE_LICENSE_KEY_FIELD "license_key"
 
 #define DUMMY_LOG_FILE_PATH "/dev/null"
@@ -77,10 +75,6 @@ common::ErrnoError ReadConfigFile(const std::string& path, common::HashValue** a
       options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
     } else if (pair.first == SERVICE_EPG_URL_FIELD) {
       options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
-    } else if (pair.first == SERVICE_CATCHUP_HOST_FIELD) {
-      options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
-    } else if (pair.first == SERVICE_CATCHUP_HTTP_ROOT_FIELD) {
-      options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
     } else if (pair.first == SERVICE_LICENSE_KEY_FIELD) {
       options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
     }
@@ -101,21 +95,11 @@ Config::Config()
       log_level(common::logging::LOG_LEVEL_INFO),
       mongodb_url(MONGODB_URL),
       epg_url(EPG_URL),
-      catchup_host(GetCatchupDefaultHost()),
-      catchups_http_root(CATCHUPS_HTTP_ROOT),
       license_key() {}
 
 common::net::HostAndPort Config::GetDefaultHost() {
   common::net::HostAndPort result;
   if (common::ConvertFromString(SERVICE_HOST, &result)) {
-    return result;
-  }
-  return result;
-}
-
-common::net::HostAndPort Config::GetCatchupDefaultHost() {
-  common::net::HostAndPort result;
-  if (common::ConvertFromString(CATCHUPS_HOST, &result)) {
     return result;
   }
   return result;
@@ -194,21 +178,6 @@ common::ErrnoError load_config_from_file(const std::string& config_absolute_path
       !common::ConvertFromString(epg_url_str, &lconfig.epg_url)) {
     lconfig.epg_url = common::uri::Url(EPG_URL);
   }
-
-  common::Value* catchup_host_field = slave_config_args->Find(SERVICE_CATCHUP_HOST_FIELD);
-  std::string catchup_host_str;
-  if (!catchup_host_field || !catchup_host_field->GetAsBasicString(&catchup_host_str) ||
-      !common::ConvertFromString(catchup_host_str, &lconfig.catchup_host)) {
-    lconfig.catchup_host = Config::GetCatchupDefaultHost();
-  }
-
-  common::file_system::ascii_directory_string_path catchups_http_root(CATCHUPS_HTTP_ROOT);
-  common::Value* catchup_http_root_field = slave_config_args->Find(SERVICE_CATCHUP_HTTP_ROOT_FIELD);
-  std::string catchup_http_root_str;
-  if (catchup_http_root_field && catchup_http_root_field->GetAsBasicString(&catchup_http_root_str)) {
-    catchups_http_root = common::file_system::ascii_directory_string_path(catchup_http_root_str);
-  }
-  lconfig.catchups_http_root = catchups_http_root;
 
   *config = lconfig;
   delete slave_config_args;

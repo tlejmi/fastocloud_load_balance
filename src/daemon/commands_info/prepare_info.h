@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#include <common/file_system/path.h>
+#include <common/net/net.h>
 #include <common/serializer/json_serializer.h>
 
 namespace fastocloud {
@@ -29,9 +31,16 @@ class PrepareInfo : public common::serializer::JsonSerializer<PrepareInfo> {
 
   PrepareInfo();
 
+  common::net::HostAndPort GetCatchupsHost() const;
+  common::file_system::ascii_directory_string_path GetCatchupsHttpRoot() const;
+
  protected:
   common::Error DoDeSerialize(json_object* serialized) override;
   common::Error SerializeFields(json_object* out) const override;
+
+ private:
+  common::net::HostAndPort catchups_host;
+  common::file_system::ascii_directory_string_path catchups_http_root;
 };
 
 }  // namespace service

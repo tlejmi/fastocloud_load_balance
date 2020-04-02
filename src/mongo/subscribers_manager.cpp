@@ -1857,8 +1857,6 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   BSON_APPEND_INT32(doc.get(), STREAM_AUDIO_SELECT_FIELD, audio_select);
   bool loop = false;
   BSON_APPEND_BOOL(doc.get(), STREAM_LOOP_FIELD, loop);
-  bool avformat = false;
-  BSON_APPEND_BOOL(doc.get(), STREAM_AVFORMAT_FIELD, avformat);
   int restart_attempts = 10;
   BSON_APPEND_INT32(doc.get(), STREAM_RESTART_ATTEMPTS_FIELD, restart_attempts);
   int auto_exit = (stop - start) / 1000;

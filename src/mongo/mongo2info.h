@@ -41,7 +41,6 @@
 #define STREAM_VISIBLE_FIELD "visible"
 #define STREAM_LOG_LEVEL_FIELD "log_level"
 #define STREAM_LOOP_FIELD "loop"
-#define STREAM_AVFORMAT_FIELD "avformat"
 #define STREAM_RESTART_ATTEMPTS_FIELD "restart_attempts"
 #define STREAM_AUTO_EXIT_FIELD "auto_exit_time"
 #define STREAM_EXTRA_CONFIG_ARGS_FIELD "extra_config_fields"

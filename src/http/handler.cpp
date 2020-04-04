@@ -48,18 +48,13 @@ void HttpHandler::Moved(common::libev::IoLoop* server, common::libev::IoClient* 
 
 void HttpHandler::Closed(common::libev::IoClient* client) {
   HttpClient* iclient = static_cast<HttpClient*>(client);
-  const auto server_user_auth = iclient->GetLogin();
   common::Error unreg_err = manager_->UnRegisterInnerConnectionByHost(iclient);
   if (unreg_err) {
     base_class::Closed(client);
     return;
   }
 
-  if (!server_user_auth) {
-    base_class::Closed(client);
-    return;
-  }
-
+  const auto server_user_auth = iclient->GetLogin();
   INFO_LOG() << "Bye http registered user: " << server_user_auth->GetLogin();
   base_class::Closed(client);
 }

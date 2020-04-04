@@ -350,8 +350,9 @@ common::Error RemoveStreamFromUserCatchupsArray(mongoc_collection_t* subscribers
 
 }  // namespace
 
-SubscribersManager::SubscribersManager()
-    : connections_mutex_(),
+SubscribersManager::SubscribersManager(base::ISubscribersObserver* observer)
+    : base_class(observer),
+      connections_mutex_(),
       connections_(),
       client_(nullptr),
       subscribers_(nullptr),
@@ -361,6 +362,19 @@ SubscribersManager::SubscribersManager()
 
 void SubscribersManager::SetupCatchupsEndpoint(const base::CatchupEndpointInfo& info) {
   catchup_endpoint_ = info;
+}
+
+std::vector<base::SubscriberInfo> SubscribersManager::GetOnlineSubscribers() {
+  std::unique_lock<std::mutex> lock(connections_mutex_);
+  std::vector<base::SubscriberInfo> result;
+  for (auto clients : connections_) {
+    for (const auto* client : clients.second) {
+      if (client) {
+        result.push_back(*client);
+      }
+    }
+  }
+  return result;
 }
 
 common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mongodb_url) {
@@ -432,7 +446,7 @@ common::Error SubscribersManager::RegisterInnerConnectionByHost(base::Subscriber
   client->SetLoginInfo(info);
   std::unique_lock<std::mutex> lock(connections_mutex_);
   connections_[info.GetUserID()].push_back(client);
-  return common::Error();
+  return base_class::RegisterInnerConnectionByHost(client, info);
 }
 
 common::Error SubscribersManager::UnRegisterInnerConnectionByHost(base::SubscriberInfo* client) {
@@ -449,7 +463,7 @@ common::Error SubscribersManager::UnRegisterInnerConnectionByHost(base::Subscrib
   std::unique_lock<std::mutex> lock(connections_mutex_);
   auto hs = connections_.find(sinf->GetUserID());
   if (hs == connections_.end()) {
-    return common::Error();
+    return base_class::UnRegisterInnerConnectionByHost(client);
   }
 
   for (auto it = hs->second.begin(); it != hs->second.end(); ++it) {
@@ -462,7 +476,7 @@ common::Error SubscribersManager::UnRegisterInnerConnectionByHost(base::Subscrib
   if (hs->second.empty()) {
     connections_.erase(hs);
   }
-  return common::Error();
+  return base_class::UnRegisterInnerConnectionByHost(client);
 }
 
 common::Error SubscribersManager::CheckIsLoginClient(base::SubscriberInfo* client, base::ServerDBAuthInfo* ser) const {

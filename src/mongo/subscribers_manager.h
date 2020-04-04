@@ -33,10 +33,13 @@ namespace mongo {
 
 class SubscribersManager : public base::ISubscribersManager {
  public:
+  typedef base::ISubscribersManager base_class;
   typedef std::unordered_map<fastotv::user_id_t, std::vector<base::SubscriberInfo*>> inner_connections_t;
-  SubscribersManager();
+  SubscribersManager(base::ISubscribersObserver* observer);
 
   void SetupCatchupsEndpoint(const base::CatchupEndpointInfo& info) override;
+
+  std::vector<base::SubscriberInfo> GetOnlineSubscribers() override;
 
   common::ErrnoError ConnectToDatabase(const std::string& mongodb_url) WARN_UNUSED_RESULT;
   common::ErrnoError Disconnect() WARN_UNUSED_RESULT;

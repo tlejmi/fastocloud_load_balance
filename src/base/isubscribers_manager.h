@@ -15,6 +15,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <common/file_system/path.h>
 #include <common/net/types.h>
@@ -40,15 +41,21 @@ struct CatchupEndpointInfo {
   common::file_system::ascii_directory_string_path catchups_http_root;
 };
 
+class ISubscribersObserver;
+
 class ISubscribersManager {
  public:
   typedef common::file_system::ascii_directory_string_path http_directory_t;
 
+  explicit ISubscribersManager(ISubscribersObserver* observer);
+
   virtual void SetupCatchupsEndpoint(const CatchupEndpointInfo& info) = 0;
 
+  virtual std::vector<SubscriberInfo> GetOnlineSubscribers() WARN_UNUSED_RESULT = 0;
+
   virtual common::Error RegisterInnerConnectionByHost(SubscriberInfo* client,
-                                                      const ServerDBAuthInfo& info) WARN_UNUSED_RESULT = 0;
-  virtual common::Error UnRegisterInnerConnectionByHost(SubscriberInfo* client) WARN_UNUSED_RESULT = 0;
+                                                      const ServerDBAuthInfo& info) WARN_UNUSED_RESULT;
+  virtual common::Error UnRegisterInnerConnectionByHost(SubscriberInfo* client) WARN_UNUSED_RESULT;
   virtual common::Error CheckIsLoginClient(SubscriberInfo* client, ServerDBAuthInfo* ser) const WARN_UNUSED_RESULT = 0;
 
   virtual size_t GetAndUpdateOnlineUserByStreamID(fastotv::stream_id_t sid) = 0;
@@ -117,6 +124,9 @@ class ISubscribersManager {
                                        fastotv::stream_id_t sid) WARN_UNUSED_RESULT = 0;
 
   virtual ~ISubscribersManager();
+
+ private:
+  ISubscribersObserver* const observer_;
 };
 
 }  // namespace base

@@ -12,41 +12,10 @@
     along with fastocloud.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/isubscribers_manager.h"
-
 #include "base/isubscribers_observer.h"
 
 namespace fastocloud {
 namespace server {
-namespace base {
-
-bool CatchupEndpointInfo::IsValid() const {
-  return catchups_host.IsValid() && catchups_http_root.IsValid();
-}
-
-ISubscribersManager::ISubscribersManager(ISubscribersObserver* observer) : observer_(observer) {}
-
-common::Error ISubscribersManager::RegisterInnerConnectionByHost(SubscriberInfo* client, const ServerDBAuthInfo& info) {
-  UNUSED(info);
-  if (observer_) {
-    if (client) {
-      observer_->OnSubscriberConnected(*client);
-    }
-  }
-  return common::Error();
-}
-
-common::Error ISubscribersManager::UnRegisterInnerConnectionByHost(SubscriberInfo* client) {
-  if (observer_) {
-    if (client) {
-      observer_->OnSubscriberDisConnected(*client);
-    }
-  }
-  return common::Error();
-}
-
-ISubscribersManager::~ISubscribersManager() {}
-
-}  // namespace base
+namespace base {}  // namespace base
 }  // namespace server
 }  // namespace fastocloud

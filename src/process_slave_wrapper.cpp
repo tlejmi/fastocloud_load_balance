@@ -65,7 +65,7 @@ ProcessSlaveWrapper::ProcessSlaveWrapper(const Config& config)
   loop_ = new DaemonServer(config.host, this);
   loop_->SetName("client_server");
 
-  mongo::SubscribersManager* sub_manager = new mongo::SubscribersManager;
+  mongo::SubscribersManager* sub_manager = new mongo::SubscribersManager(this);
   sub_manager->ConnectToDatabase(config.mongodb_url);
   sub_manager_ = sub_manager;
 
@@ -177,6 +177,10 @@ finished:
   http_thread.join();
   return res;
 }
+
+void ProcessSlaveWrapper::OnSubscriberConnected(const base::SubscriberInfo& info) {}
+
+void ProcessSlaveWrapper::OnSubscriberDisConnected(const base::SubscriberInfo& info) {}
 
 void ProcessSlaveWrapper::PreLooped(common::libev::IoLoop* server) {
   ping_client_timer_ = server->CreateTimer(ping_timeout_clients_seconds, true);

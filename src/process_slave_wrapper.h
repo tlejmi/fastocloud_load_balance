@@ -23,6 +23,8 @@
 
 #include "subscribers/handler_observer.h"
 
+#include "base/isubscribers_observer.h"
+
 #include "config.h"
 
 namespace fastocloud {
@@ -34,7 +36,9 @@ namespace base {
 class ISubscribersManager;
 }
 
-class ProcessSlaveWrapper : public common::libev::IoLoopObserver, public subscribers::ISubscribersHandlerObserver {
+class ProcessSlaveWrapper : public common::libev::IoLoopObserver,
+                            public subscribers::ISubscribersHandlerObserver,
+                            public base::ISubscribersObserver {
  public:
   enum { ping_timeout_clients_seconds = 60, node_stats_send_seconds = 10, check_license_timeout_seconds = 300 };
   typedef fastotv::protocol::protocol_client_t stream_client_t;
@@ -48,6 +52,9 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver, public subscri
   int Exec() WARN_UNUSED_RESULT;
 
  protected:
+  void OnSubscriberConnected(const base::SubscriberInfo& info) override;
+  void OnSubscriberDisConnected(const base::SubscriberInfo& info) override;
+
   void PreLooped(common::libev::IoLoop* server) override;
   void Accepted(common::libev::IoClient* client) override;
   void Moved(common::libev::IoLoop* server,

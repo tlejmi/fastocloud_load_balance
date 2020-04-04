@@ -178,7 +178,7 @@ finished:
   return res;
 }
 
-void ProcessSlaveWrapper::OnSubscriberConnected(const base::ServerDBAuthInfo& info) {
+void ProcessSlaveWrapper::OnSubscriberConnected(const base::FrontSubscriberInfo& info) {
   fastotv::protocol::request_t req;
   common::Error err_ser = SubscriberConnectedBroadcast(info, &req);
   if (err_ser) {
@@ -189,7 +189,7 @@ void ProcessSlaveWrapper::OnSubscriberConnected(const base::ServerDBAuthInfo& in
   INFO_LOG() << "Welcome: " << info.GetLogin();
 }
 
-void ProcessSlaveWrapper::OnSubscriberDisConnected(const base::ServerDBAuthInfo& info) {
+void ProcessSlaveWrapper::OnSubscriberDisConnected(const base::FrontSubscriberInfo& info) {
   fastotv::protocol::request_t req;
   common::Error err_ser = SubscriberDisConnectedBroadcast(info, &req);
   if (err_ser) {

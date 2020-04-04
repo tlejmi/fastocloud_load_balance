@@ -29,6 +29,16 @@ void HttpClient::SetVerified(bool verified) {
   is_verified_ = verified;
 }
 
+common::Optional<base::FrontSubscriberInfo> HttpClient::MakeFrontSubscriberInfo() const {
+  const auto login = GetLogin();
+  if (!login) {
+    return common::Optional<base::FrontSubscriberInfo>();
+  }
+
+  return base::FrontSubscriberInfo(login->GetUserID(), login->GetLogin(), login->GetDeviceID(),
+                                   login->GetExpiredDate());
+}
+
 const char* HttpClient::ClassName() const {
   return "HttpClient";
 }

@@ -19,7 +19,7 @@
 #include <fastotv/commands_info/catchups_info.h>
 #include <fastotv/protocol/types.h>
 
-#include "base/server_auth_info.h"
+#include "base/front_subscriber_info.h"
 
 // daemon
 // client commands
@@ -48,8 +48,8 @@ common::Error CatchupCreatedBroadcast(const fastotv::commands_info::CatchupInfo&
 common::Error StatisitcServiceBroadcast(fastotv::protocol::serializet_params_t params,
                                         fastotv::protocol::request_t* req);
 
-common::Error SubscriberConnectedBroadcast(const base::ServerDBAuthInfo& subs, fastotv::protocol::request_t* req);
-common::Error SubscriberDisConnectedBroadcast(const base::ServerDBAuthInfo& subs, fastotv::protocol::request_t* req);
+common::Error SubscriberConnectedBroadcast(const base::FrontSubscriberInfo& subs, fastotv::protocol::request_t* req);
+common::Error SubscriberDisConnectedBroadcast(const base::FrontSubscriberInfo& subs, fastotv::protocol::request_t* req);
 
 }  // namespace server
 }  // namespace fastocloud

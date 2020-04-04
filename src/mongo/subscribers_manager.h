@@ -35,11 +35,11 @@ class SubscribersManager : public base::ISubscribersManager {
  public:
   typedef base::ISubscribersManager base_class;
   typedef std::unordered_map<fastotv::user_id_t, std::vector<base::SubscriberInfo*>> inner_connections_t;
-  SubscribersManager(base::ISubscribersObserver* observer);
+  explicit SubscribersManager(base::ISubscribersObserver* observer);
 
   void SetupCatchupsEndpoint(const base::CatchupEndpointInfo& info) override;
 
-  std::vector<base::ServerDBAuthInfo> GetOnlineSubscribers() override;
+  std::vector<base::FrontSubscriberInfo> GetOnlineSubscribers() override;
 
   common::ErrnoError ConnectToDatabase(const std::string& mongodb_url) WARN_UNUSED_RESULT;
   common::ErrnoError Disconnect() WARN_UNUSED_RESULT;

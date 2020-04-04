@@ -43,7 +43,7 @@ common::Error StatisitcServiceBroadcast(fastotv::protocol::serializet_params_t p
   return common::Error();
 }
 
-common::Error SubscriberConnectedBroadcast(const base::ServerDBAuthInfo& subs, fastotv::protocol::request_t* req) {
+common::Error SubscriberConnectedBroadcast(const base::FrontSubscriberInfo& subs, fastotv::protocol::request_t* req) {
   if (!req) {
     return common::make_error_inval();
   }
@@ -58,7 +58,8 @@ common::Error SubscriberConnectedBroadcast(const base::ServerDBAuthInfo& subs, f
   return common::Error();
 }
 
-common::Error SubscriberDisConnectedBroadcast(const base::ServerDBAuthInfo& subs, fastotv::protocol::request_t* req) {
+common::Error SubscriberDisConnectedBroadcast(const base::FrontSubscriberInfo& subs,
+                                              fastotv::protocol::request_t* req) {
   if (!req) {
     return common::make_error_inval();
   }

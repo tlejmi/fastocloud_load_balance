@@ -31,6 +31,8 @@ class HttpClient : public common::libev::http::HttpClient, public base::Subscrib
   bool IsVerified() const;
   void SetVerified(bool verified);
 
+  common::Optional<base::FrontSubscriberInfo> MakeFrontSubscriberInfo() const override;
+
   const char* ClassName() const override;
 
  private:

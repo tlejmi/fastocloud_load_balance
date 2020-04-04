@@ -55,7 +55,7 @@ common::Error StateInfo::DoDeSerialize(json_object* serialized) {
     size_t len = json_object_array_length(jclients);
     for (size_t i = 0; i < len; ++i) {
       json_object* jclient = json_object_array_get_idx(jclients, i);
-      base::ServerDBAuthInfo client;
+      base::FrontSubscriberInfo client;
       common::Error err = client.DeSerialize(jclient);
       if (err) {
         continue;

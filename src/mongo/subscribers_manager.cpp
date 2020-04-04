@@ -364,13 +364,13 @@ void SubscribersManager::SetupCatchupsEndpoint(const base::CatchupEndpointInfo& 
   catchup_endpoint_ = info;
 }
 
-std::vector<base::ServerDBAuthInfo> SubscribersManager::GetOnlineSubscribers() {
+std::vector<base::FrontSubscriberInfo> SubscribersManager::GetOnlineSubscribers() {
   std::unique_lock<std::mutex> lock(connections_mutex_);
-  std::vector<base::ServerDBAuthInfo> result;
+  std::vector<base::FrontSubscriberInfo> result;
   for (auto clients : connections_) {
     for (const auto* client : clients.second) {
       if (client) {
-        const auto login = client->GetLogin();
+        const auto login = client->MakeFrontSubscriberInfo();
         if (login) {
           result.push_back(*login);
         }

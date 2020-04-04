@@ -140,6 +140,7 @@ SET(SERVER_HEADERS
   ${CMAKE_SOURCE_DIR}/src/base/iserver_handler.h
   ${CMAKE_SOURCE_DIR}/src/base/server_auth_info.h
   ${CMAKE_SOURCE_DIR}/src/base/subscriber_info.h
+  ${CMAKE_SOURCE_DIR}/src/base/front_subscriber_info.h
   ${CMAKE_SOURCE_DIR}/src/base/isubscribers_manager.h
   ${CMAKE_SOURCE_DIR}/src/base/isubscribers_observer.h
 
@@ -155,6 +156,7 @@ SET(SERVER_SOURCES
   ${CMAKE_SOURCE_DIR}/src/base/iserver_handler.cpp
   ${CMAKE_SOURCE_DIR}/src/base/server_auth_info.cpp
   ${CMAKE_SOURCE_DIR}/src/base/subscriber_info.cpp
+  ${CMAKE_SOURCE_DIR}/src/base/front_subscriber_info.cpp
   ${CMAKE_SOURCE_DIR}/src/base/isubscribers_manager.cpp
   ${CMAKE_SOURCE_DIR}/src/base/isubscribers_observer.cpp
 

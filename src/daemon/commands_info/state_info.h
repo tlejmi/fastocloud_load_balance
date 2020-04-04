@@ -19,7 +19,7 @@
 
 #include <common/serializer/json_serializer.h>
 
-#include "base/server_auth_info.h"
+#include "base/front_subscriber_info.h"
 
 namespace fastocloud {
 namespace server {
@@ -28,7 +28,7 @@ namespace service {
 class StateInfo : public common::serializer::JsonSerializer<StateInfo> {
  public:
   typedef JsonSerializer<StateInfo> base_class;
-  typedef std::vector<base::ServerDBAuthInfo> online_clients_t;
+  typedef std::vector<base::FrontSubscriberInfo> online_clients_t;
 
   StateInfo();
 

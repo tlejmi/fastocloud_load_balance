@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "base/front_subscriber_info.h"
 #include "base/server_auth_info.h"
 
 namespace fastocloud {
@@ -31,6 +32,8 @@ class SubscriberInfo {
 
   void SetLogin(login_t login);
   login_t GetLogin() const;
+
+  virtual common::Optional<FrontSubscriberInfo> MakeFrontSubscriberInfo() const = 0;
 
  private:
   login_t login_;

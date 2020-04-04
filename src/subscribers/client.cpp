@@ -33,6 +33,16 @@ SubscriberClient::client_info_t SubscriberClient::GetClInfo() const {
   return client_info_;
 }
 
+common::Optional<base::FrontSubscriberInfo> SubscriberClient::MakeFrontSubscriberInfo() const {
+  const auto login = GetLogin();
+  if (!login) {
+    return common::Optional<base::FrontSubscriberInfo>();
+  }
+
+  return base::FrontSubscriberInfo(login->GetUserID(), login->GetLogin(), login->GetDeviceID(), login->GetExpiredDate(),
+                                   client_info_);
+}
+
 }  // namespace subscribers
 }  // namespace server
 }  // namespace fastocloud

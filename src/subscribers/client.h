@@ -32,6 +32,8 @@ class SubscriberClient : public fastotv::server::Client, public base::Subscriber
 
   const char* ClassName() const override;
 
+  common::Optional<base::FrontSubscriberInfo> MakeFrontSubscriberInfo() const override;
+
   void SetClInfo(const client_info_t& info);
   client_info_t GetClInfo() const;
 

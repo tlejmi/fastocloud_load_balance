@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "base/server_auth_info.h"
+#include "base/front_subscriber_info.h"
 
 namespace fastocloud {
 namespace server {
@@ -22,8 +22,8 @@ namespace base {
 
 class ISubscribersObserver {
  public:
-  virtual void OnSubscriberConnected(const ServerDBAuthInfo& info) = 0;
-  virtual void OnSubscriberDisConnected(const ServerDBAuthInfo& info) = 0;
+  virtual void OnSubscriberConnected(const FrontSubscriberInfo& info) = 0;
+  virtual void OnSubscriberDisConnected(const FrontSubscriberInfo& info) = 0;
 };
 
 }  // namespace base

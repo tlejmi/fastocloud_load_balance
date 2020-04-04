@@ -28,7 +28,7 @@ fastotv::stream_id_t SubscriberInfo::GetCurrentStreamID() const {
   return current_stream_id_;
 }
 
-void SubscriberInfo::SetLoginInfo(login_t login) {
+void SubscriberInfo::SetLogin(login_t login) {
   login_ = login;
 }
 

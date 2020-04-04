@@ -64,8 +64,6 @@ void SubscribersHandler::Closed(common::libev::IoClient* client) {
     return;
   }
 
-  const auto server_user_auth = iclient->GetLogin();
-  INFO_LOG() << "Bye registered user: " << server_user_auth->GetLogin();
   base_class::Closed(client);
 }
 
@@ -284,7 +282,6 @@ common::ErrnoError SubscribersHandler::HandleRequestClientLogin(SubscriberClient
 
     err = manager_->RegisterInnerConnectionByHost(client, ser);
     DCHECK(!err) << "Register inner connection error: " << err->GetDescription();
-    INFO_LOG() << "Welcome registered user: " << ser.GetLogin();
     return common::ErrnoError();
   }
 

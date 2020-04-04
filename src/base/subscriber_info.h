@@ -29,7 +29,7 @@ class SubscriberInfo {
   void SetCurrentStreamID(fastotv::stream_id_t sid);
   fastotv::stream_id_t GetCurrentStreamID() const;
 
-  void SetLoginInfo(login_t login);
+  void SetLogin(login_t login);
   login_t GetLogin() const;
 
  private:

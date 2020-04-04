@@ -30,7 +30,10 @@ common::Error ISubscribersManager::RegisterInnerConnectionByHost(SubscriberInfo*
   UNUSED(info);
   if (observer_) {
     if (client) {
-      observer_->OnSubscriberConnected(*client);
+      const auto login = client->GetLogin();
+      if (login) {
+        observer_->OnSubscriberConnected(*login);
+      }
     }
   }
   return common::Error();
@@ -39,7 +42,10 @@ common::Error ISubscribersManager::RegisterInnerConnectionByHost(SubscriberInfo*
 common::Error ISubscribersManager::UnRegisterInnerConnectionByHost(SubscriberInfo* client) {
   if (observer_) {
     if (client) {
-      observer_->OnSubscriberDisConnected(*client);
+      const auto login = client->GetLogin();
+      if (login) {
+        observer_->OnSubscriberDisConnected(*login);
+      }
     }
   }
   return common::Error();

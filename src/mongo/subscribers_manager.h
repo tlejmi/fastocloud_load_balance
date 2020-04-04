@@ -39,7 +39,7 @@ class SubscribersManager : public base::ISubscribersManager {
 
   void SetupCatchupsEndpoint(const base::CatchupEndpointInfo& info) override;
 
-  std::vector<base::SubscriberInfo> GetOnlineSubscribers() override;
+  std::vector<base::ServerDBAuthInfo> GetOnlineSubscribers() override;
 
   common::ErrnoError ConnectToDatabase(const std::string& mongodb_url) WARN_UNUSED_RESULT;
   common::ErrnoError Disconnect() WARN_UNUSED_RESULT;

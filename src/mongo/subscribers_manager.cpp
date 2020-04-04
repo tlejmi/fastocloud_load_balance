@@ -364,13 +364,16 @@ void SubscribersManager::SetupCatchupsEndpoint(const base::CatchupEndpointInfo& 
   catchup_endpoint_ = info;
 }
 
-std::vector<base::SubscriberInfo> SubscribersManager::GetOnlineSubscribers() {
+std::vector<base::ServerDBAuthInfo> SubscribersManager::GetOnlineSubscribers() {
   std::unique_lock<std::mutex> lock(connections_mutex_);
-  std::vector<base::SubscriberInfo> result;
+  std::vector<base::ServerDBAuthInfo> result;
   for (auto clients : connections_) {
     for (const auto* client : clients.second) {
       if (client) {
-        result.push_back(*client);
+        const auto login = client->GetLogin();
+        if (login) {
+          result.push_back(*login);
+        }
       }
     }
   }
@@ -443,7 +446,7 @@ common::Error SubscribersManager::RegisterInnerConnectionByHost(base::Subscriber
     return common::make_error_inval();
   }
 
-  client->SetLoginInfo(info);
+  client->SetLogin(info);
   std::unique_lock<std::mutex> lock(connections_mutex_);
   connections_[info.GetUserID()].push_back(client);
   return base_class::RegisterInnerConnectionByHost(client, info);

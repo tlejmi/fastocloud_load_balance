@@ -54,8 +54,6 @@ void HttpHandler::Closed(common::libev::IoClient* client) {
     return;
   }
 
-  const auto server_user_auth = iclient->GetLogin();
-  INFO_LOG() << "Bye http registered user: " << server_user_auth->GetLogin();
   base_class::Closed(client);
 }
 
@@ -170,7 +168,6 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
       }
       cerr = manager_->RegisterInnerConnectionByHost(hclient, maybe_auth);
       DCHECK(!cerr) << "Register inner connection error: " << cerr->GetDescription();
-      INFO_LOG() << "Welcome registered user: " << maybe_auth.GetLogin();
     }
 
     const fastotv::stream_id_t sid = tokens[3];

@@ -178,9 +178,13 @@ finished:
   return res;
 }
 
-void ProcessSlaveWrapper::OnSubscriberConnected(const base::SubscriberInfo& info) {}
+void ProcessSlaveWrapper::OnSubscriberConnected(const base::ServerDBAuthInfo& info) {
+  INFO_LOG() << "Welcome: " << info.GetLogin();
+}
 
-void ProcessSlaveWrapper::OnSubscriberDisConnected(const base::SubscriberInfo& info) {}
+void ProcessSlaveWrapper::OnSubscriberDisConnected(const base::ServerDBAuthInfo& info) {
+  INFO_LOG() << "Bye: " << info.GetLogin();
+}
 
 void ProcessSlaveWrapper::PreLooped(common::libev::IoLoop* server) {
   ping_client_timer_ = server->CreateTimer(ping_timeout_clients_seconds, true);

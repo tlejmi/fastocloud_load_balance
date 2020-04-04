@@ -51,7 +51,7 @@ class ISubscribersManager {
 
   virtual void SetupCatchupsEndpoint(const CatchupEndpointInfo& info) = 0;
 
-  virtual std::vector<SubscriberInfo> GetOnlineSubscribers() WARN_UNUSED_RESULT = 0;
+  virtual std::vector<ServerDBAuthInfo> GetOnlineSubscribers() WARN_UNUSED_RESULT = 0;
 
   virtual common::Error RegisterInnerConnectionByHost(SubscriberInfo* client,
                                                       const ServerDBAuthInfo& info) WARN_UNUSED_RESULT;

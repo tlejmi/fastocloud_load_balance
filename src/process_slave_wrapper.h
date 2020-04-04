@@ -52,8 +52,8 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver,
   int Exec() WARN_UNUSED_RESULT;
 
  protected:
-  void OnSubscriberConnected(const base::SubscriberInfo& info) override;
-  void OnSubscriberDisConnected(const base::SubscriberInfo& info) override;
+  void OnSubscriberConnected(const base::ServerDBAuthInfo &info) override;
+  void OnSubscriberDisConnected(const base::ServerDBAuthInfo& info) override;
 
   void PreLooped(common::libev::IoLoop* server) override;
   void Accepted(common::libev::IoClient* client) override;

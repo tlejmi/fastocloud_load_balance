@@ -108,9 +108,10 @@ common::ErrnoError ProtocoledDaemonClient::ActivateSuccess(fastotv::protocol::se
   return WriteResponse(resp);
 }
 
-common::ErrnoError ProtocoledDaemonClient::PrepareServiceSuccess(fastotv::protocol::sequance_id_t id) {
+common::ErrnoError ProtocoledDaemonClient::PrepareServiceSuccess(fastotv::protocol::sequance_id_t id,
+                                                                 const service::StateInfo& state) {
   fastotv::protocol::response_t resp;
-  common::Error err_ser = PrepareServiceResponceSuccess(id, &resp);
+  common::Error err_ser = PrepareServiceResponceSuccess(id, state, &resp);
   if (err_ser) {
     return common::make_errno_error(err_ser->GetDescription(), EAGAIN);
   }

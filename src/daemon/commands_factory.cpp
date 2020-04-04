@@ -137,13 +137,21 @@ common::Error ActivateResponseFail(fastotv::protocol::sequance_id_t id,
   return common::Error();
 }
 
-common::Error PrepareServiceResponceSuccess(fastotv::protocol::sequance_id_t id, fastotv::protocol::response_t* resp) {
+common::Error PrepareServiceResponceSuccess(fastotv::protocol::sequance_id_t id,
+                                            const service::StateInfo& state,
+                                            fastotv::protocol::response_t* resp) {
   if (!resp) {
     return common::make_error_inval();
   }
 
-  *resp =
-      fastotv::protocol::response_t::MakeMessage(id, common::protocols::json_rpc::JsonRPCMessage::MakeSuccessMessage());
+  std::string state_json;
+  common::Error err_ser = state.SerializeToString(&state_json);
+  if (err_ser) {
+    return err_ser;
+  }
+
+  *resp = fastotv::protocol::response_t::MakeMessage(
+      id, common::protocols::json_rpc::JsonRPCMessage::MakeSuccessMessage(state_json));
   return common::Error();
 }
 

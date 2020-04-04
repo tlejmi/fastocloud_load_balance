@@ -19,6 +19,8 @@
 #include <fastotv/commands_info/catchups_info.h>
 #include <fastotv/protocol/types.h>
 
+#include "base/server_auth_info.h"
+
 // daemon
 // client commands
 
@@ -34,6 +36,8 @@
 // Broadcast
 #define DAEMON_SERVER_CATCHUP_CREATED "catchup_created"
 #define STREAM_STATISTIC_SERVICE "statistic_service"
+#define DAEMON_SERVER_SUBSCRIBER_CONNECTED "subscriber_connected"
+#define DAEMON_SERVER_SUBSCRIBER_DISCONNECTED "subscriber_disconnected"
 
 namespace fastocloud {
 namespace server {
@@ -43,6 +47,9 @@ common::Error CatchupCreatedBroadcast(const fastotv::commands_info::CatchupInfo&
 
 common::Error StatisitcServiceBroadcast(fastotv::protocol::serializet_params_t params,
                                         fastotv::protocol::request_t* req);
+
+common::Error SubscriberConnectedBroadcast(const base::ServerDBAuthInfo& subs, fastotv::protocol::request_t* req);
+common::Error SubscriberDisConnectedBroadcast(const base::ServerDBAuthInfo& subs, fastotv::protocol::request_t* req);
 
 }  // namespace server
 }  // namespace fastocloud

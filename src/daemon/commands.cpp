@@ -43,5 +43,35 @@ common::Error StatisitcServiceBroadcast(fastotv::protocol::serializet_params_t p
   return common::Error();
 }
 
+common::Error SubscriberConnectedBroadcast(const base::ServerDBAuthInfo& subs, fastotv::protocol::request_t* req) {
+  if (!req) {
+    return common::make_error_inval();
+  }
+
+  std::string subscriber;
+  common::Error err_ser = subs.SerializeToString(&subscriber);
+  if (err_ser) {
+    return err_ser;
+  }
+
+  *req = fastotv::protocol::request_t::MakeNotification(DAEMON_SERVER_SUBSCRIBER_CONNECTED, subscriber);
+  return common::Error();
+}
+
+common::Error SubscriberDisConnectedBroadcast(const base::ServerDBAuthInfo& subs, fastotv::protocol::request_t* req) {
+  if (!req) {
+    return common::make_error_inval();
+  }
+
+  std::string subscriber;
+  common::Error err_ser = subs.SerializeToString(&subscriber);
+  if (err_ser) {
+    return err_ser;
+  }
+
+  *req = fastotv::protocol::request_t::MakeNotification(DAEMON_SERVER_SUBSCRIBER_DISCONNECTED, subscriber);
+  return common::Error();
+}
+
 }  // namespace server
 }  // namespace fastocloud

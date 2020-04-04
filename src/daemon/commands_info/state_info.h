@@ -19,19 +19,28 @@
 
 #include <common/serializer/json_serializer.h>
 
+#include "base/server_auth_info.h"
+
 namespace fastocloud {
 namespace server {
 namespace service {
 
-class SyncInfo : public common::serializer::JsonSerializer<SyncInfo> {
+class StateInfo : public common::serializer::JsonSerializer<StateInfo> {
  public:
-  typedef JsonSerializer<SyncInfo> base_class;
+  typedef JsonSerializer<StateInfo> base_class;
+  typedef std::vector<base::ServerDBAuthInfo> online_clients_t;
 
-  SyncInfo();
+  StateInfo();
+
+  void SetOnlineClients(const online_clients_t& clients);
+  online_clients_t GetOnlineClients() const;
 
  protected:
   common::Error DoDeSerialize(json_object* serialized) override;
-  common::Error SerializeFields(json_object* out) const override;
+  common::Error SerializeFields(json_object* deserialized) const override;
+
+ private:
+  online_clients_t clients_;
 };
 
 }  // namespace service

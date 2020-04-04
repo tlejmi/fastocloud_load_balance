@@ -179,10 +179,24 @@ finished:
 }
 
 void ProcessSlaveWrapper::OnSubscriberConnected(const base::ServerDBAuthInfo& info) {
+  fastotv::protocol::request_t req;
+  common::Error err_ser = SubscriberConnectedBroadcast(info, &req);
+  if (err_ser) {
+    return;
+  }
+
+  loop_->ExecInLoopThread([this, req]() { BroadcastClients(req); });
   INFO_LOG() << "Welcome: " << info.GetLogin();
 }
 
 void ProcessSlaveWrapper::OnSubscriberDisConnected(const base::ServerDBAuthInfo& info) {
+  fastotv::protocol::request_t req;
+  common::Error err_ser = SubscriberDisConnectedBroadcast(info, &req);
+  if (err_ser) {
+    return;
+  }
+
+  loop_->ExecInLoopThread([this, req]() { BroadcastClients(req); });
   INFO_LOG() << "Bye: " << info.GetLogin();
 }
 
@@ -433,7 +447,10 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientPrepareService(Protoc
     }
 
     sub_manager_->SetupCatchupsEndpoint({state_info.GetCatchupsHost(), state_info.GetCatchupsHttpRoot()});
-    return dclient->PrepareServiceSuccess(req->id);
+
+    service::StateInfo state;
+    state.SetOnlineClients(sub_manager_->GetOnlineSubscribers());
+    return dclient->PrepareServiceSuccess(req->id, state);
   }
 
   return common::make_errno_error_inval();

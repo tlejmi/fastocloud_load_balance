@@ -16,7 +16,7 @@
 
 #include <common/serializer/json_serializer.h>
 
-#include <fastotv/commands_info/client_info.h>
+#include <fastotv/types.h>
 
 namespace fastocloud {
 namespace server {
@@ -24,14 +24,11 @@ namespace base {
 
 class FrontSubscriberInfo : public common::serializer::JsonSerializer<FrontSubscriberInfo> {
  public:
-  typedef common::Optional<fastotv::commands_info::ClientInfo> client_info_t;
-
   FrontSubscriberInfo();
   FrontSubscriberInfo(const fastotv::user_id_t& uid,
                       const fastotv::login_t& login,
                       const fastotv::device_id_t& device_id,
-                      fastotv::timestamp_t exp_date,
-                      client_info_t client_info = client_info_t());
+                      fastotv::timestamp_t exp_date);
 
   bool IsValid() const;
 
@@ -47,9 +44,6 @@ class FrontSubscriberInfo : public common::serializer::JsonSerializer<FrontSubsc
   fastotv::timestamp_t GetExpiredDate() const;
   void SetExpiredDate(fastotv::timestamp_t date);
 
-  void SetClientInfo(const client_info_t& info);
-  client_info_t GetClientInfo() const;
-
  protected:
   common::Error DoDeSerialize(json_object* serialized) override;
   common::Error SerializeFields(json_object* deserialized) const override;
@@ -59,7 +53,6 @@ class FrontSubscriberInfo : public common::serializer::JsonSerializer<FrontSubsc
   fastotv::login_t login_;
   fastotv::device_id_t device_id_;
   fastotv::timestamp_t expired_date_;
-  client_info_t clinet_info_;
 };
 
 }  // namespace base

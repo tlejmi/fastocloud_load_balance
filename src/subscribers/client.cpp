@@ -39,8 +39,8 @@ common::Optional<base::FrontSubscriberInfo> SubscriberClient::MakeFrontSubscribe
     return common::Optional<base::FrontSubscriberInfo>();
   }
 
-  return base::FrontSubscriberInfo(login->GetUserID(), login->GetLogin(), login->GetDeviceID(), login->GetExpiredDate(),
-                                   client_info_);
+  return base::FrontSubscriberInfo(login->GetUserID(), login->GetLogin(), login->GetDeviceID(),
+                                   login->GetExpiredDate());
 }
 
 }  // namespace subscribers

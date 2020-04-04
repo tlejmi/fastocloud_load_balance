@@ -24,14 +24,13 @@ namespace fastocloud {
 namespace server {
 namespace base {
 
-FrontSubscriberInfo::FrontSubscriberInfo() : uid_(), login_(), device_id_(), expired_date_(0), clinet_info_() {}
+FrontSubscriberInfo::FrontSubscriberInfo() : uid_(), login_(), device_id_(), expired_date_(0) {}
 
 FrontSubscriberInfo::FrontSubscriberInfo(const fastotv::user_id_t& uid,
                                          const fastotv::login_t& login,
                                          const fastotv::device_id_t& device_id,
-                                         fastotv::timestamp_t exp_date,
-                                         client_info_t client_info)
-    : uid_(uid), login_(login), device_id_(device_id), expired_date_(exp_date), clinet_info_(client_info) {}
+                                         fastotv::timestamp_t exp_date)
+    : uid_(uid), login_(login), device_id_(device_id), expired_date_(exp_date) {}
 
 bool FrontSubscriberInfo::IsValid() const {
   return !login_.empty() && !uid_.empty() && !device_id_.empty() && expired_date_ != 0;
@@ -69,14 +68,6 @@ void FrontSubscriberInfo::SetExpiredDate(fastotv::timestamp_t date) {
   expired_date_ = date;
 }
 
-void FrontSubscriberInfo::SetClientInfo(const client_info_t& info) {
-  clinet_info_ = info;
-}
-
-FrontSubscriberInfo::client_info_t FrontSubscriberInfo::GetClientInfo() const {
-  return clinet_info_;
-}
-
 common::Error FrontSubscriberInfo::DoDeSerialize(json_object* serialized) {
   json_object* jid = nullptr;
   json_bool jid_exists = json_object_object_get_ex(serialized, FRONT_SUBSCRIBER_INFO_UID_FIELD, &jid);
@@ -102,19 +93,8 @@ common::Error FrontSubscriberInfo::DoDeSerialize(json_object* serialized) {
     return common::make_error_inval();
   }
 
-  json_object* jdev = nullptr;
-  client_info_t dinf;
-  json_bool jdev_exists = json_object_object_get_ex(serialized, FRONT_SUBSCRIBER_INFO_DEVICE_FIELD, &jdev);
-  if (jdev_exists) {
-    fastotv::commands_info::ClientInfo cl;
-    common::Error err_ser = cl.DeSerialize(jdev);
-    if (!err_ser) {
-      dinf = cl;
-    }
-  }
-
   FrontSubscriberInfo ainf(json_object_get_string(jid), json_object_get_string(jlogin), json_object_get_string(jdevid),
-                           json_object_get_int64(jexp), dinf);
+                           json_object_get_int64(jexp));
   *this = ainf;
   return common::Error();
 }
@@ -129,13 +109,6 @@ common::Error FrontSubscriberInfo::SerializeFields(json_object* deserialized) co
   json_object_object_add(deserialized, FRONT_SUBSCRIBER_INFO_DEVICE_ID_FIELD,
                          json_object_new_string(device_id_.c_str()));
   json_object_object_add(deserialized, FRONT_SUBSCRIBER_INFO_EXPIRED_DATE_FIELD, json_object_new_int64(expired_date_));
-  if (clinet_info_) {
-    json_object* obj = nullptr;
-    common::Error err_ser = clinet_info_->Serialize(&obj);
-    if (!err_ser) {
-      json_object_object_add(deserialized, FRONT_SUBSCRIBER_INFO_DEVICE_FIELD, obj);
-    }
-  }
   return common::Error();
 }
 

@@ -1135,7 +1135,7 @@ common::Error SubscribersManager::ClientFindHttpDirectoryOrUrlForChannel(const f
                     }
 
                     fastotv::StreamType st = MongoStreamType2StreamType(bson_iter_utf8(&bcls, NULL));
-                    bool is_proxy = false;
+                    bool is_proxy = (st == fastotv::PROXY || st == fastotv::VOD_PROXY);
 
                     if (is_proxy) {
                       common::uri::Url lurl;
@@ -1144,18 +1144,21 @@ common::Error SubscribersManager::ClientFindHttpDirectoryOrUrlForChannel(const f
                         return common::Error();
                       }
                     } else {
-                      http_directory_t ldir;
-                      if (GetHttpRootFromStream(sdoc, st, cid, &ldir)) {
-                        if (common::file_system::is_directory_exist(ldir.GetPath())) {
-                          *directory = ldir;
-                          return common::Error();
+                      bool is_requst_streams = st == fastotv::COD_RELAY || st == fastotv::COD_ENCODE ||
+                                               st == fastotv::VOD_ENCODE || st == fastotv::VOD_RELAY;
+                      if (!is_requst_streams) {
+                        http_directory_t ldir;
+                        if (GetHttpRootFromStream(sdoc, st, cid, &ldir)) {
+                          if (common::file_system::is_directory_exist(ldir.GetPath())) {
+                            *directory = ldir;
+                            return common::Error();
+                          }
                         }
-
-                        common::uri::Url lurl;
-                        if (GetUrlFromStream(sdoc, st, cid, &lurl)) {
-                          *url = lurl;
-                          return common::Error();
-                        }
+                      }
+                      common::uri::Url lurl;
+                      if (GetUrlFromStream(sdoc, st, cid, &lurl)) {
+                        *url = lurl;
+                        return common::Error();
                       }
                     }
                     return common::make_error("Cant parse stream urls");

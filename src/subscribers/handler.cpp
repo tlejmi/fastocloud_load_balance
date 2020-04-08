@@ -211,8 +211,10 @@ common::ErrnoError SubscribersHandler::HandleResponceCommand(SubscriberClient* c
       return HandleResponceServerPing(sclient, resp);
     } else if (req.method == SERVER_GET_CLIENT_INFO) {
       return HandleResponceServerGetClientInfo(sclient, resp);
+    } else if (req.method == SERVER_TEXT_NOTIFICATION) {
+      return HandleResponceServerTextNotification(sclient, resp);
     } else {
-      WARNING_LOG() << "HandleResponceServiceCommand not handled command: " << req.method;
+      WARNING_LOG() << "HandleResponceCommand not handled command: " << req.method;
     }
   }
 
@@ -635,6 +637,21 @@ common::ErrnoError SubscribersHandler::HandleResponceServerGetClientInfo(Subscri
       return common::make_errno_error(err_str, EAGAIN);
     }
     client->SetClInfo(cinf);
+    return common::ErrnoError();
+  }
+  return common::ErrnoError();
+}
+
+common::ErrnoError SubscribersHandler::HandleResponceServerTextNotification(SubscriberClient* client,
+                                                                            fastotv::protocol::response_t* resp) {
+  UNUSED(client);
+  if (resp->IsMessage()) {
+    const char* params_ptr = resp->message->result.c_str();
+    json_object* jnotify = json_tokener_parse(params_ptr);
+    if (!jnotify) {
+      return common::make_errno_error_inval();
+    }
+
     return common::ErrnoError();
   }
   return common::ErrnoError();

@@ -106,6 +106,9 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver,
                                                const fastotv::protocol::response_t* resp) WARN_UNUSED_RESULT;
   common::ErrnoError HandleResponceCatchupCreatedService(ProtocoledDaemonClient* dclient,
                                                          const fastotv::protocol::response_t* resp) WARN_UNUSED_RESULT;
+  common::ErrnoError HandleResponceSendMessageForSubscriber(ProtocoledDaemonClient* dclient,
+                                                            const fastotv::protocol::response_t* resp)
+      WARN_UNUSED_RESULT;
 
   void CheckLicenseExpired();
 

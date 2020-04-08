@@ -377,7 +377,11 @@ common::Error SubscribersManager::SendSubscriberNotification(
   for (auto connection : hs->second) {
     const auto login = connection->GetLogin();
     if (login && login->GetDeviceID() == device) {
-      return common::make_error_from_errno(connection->SendNotification(notify));
+      common::ErrnoError errn = connection->SendNotification(notify);
+      if (errn) {
+        return common::make_error_from_errno(errn);
+      }
+      return common::Error();
     }
   }
   return common::make_error("Device not found");

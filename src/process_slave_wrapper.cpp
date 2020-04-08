@@ -598,6 +598,23 @@ common::ErrnoError ProcessSlaveWrapper::HandleResponceCatchupCreatedService(Prot
   return common::ErrnoError();
 }
 
+common::ErrnoError ProcessSlaveWrapper::HandleResponceSendMessageForSubscriber(
+    ProtocoledDaemonClient* dclient,
+    const fastotv::protocol::response_t* resp) {
+  UNUSED(dclient);
+  CHECK(loop_->IsLoopThread());
+  if (resp->IsMessage()) {
+    const char* params_ptr = resp->message->result.c_str();
+    json_object* jnotify = json_tokener_parse(params_ptr);
+    if (!jnotify) {
+      return common::make_errno_error_inval();
+    }
+
+    return common::ErrnoError();
+  }
+  return common::ErrnoError();
+}
+
 common::ErrnoError ProcessSlaveWrapper::HandleRequestClientPingService(ProtocoledDaemonClient* dclient,
                                                                        const fastotv::protocol::request_t* req) {
   CHECK(loop_->IsLoopThread());
@@ -660,6 +677,8 @@ common::ErrnoError ProcessSlaveWrapper::HandleResponceServiceCommand(ProtocoledD
     if (req.method == DAEMON_SERVER_PING) {
       ignore_result(HandleResponcePingService(dclient, resp));
     } else if (req.method == DAEMON_SERVER_CATCHUP_CREATED) {
+      ignore_result(HandleResponceCatchupCreatedService(dclient, resp));
+    } else if (req.method == DAEMON_CLIENT_SEND_MESSAGE) {
       ignore_result(HandleResponceCatchupCreatedService(dclient, resp));
     } else {
       WARNING_LOG() << "HandleResponceServiceCommand not handled command: " << req.method;

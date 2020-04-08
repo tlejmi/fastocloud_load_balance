@@ -646,12 +646,6 @@ common::ErrnoError SubscribersHandler::HandleResponceServerTextNotification(Subs
                                                                             fastotv::protocol::response_t* resp) {
   UNUSED(client);
   if (resp->IsMessage()) {
-    const char* params_ptr = resp->message->result.c_str();
-    json_object* jnotify = json_tokener_parse(params_ptr);
-    if (!jnotify) {
-      return common::make_errno_error_inval();
-    }
-
     return common::ErrnoError();
   }
   return common::ErrnoError();

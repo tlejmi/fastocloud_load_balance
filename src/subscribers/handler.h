@@ -78,7 +78,8 @@ class SubscribersHandler : public base::IServerHandler {
 
   common::ErrnoError HandleResponceServerPing(SubscriberClient* client, fastotv::protocol::response_t* resp);
   common::ErrnoError HandleResponceServerGetClientInfo(SubscriberClient* client, fastotv::protocol::response_t* resp);
-  common::ErrnoError HandleResponceServerTextNotification(SubscriberClient* client, fastotv::protocol::response_t* resp);
+  common::ErrnoError HandleResponceServerTextNotification(SubscriberClient* client,
+                                                          fastotv::protocol::response_t* resp);
 
  private:
   const common::uri::Url epg_url_;

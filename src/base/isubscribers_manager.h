@@ -25,6 +25,7 @@
 #include <fastotv/commands_info/devices_info.h>
 #include <fastotv/commands_info/favorite_info.h>
 #include <fastotv/commands_info/interrupt_stream_time_info.h>
+#include <fastotv/commands_info/notification_text_info.h>
 #include <fastotv/commands_info/recent_stream_time_info.h>
 #include <fastotv/commands_info/vods_info.h>
 
@@ -50,6 +51,10 @@ class ISubscribersManager {
   explicit ISubscribersManager(ISubscribersObserver* observer);
 
   virtual void SetupCatchupsEndpoint(const CatchupEndpointInfo& info) = 0;
+  virtual common::Error SendSubscriberNotification(const fastotv::user_id_t& uid,
+                                                   const fastotv::device_id_t& device,
+                                                   const fastotv::commands_info::NotificationTextInfo& notify)
+      WARN_UNUSED_RESULT = 0;
 
   virtual std::vector<FrontSubscriberInfo> GetOnlineSubscribers() WARN_UNUSED_RESULT = 0;
 

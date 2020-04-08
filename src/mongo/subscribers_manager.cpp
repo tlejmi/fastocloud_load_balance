@@ -364,6 +364,25 @@ void SubscribersManager::SetupCatchupsEndpoint(const base::CatchupEndpointInfo& 
   catchup_endpoint_ = info;
 }
 
+common::Error SubscribersManager::SendSubscriberNotification(
+    const fastotv::user_id_t& uid,
+    const fastotv::device_id_t& device,
+    const fastotv::commands_info::NotificationTextInfo& notify) {
+  std::unique_lock<std::mutex> lock(connections_mutex_);
+  auto hs = connections_.find(uid);
+  if (hs == connections_.end()) {
+    return common::make_error("Client not found");
+  }
+
+  for (auto connection : hs->second) {
+    const auto login = connection->GetLogin();
+    if (login && login->GetDeviceID() == device) {
+      return common::make_error_from_errno(connection->SendNotification(notify));
+    }
+  }
+  return common::make_error("Device not found");
+}
+
 std::vector<base::FrontSubscriberInfo> SubscribersManager::GetOnlineSubscribers() {
   std::unique_lock<std::mutex> lock(connections_mutex_);
   std::vector<base::FrontSubscriberInfo> result;

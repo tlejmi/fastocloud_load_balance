@@ -39,6 +39,11 @@ common::Optional<base::FrontSubscriberInfo> HttpClient::MakeFrontSubscriberInfo(
                                    login->GetExpiredDate());
 }
 
+common::ErrnoError HttpClient::SendNotification(const fastotv::commands_info::NotificationTextInfo& notify) {
+  UNUSED(notify);
+  return common::make_errno_error("Send notification for http not supported", ENOENT);
+}
+
 const char* HttpClient::ClassName() const {
   return "HttpClient";
 }

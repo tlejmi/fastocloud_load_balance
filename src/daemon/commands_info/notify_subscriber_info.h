@@ -14,35 +14,40 @@
 
 #pragma once
 
-#include <fastotv/commands_info/notification_text_info.h>
+#include <string>
 
-#include "base/front_subscriber_info.h"
-#include "base/server_auth_info.h"
+#include <fastotv/types.h>
+
+#include <fastotv/commands_info/notification_text_info.h>
 
 namespace fastocloud {
 namespace server {
-namespace base {
+namespace service {
 
-class SubscriberInfo {
+class NotifySubscriberInfo : public fastotv::commands_info::NotificationTextInfo {
  public:
-  typedef common::Optional<ServerDBAuthInfo> login_t;
+  typedef fastotv::commands_info::NotificationTextInfo base_class;
 
-  SubscriberInfo();
+  NotifySubscriberInfo();
+  NotifySubscriberInfo(fastotv::user_id_t uid, fastotv::device_id_t did);
 
-  void SetCurrentStreamID(fastotv::stream_id_t sid);
-  fastotv::stream_id_t GetCurrentStreamID() const;
+  bool IsValid() const;
 
-  void SetLogin(login_t login);
-  login_t GetLogin() const;
+  fastotv::user_id_t GetUserID() const;
+  void SetUserID(fastotv::user_id_t uid);
 
-  virtual common::Optional<FrontSubscriberInfo> MakeFrontSubscriberInfo() const = 0;
-  virtual common::ErrnoError SendNotification(const fastotv::commands_info::NotificationTextInfo& notify) = 0;
+  fastotv::device_id_t GetDeviceID() const;
+  void SetDeviceID(fastotv::device_id_t dev);
+
+ protected:
+  common::Error DoDeSerialize(json_object* serialized) override;
+  common::Error SerializeFields(json_object* out) const override;
 
  private:
-  login_t login_;
-  fastotv::stream_id_t current_stream_id_;
+  fastotv::user_id_t uid_;
+  fastotv::device_id_t device_id_;
 };
 
-}  // namespace base
+}  // namespace service
 }  // namespace server
 }  // namespace fastocloud

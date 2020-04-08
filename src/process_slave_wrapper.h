@@ -98,6 +98,9 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver,
                                                     const fastotv::protocol::request_t* req) WARN_UNUSED_RESULT;
   common::ErrnoError HandleRequestClientGetLogService(ProtocoledDaemonClient* dclient,
                                                       const fastotv::protocol::request_t* req) WARN_UNUSED_RESULT;
+  common::ErrnoError HandleRequestClientSendMessageForSubscriber(ProtocoledDaemonClient* dclient,
+                                                                 const fastotv::protocol::request_t* req)
+      WARN_UNUSED_RESULT;
 
   common::ErrnoError HandleResponcePingService(ProtocoledDaemonClient* dclient,
                                                const fastotv::protocol::response_t* resp) WARN_UNUSED_RESULT;

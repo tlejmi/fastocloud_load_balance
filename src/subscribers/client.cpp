@@ -14,6 +14,33 @@
 
 #include "subscribers/client.h"
 
+#define NOTIFY_MESSAGE "send_message"
+
+namespace fastotv {
+namespace {
+common::Error NotifyRequest(protocol::sequance_id_t id,
+                            const commands_info::NotificationTextInfo& params,
+                            protocol::request_t* req) {
+  if (!req) {
+    return common::make_error_inval();
+  }
+
+  std::string ping_client_json;
+  common::Error err_ser = params.SerializeToString(&ping_client_json);
+  if (err_ser) {
+    return err_ser;
+  }
+
+  protocol::request_t lreq;
+  lreq.id = id;
+  lreq.method = NOTIFY_MESSAGE;
+  lreq.params = ping_client_json;
+  *req = lreq;
+  return common::Error();
+}
+}  // namespace
+}  // namespace fastotv
+
 namespace fastocloud {
 namespace server {
 namespace subscribers {
@@ -41,6 +68,16 @@ common::Optional<base::FrontSubscriberInfo> SubscriberClient::MakeFrontSubscribe
 
   return base::FrontSubscriberInfo(login->GetUserID(), login->GetLogin(), login->GetDeviceID(),
                                    login->GetExpiredDate());
+}
+
+common::ErrnoError SubscriberClient::SendNotification(const fastotv::commands_info::NotificationTextInfo& notify) {
+  fastotv::protocol::request_t notify_request;
+  common::Error err_ser = fastotv::NotifyRequest(NextRequestID(), notify, &notify_request);
+  if (err_ser) {
+    return common::make_errno_error(err_ser->GetDescription(), EAGAIN);
+  }
+
+  return WriteRequest(notify_request);
 }
 
 }  // namespace subscribers

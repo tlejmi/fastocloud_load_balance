@@ -27,6 +27,7 @@
 #include "daemon/commands.h"
 #include "daemon/commands_info/details/shots.h"
 #include "daemon/commands_info/get_log_info.h"
+#include "daemon/commands_info/notify_subscriber_info.h"
 #include "daemon/commands_info/prepare_info.h"
 #include "daemon/commands_info/server_info.h"
 #include "daemon/commands_info/sync_info.h"
@@ -424,6 +425,40 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientGetLogService(Protoco
   return common::make_errno_error_inval();
 }
 
+common::ErrnoError ProcessSlaveWrapper::HandleRequestClientSendMessageForSubscriber(
+    ProtocoledDaemonClient* dclient,
+    const fastotv::protocol::request_t* req) {
+  CHECK(loop_->IsLoopThread());
+  if (!dclient->IsVerified()) {
+    return common::make_errno_error_inval();
+  }
+
+  if (req->params) {
+    const char* params_ptr = req->params->c_str();
+    json_object* jnotify = json_tokener_parse(params_ptr);
+    if (!jnotify) {
+      return common::make_errno_error_inval();
+    }
+
+    service::NotifySubscriberInfo notify;
+    common::Error err_des = notify.DeSerialize(jnotify);
+    json_object_put(jnotify);
+    if (err_des) {
+      const std::string err_str = err_des->GetDescription();
+      return common::make_errno_error(err_str, EAGAIN);
+    }
+
+    common::Error err = sub_manager_->SendSubscriberNotification(notify.GetUserID(), notify.GetDeviceID(), notify);
+    if (err) {
+      ignore_result(dclient->SendSubscriberMessageFail(req->id, err));
+      return common::make_errno_error(err->GetDescription(), EAGAIN);
+    }
+    return dclient->SendSubscriberMessageSuccess(req->id);
+  }
+
+  return common::make_errno_error_inval();
+}
+
 common::ErrnoError ProcessSlaveWrapper::HandleRequestClientPrepareService(ProtocoledDaemonClient* dclient,
                                                                           const fastotv::protocol::request_t* req) {
   CHECK(loop_->IsLoopThread());
@@ -605,6 +640,8 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestServiceCommand(ProtocoledDa
     return HandleRequestClientSyncService(dclient, req);
   } else if (req->method == DAEMON_GET_LOG_SERVICE) {
     return HandleRequestClientGetLogService(dclient, req);
+  } else if (req->method == DAEMON_CLIENT_SEND_MESSAGE) {
+    return HandleRequestClientSendMessageForSubscriber(dclient, req);
   }
 
   WARNING_LOG() << "Received unknown method: " << req->method;

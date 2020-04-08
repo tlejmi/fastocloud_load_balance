@@ -33,6 +33,8 @@ class HttpClient : public common::libev::http::HttpClient, public base::Subscrib
 
   common::Optional<base::FrontSubscriberInfo> MakeFrontSubscriberInfo() const override;
 
+  common::ErrnoError SendNotification(const fastotv::commands_info::NotificationTextInfo& notify) override;
+
   const char* ClassName() const override;
 
  private:

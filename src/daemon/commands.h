@@ -30,6 +30,7 @@
 #define DAEMON_PREPARE_SERVICE "prepare_service"
 #define DAEMON_SYNC_SERVICE "sync_service"
 #define DAEMON_GET_LOG_SERVICE "get_log_service"
+#define DAEMON_CLIENT_SEND_MESSAGE "send_message"
 
 #define DAEMON_SERVER_PING "ping_client"
 

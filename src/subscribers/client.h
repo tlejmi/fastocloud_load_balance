@@ -34,6 +34,8 @@ class SubscriberClient : public fastotv::server::Client, public base::Subscriber
 
   common::Optional<base::FrontSubscriberInfo> MakeFrontSubscriberInfo() const override;
 
+  common::ErrnoError SendNotification(const fastotv::commands_info::NotificationTextInfo& notify) override;
+
   void SetClInfo(const client_info_t& info);
   client_info_t GetClInfo() const;
 

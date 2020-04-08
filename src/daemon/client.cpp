@@ -139,5 +139,27 @@ common::ErrnoError ProtocoledDaemonClient::GetLogServiceSuccess(fastotv::protoco
   return WriteResponse(resp);
 }
 
+common::ErrnoError ProtocoledDaemonClient::SendSubscriberMessageFail(fastotv::protocol::sequance_id_t id,
+                                                                     common::Error err) {
+  const std::string error_str = err->GetDescription();
+  fastotv::protocol::response_t resp;
+  common::Error err_ser = SendSubscriberMessageResponseFail(id, error_str, &resp);
+  if (err_ser) {
+    return common::make_errno_error(err_ser->GetDescription(), EAGAIN);
+  }
+
+  return WriteResponse(resp);
+}
+
+common::ErrnoError ProtocoledDaemonClient::SendSubscriberMessageSuccess(fastotv::protocol::sequance_id_t id) {
+  fastotv::protocol::response_t resp;
+  common::Error err_ser = SendSubscriberMessageResponseSuccess(id, &resp);
+  if (err_ser) {
+    return common::make_errno_error(err_ser->GetDescription(), EAGAIN);
+  }
+
+  return WriteResponse(resp);
+}
+
 }  // namespace server
 }  // namespace fastocloud

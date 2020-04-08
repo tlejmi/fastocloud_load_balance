@@ -38,6 +38,9 @@ class SubscribersManager : public base::ISubscribersManager {
   explicit SubscribersManager(base::ISubscribersObserver* observer);
 
   void SetupCatchupsEndpoint(const base::CatchupEndpointInfo& info) override;
+  common::Error SendSubscriberNotification(const fastotv::user_id_t& uid,
+                                           const fastotv::device_id_t& device,
+                                           const fastotv::commands_info::NotificationTextInfo& notify) override;
 
   std::vector<base::FrontSubscriberInfo> GetOnlineSubscribers() override;
 

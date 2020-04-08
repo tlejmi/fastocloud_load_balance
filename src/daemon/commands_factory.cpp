@@ -175,5 +175,28 @@ common::Error GetLogServiceResponseSuccess(fastotv::protocol::sequance_id_t id, 
   return common::Error();
 }
 
+common::Error SendSubscriberMessageResponseFail(fastotv::protocol::sequance_id_t id,
+                                                const std::string& error_text,
+                                                fastotv::protocol::response_t* resp) {
+  if (!resp) {
+    return common::make_error_inval();
+  }
+
+  *resp = fastotv::protocol::response_t::MakeError(
+      id, common::protocols::json_rpc::JsonRPCError::MakeServerErrorFromText(error_text));
+  return common::Error();
+}
+
+common::Error SendSubscriberMessageResponseSuccess(fastotv::protocol::sequance_id_t id,
+                                                   fastotv::protocol::response_t* resp) {
+  if (!resp) {
+    return common::make_error_inval();
+  }
+
+  *resp =
+      fastotv::protocol::response_t::MakeMessage(id, common::protocols::json_rpc::JsonRPCMessage::MakeSuccessMessage());
+  return common::Error();
+}
+
 }  // namespace server
 }  // namespace fastocloud

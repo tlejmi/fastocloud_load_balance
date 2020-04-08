@@ -53,6 +53,10 @@ class ProtocoledDaemonClient : public fastotv::protocol::ProtocolClient<common::
                                            const service::StateInfo& state) WARN_UNUSED_RESULT;
   common::ErrnoError SyncServiceSuccess(fastotv::protocol::sequance_id_t id) WARN_UNUSED_RESULT;
   common::ErrnoError GetLogServiceSuccess(fastotv::protocol::sequance_id_t id) WARN_UNUSED_RESULT;
+
+  common::ErrnoError SendSubscriberMessageFail(fastotv::protocol::sequance_id_t id,
+                                               common::Error err) WARN_UNUSED_RESULT;
+  common::ErrnoError SendSubscriberMessageSuccess(fastotv::protocol::sequance_id_t id) WARN_UNUSED_RESULT;
 };
 
 }  // namespace server

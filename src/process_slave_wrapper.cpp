@@ -679,7 +679,7 @@ common::ErrnoError ProcessSlaveWrapper::HandleResponceServiceCommand(ProtocoledD
     } else if (req.method == DAEMON_SERVER_CATCHUP_CREATED) {
       ignore_result(HandleResponceCatchupCreatedService(dclient, resp));
     } else if (req.method == DAEMON_CLIENT_SEND_MESSAGE) {
-      ignore_result(HandleResponceCatchupCreatedService(dclient, resp));
+      ignore_result(HandleResponceSendMessageForSubscriber(dclient, resp));
     } else {
       WARNING_LOG() << "HandleResponceServiceCommand not handled command: " << req.method;
     }

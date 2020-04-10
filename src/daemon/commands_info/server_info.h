@@ -103,6 +103,7 @@ class FullServiceInfo : public ServerInfo {
  private:
   common::net::HostAndPort http_host_;
   common::time64_t exp_time_;
+  std::string project_;
   std::string proj_ver_;
   fastotv::commands_info::OperationSystemInfo os_;
 };

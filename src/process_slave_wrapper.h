@@ -76,6 +76,7 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver,
                                                           const fastotv::protocol::response_t* resp) WARN_UNUSED_RESULT;
 
   void CatchupCreated(subscribers::SubscribersHandler* handler,
+                      std::string serverid,
                       const fastotv::commands_info::CatchupInfo& chan) override;
 
  private:

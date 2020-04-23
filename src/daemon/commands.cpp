@@ -14,20 +14,31 @@
 
 #include "daemon/commands.h"
 
+#define SERVER_ID_FIELD "sid"
+#define CATCHUP_FIELD "catchup"
+
 namespace fastocloud {
 namespace server {
 
-common::Error CatchupCreatedBroadcast(const fastotv::commands_info::CatchupInfo& params,
+common::Error CatchupCreatedBroadcast(std::string serverid,
+                                      const fastotv::commands_info::CatchupInfo& params,
                                       fastotv::protocol::request_t* req) {
   if (!req) {
     return common::make_error_inval();
   }
 
-  std::string catchup;
-  common::Error err_ser = params.SerializeToString(&catchup);
+  json_object* catchup_obj = nullptr;
+  common::Error err_ser = params.Serialize(&catchup_obj);
   if (err_ser) {
     return err_ser;
   }
+
+  const char* serverid_str = serverid.c_str();
+  json_object* notif = json_object_new_object();
+  json_object_object_add(notif, SERVER_ID_FIELD, json_object_new_string(serverid_str));
+  json_object_object_add(notif, CATCHUP_FIELD, catchup_obj);
+  std::string catchup = json_object_get_string(notif);
+  json_object_put(notif);
 
   *req = fastotv::protocol::request_t::MakeNotification(DAEMON_SERVER_CATCHUP_CREATED, catchup);
   return common::Error();

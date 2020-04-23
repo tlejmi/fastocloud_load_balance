@@ -133,8 +133,14 @@ void CreateInputUrl(bson_t* result, const std::vector<fastotv::InputUri>& urls) 
     BSON_APPEND_INT32(&url, "id", iurl.GetID());
     const std::string url_str = iurl.GetInput().GetUrl();
     BSON_APPEND_UTF8(&url, "uri", url_str.c_str());
-    BSON_APPEND_INT32(&url, "user_agent", iurl.GetUserAgent());
-    BSON_APPEND_BOOL(&url, "stream_link", iurl.GetStreamLink());
+    const auto ua = iurl.GetUserAgent();
+    if (ua) {
+      BSON_APPEND_INT32(&url, "user_agent", *ua);
+    }
+    const auto stream_link = iurl.GetStreamLink();
+    if (stream_link) {
+      BSON_APPEND_BOOL(&url, "stream_link", *stream_link);
+    }
     bson_append_document_end(&child, &url);
   }
   bson_append_array_end(result, &child);
@@ -166,9 +172,14 @@ void CreateOutputUrl(bson_t* result, const std::vector<fastotv::OutputUri>& urls
     const auto url_str = out.GetOutput().GetUrl();
     BSON_APPEND_UTF8(&url, "uri", url_str.c_str());
     const auto http_root = out.GetHttpRoot();
-    const std::string http_root_str = http_root.GetPath();
-    BSON_APPEND_UTF8(&url, "http_root", http_root_str.c_str());
-    BSON_APPEND_INT32(&url, "hls_type", out.GetHlsType());
+    if (http_root) {
+      const std::string http_root_str = http_root->GetPath();
+      BSON_APPEND_UTF8(&url, "http_root", http_root_str.c_str());
+    }
+    const auto hls_type = out.GetHlsType();
+    if (hls_type) {
+      BSON_APPEND_INT32(&url, "hls_type", *hls_type);
+    }
     bson_append_document_end(&child, &url);
   }
   bson_append_array_end(result, &child);
@@ -187,7 +198,6 @@ std::vector<fastotv::OutputUri> CreateCatchupOutputUrl(
   for (size_t i = 0; i < urls.size(); ++i) {
     fastotv::OutputUri out = urls[i];
     const common::uri::Url origin_url = out.GetOutput();
-    const common::file_system::ascii_directory_string_path origin_http_root = out.GetHttpRoot();
 
     if (origin_type == fastotv::PROXY) {
       const std::string catchup_host_str = common::ConvertToString(catchup_host);
@@ -204,7 +214,11 @@ std::vector<fastotv::OutputUri> CreateCatchupOutputUrl(
       common::ReplaceFirstSubstringAfterOffset(&origin_url_str, 0, from, repl);
       out.SetOutput(common::uri::Url(origin_url_str));
 
-      std::string origin_http_root_str = origin_http_root.GetPath();
+      const auto origin_http_root = out.GetHttpRoot();
+      if (!origin_http_root) {
+        continue;
+      }
+      std::string origin_http_root_str = origin_http_root->GetPath();
       common::ReplaceFirstSubstringAfterOffset(&origin_http_root_str, 0, from, repl);
       out.SetHttpRoot(common::file_system::ascii_directory_string_path(origin_http_root_str));
     }
@@ -1556,9 +1570,10 @@ common::Error SubscribersManager::CreateCatchup(const base::ServerDBAuthInfo& au
                                                 const std::string& title,
                                                 fastotv::timestamp_t start,
                                                 fastotv::timestamp_t stop,
+                                                std::string* serverid,
                                                 fastotv::commands_info::CatchupInfo* cat,
                                                 bool* is_created) {
-  if (!auth.IsValid() || sid == fastotv::invalid_stream_id || !cat || !is_created) {
+  if (!auth.IsValid() || sid == fastotv::invalid_stream_id || !serverid || !cat || !is_created) {
     return common::make_error_inval();
   }
 
@@ -1573,7 +1588,7 @@ common::Error SubscribersManager::CreateCatchup(const base::ServerDBAuthInfo& au
   }
 
   fastotv::commands_info::CatchupInfo catchup;
-  err = CreateOrFindCatchup(ch, title, start, stop, &catchup, is_created);
+  err = CreateOrFindCatchup(ch, title, start, stop, serverid, &catchup, is_created);
   if (err) {
     return err;
   }
@@ -1748,6 +1763,7 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
                                                       const std::string& title,
                                                       fastotv::timestamp_t start,
                                                       fastotv::timestamp_t stop,
+                                                      std::string* serverid,
                                                       fastotv::commands_info::CatchupInfo* cat,
                                                       bool* is_created) {
   auto epg = based_on.GetEpg();
@@ -1939,6 +1955,7 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
     return err;
   }
 
+  *serverid = common::ConvertToString(server_oid);
   epg.SetUrls(true_catchups_urls);
   copy.SetEpg(epg);
   copy.SetStreamID(cid_str);

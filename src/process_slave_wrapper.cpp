@@ -689,10 +689,11 @@ common::ErrnoError ProcessSlaveWrapper::HandleResponceServiceCommand(ProtocoledD
 }
 
 void ProcessSlaveWrapper::CatchupCreated(subscribers::SubscribersHandler* handler,
+                                         std::string serverid,
                                          const fastotv::commands_info::CatchupInfo& chan) {
   UNUSED(handler);
   fastotv::protocol::request_t req;
-  common::Error err_ser = CatchupCreatedBroadcast(chan, &req);
+  common::Error err_ser = CatchupCreatedBroadcast(serverid, chan, &req);
   if (err_ser) {
     return;
   }

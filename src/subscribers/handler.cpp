@@ -530,9 +530,10 @@ common::ErrnoError SubscribersHandler::HandleRequestGenerateCatchup(SubscriberCl
     }
 
     bool is_created = false;
+    std::string serverid;
     fastotv::commands_info::CatchupInfo chan;
     common::Error err = manager_->CreateCatchup(auth, cat_gen.GetStreamID(), cat_gen.GetTitle(), cat_gen.GetStart(),
-                                                cat_gen.GetStop(), &chan, &is_created);
+                                                cat_gen.GetStop(), &serverid, &chan, &is_created);
     if (err) {
       const std::string err_str = err->GetDescription();
       client->CatchupGenerateFail(req->id, err);
@@ -548,7 +549,7 @@ common::ErrnoError SubscribersHandler::HandleRequestGenerateCatchup(SubscriberCl
 
     if (is_created) {
       if (observer_) {
-        observer_->CatchupCreated(this, chan);
+        observer_->CatchupCreated(this, serverid, chan);
       }
     }
 

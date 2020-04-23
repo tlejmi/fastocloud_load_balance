@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <fastotv/commands_info/catchup_info.h>
 
 namespace fastocloud {
@@ -24,7 +26,9 @@ class SubscribersHandler;
 
 class ISubscribersHandlerObserver {
  public:
-  virtual void CatchupCreated(SubscribersHandler* handler, const fastotv::commands_info::CatchupInfo& chan) = 0;
+  virtual void CatchupCreated(SubscribersHandler* handler,
+                              std::string serverid,
+                              const fastotv::commands_info::CatchupInfo& chan) = 0;
 };
 
 }  // namespace subscribers

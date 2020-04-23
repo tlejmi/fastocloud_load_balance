@@ -108,6 +108,7 @@ class ISubscribersManager {
                                       const std::string& title,
                                       fastotv::timestamp_t start,
                                       fastotv::timestamp_t stop,
+                                      std::string* serverid,
                                       fastotv::commands_info::CatchupInfo* cat,
                                       bool* is_created) WARN_UNUSED_RESULT = 0;
 

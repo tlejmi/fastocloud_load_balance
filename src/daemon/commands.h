@@ -44,7 +44,8 @@
 namespace fastocloud {
 namespace server {
 
-common::Error CatchupCreatedBroadcast(const fastotv::commands_info::CatchupInfo& params,
+common::Error CatchupCreatedBroadcast(std::string serverid,
+                                      const fastotv::commands_info::CatchupInfo& params,
                                       fastotv::protocol::request_t* req);
 
 common::Error StatisitcServiceBroadcast(fastotv::protocol::serializet_params_t params,

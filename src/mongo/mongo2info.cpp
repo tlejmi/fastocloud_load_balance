@@ -463,7 +463,11 @@ bool GetHttpRootFromStream(const bson_t* sdoc,
 
       for (size_t i = 0; i < urls.size(); ++i) {
         if (urls[i].GetID() == cid) {
-          *dir = urls[i].GetHttpRoot();
+          const auto http_root = urls[i].GetHttpRoot();
+          if (!http_root) {
+            return false;
+          }
+          *dir = *http_root;
           return true;
         }
       }

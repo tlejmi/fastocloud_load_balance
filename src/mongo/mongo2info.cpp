@@ -574,20 +574,20 @@ bool GetOutputUrlData(bson_iter_t* iter, std::vector<fastotv::OutputUri>* urls) 
       if (bson_iter_recurse(&ar, &burl) && bson_iter_find(&burl, STREAM_OUTPUT_URLS_URI_FIELD) &&
           BSON_ITER_HOLDS_UTF8(&burl)) {
         common::uri::Url uri(bson_iter_utf8(&burl, NULL));
+        fastotv::OutputUri out(lcid, uri);
         bson_iter_t bhttp_root;
         if (bson_iter_recurse(&ar, &bhttp_root) && bson_iter_find(&bhttp_root, STREAM_OUTPUT_URLS_HTTP_ROOT_FIELD) &&
             BSON_ITER_HOLDS_UTF8(&bhttp_root)) {
           common::file_system::ascii_directory_string_path http_root =
               common::file_system::ascii_directory_string_path(bson_iter_utf8(&bhttp_root, NULL));
-          bson_iter_t bhls_type;
-          if (bson_iter_recurse(&ar, &bhls_type) && bson_iter_find(&bhls_type, STREAM_OUTPUT_URLS_HLS_TYPE_FIELD) &&
-              BSON_ITER_HOLDS_INT32(&bhls_type)) {
-            fastotv::OutputUri out(lcid, uri);
-            out.SetHttpRoot(http_root);
-            out.SetHlsType(static_cast<fastotv::OutputUri::HlsType>(bson_iter_int32(&bhls_type)));
-            lurls.push_back(out);
-          }
+          out.SetHttpRoot(http_root);
         }
+        bson_iter_t bhls_type;
+        if (bson_iter_recurse(&ar, &bhls_type) && bson_iter_find(&bhls_type, STREAM_OUTPUT_URLS_HLS_TYPE_FIELD) &&
+            BSON_ITER_HOLDS_INT32(&bhls_type)) {
+          out.SetHlsType(static_cast<fastotv::OutputUri::HlsType>(bson_iter_int32(&bhls_type)));
+        }
+        lurls.push_back(out);
       }
     }
   }

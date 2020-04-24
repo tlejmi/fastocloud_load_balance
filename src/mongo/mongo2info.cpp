@@ -77,8 +77,10 @@ bool MakeVodInfo(const bson_t* sdoc,
         bson_iter_t it;
         if (bson_iter_init(&it, &array_doc)) {
           while (bson_iter_next(&iter)) {
-            std::string group = bson_iter_utf8(&it, NULL);
-            groups.push_back(group);
+            const char* group_data = bson_iter_utf8(&iter, NULL);
+            if (group_data) {
+              groups.push_back(group_data);
+            }
           }
         }
       }
@@ -112,7 +114,10 @@ bool MakeVodInfo(const bson_t* sdoc,
       if (!BSON_ITER_HOLDS_UTF8(&iter)) {
         return false;
       }
-      mov.SetPreviewIcon(common::uri::Url(bson_iter_utf8(&iter, NULL)));
+      const char* data = bson_iter_utf8(&iter, NULL);
+      if (data) {
+        mov.SetPreviewIcon(common::uri::Url());
+      }
       check_sum++;
     } else if (strcmp(key, STREAM_OUTPUT_FIELD) == 0) {
       std::vector<fastotv::OutputUri> urls;
@@ -249,8 +254,10 @@ bool MakeCatchupInfo(const bson_t* sdoc,
         bson_iter_t it;
         if (bson_iter_init(&it, &array_doc)) {
           while (bson_iter_next(&iter)) {
-            std::string group = bson_iter_utf8(&it, NULL);
-            groups.push_back(group);
+            const char* group_data = bson_iter_utf8(&iter, NULL);
+            if (group_data) {
+              groups.push_back(group_data);
+            }
           }
         }
       }
@@ -323,7 +330,10 @@ bool MakeCatchupInfo(const bson_t* sdoc,
       if (!BSON_ITER_HOLDS_UTF8(&iter)) {
         return false;
       }
-      epg.SetIconUrl(common::uri::Url(bson_iter_utf8(&iter, NULL)));
+      const char* url_data = bson_iter_utf8(&iter, NULL);
+      if (url_data) {
+        epg.SetIconUrl(common::uri::Url(url_data));
+      }
       check_sum++;
     } else if (strcmp(key, STREAM_OUTPUT_FIELD) == 0) {
       std::vector<fastotv::OutputUri> urls;
@@ -392,8 +402,10 @@ bool MakeChannelInfo(const bson_t* sdoc,
         bson_iter_t it;
         if (bson_iter_init(&it, &array_doc)) {
           while (bson_iter_next(&iter)) {
-            std::string group = bson_iter_utf8(&it, NULL);
-            groups.push_back(group);
+            const char* group_data = bson_iter_utf8(&iter, NULL);
+            if (group_data) {
+              groups.push_back(group_data);
+            }
           }
         }
       }

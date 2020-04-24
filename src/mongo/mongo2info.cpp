@@ -578,9 +578,12 @@ bool GetOutputUrlData(bson_iter_t* iter, std::vector<fastotv::OutputUri>* urls) 
         bson_iter_t bhttp_root;
         if (bson_iter_recurse(&ar, &bhttp_root) && bson_iter_find(&bhttp_root, STREAM_OUTPUT_URLS_HTTP_ROOT_FIELD) &&
             BSON_ITER_HOLDS_UTF8(&bhttp_root)) {
-          common::file_system::ascii_directory_string_path http_root =
-              common::file_system::ascii_directory_string_path(bson_iter_utf8(&bhttp_root, NULL));
-          out.SetHttpRoot(http_root);
+          const char* data = bson_iter_utf8(&bhttp_root, NULL);
+          if (data) {
+            common::file_system::ascii_directory_string_path http_root =
+                common::file_system::ascii_directory_string_path(data);
+            out.SetHttpRoot(http_root);
+          }
         }
         bson_iter_t bhls_type;
         if (bson_iter_recurse(&ar, &bhls_type) && bson_iter_find(&bhls_type, STREAM_OUTPUT_URLS_HLS_TYPE_FIELD) &&

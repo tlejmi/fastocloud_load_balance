@@ -76,8 +76,8 @@ bool MakeVodInfo(const bson_t* sdoc,
       if (bson_init_static(&array_doc, array, array_len)) {
         bson_iter_t it;
         if (bson_iter_init(&it, &array_doc)) {
-          while (bson_iter_next(&iter)) {
-            const char* group_data = bson_iter_utf8(&iter, NULL);
+          while (bson_iter_next(&it)) {
+            const char* group_data = bson_iter_utf8(&it, NULL);
             if (group_data) {
               groups.push_back(group_data);
             }
@@ -253,8 +253,8 @@ bool MakeCatchupInfo(const bson_t* sdoc,
       if (bson_init_static(&array_doc, array, array_len)) {
         bson_iter_t it;
         if (bson_iter_init(&it, &array_doc)) {
-          while (bson_iter_next(&iter)) {
-            const char* group_data = bson_iter_utf8(&iter, NULL);
+          while (bson_iter_next(&it)) {
+            const char* group_data = bson_iter_utf8(&it, NULL);
             if (group_data) {
               groups.push_back(group_data);
             }
@@ -401,8 +401,8 @@ bool MakeChannelInfo(const bson_t* sdoc,
       if (bson_init_static(&array_doc, array, array_len)) {
         bson_iter_t it;
         if (bson_iter_init(&it, &array_doc)) {
-          while (bson_iter_next(&iter)) {
-            const char* group_data = bson_iter_utf8(&iter, NULL);
+          while (bson_iter_next(&it)) {
+            const char* group_data = bson_iter_utf8(&it, NULL);
             if (group_data) {
               groups.push_back(group_data);
             }

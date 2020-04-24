@@ -1883,6 +1883,16 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   bson_append_now_utc(doc.get(), STREAM_CREATE_DATE_FIELD, SIZEOFMASS(STREAM_CREATE_DATE_FIELD) - 1);
   BSON_APPEND_UTF8(doc.get(), STREAM_NAME_FIELD, title.c_str());
   const unique_ptr_bson_t bgroups(bson_new());
+  bson_t child;
+  BSON_APPEND_ARRAY_BEGIN(bgroups.get(), "languages", &child);
+  const auto groups = copy.GetGroups();
+  char buf[16];
+  for (size_t i = 0; i < groups.size(); ++i) {
+    const char* key;
+    size_t keylen = bson_uint32_to_string(i, &key, buf, sizeof(buf));
+    bson_append_utf8(&child, key, keylen, groups[i].c_str(), -1);
+  }
+  bson_append_array_end(bgroups.get(), &child);
   BSON_APPEND_ARRAY(doc.get(), STREAM_GROUPS_FIELD, bgroups.get());
   std::string tvg_id = epg.GetTvgID();
   BSON_APPEND_UTF8(doc.get(), CHANNEL_TVG_ID_FIELD, tvg_id.c_str());

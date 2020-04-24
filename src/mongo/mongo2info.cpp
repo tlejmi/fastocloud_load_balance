@@ -52,6 +52,7 @@ bool MakeVodInfo(const bson_t* sdoc,
   int view_count;
   fastotv::commands_info::MovieInfo mov;
   fastotv::commands_info::StreamBaseInfo::parts_t parts;
+  fastotv::commands_info::StreamBaseInfo::groups_t groups;
   int check_sum = 0;
   bool have_audio = true;
   bool have_video = true;
@@ -64,11 +65,24 @@ bool MakeVodInfo(const bson_t* sdoc,
       const bson_oid_t* oid = bson_iter_oid(&iter);
       sid_str = common::ConvertToString(oid);
       check_sum++;
-    } else if (strcmp(key, STREAM_GROUP_FIELD) == 0) {
-      if (!BSON_ITER_HOLDS_UTF8(&iter)) {
+    } else if (strcmp(key, STREAM_GROUPS_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_ARRAY(&iter)) {
         return false;
       }
-      group = bson_iter_utf8(&iter, NULL);
+      uint32_t array_len;
+      const uint8_t* array = nullptr;
+      bson_iter_array(&iter, &array_len, &array);
+      bson_t array_doc;
+      if (bson_init_static(&array_doc, array, array_len)) {
+        bson_iter_t it;
+        if (bson_iter_init(&it, &array_doc)) {
+          while (bson_iter_next(&iter)) {
+            std::string group = bson_iter_utf8(&it, NULL);
+            groups.push_back(group);
+          }
+        }
+      }
+
       check_sum++;
     } else if (strcmp(key, STREAM_IARC_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_INT32(&iter)) {
@@ -182,7 +196,7 @@ bool MakeVodInfo(const bson_t* sdoc,
     }
   }
 
-  *cinf = fastotv::commands_info::VodInfo(sid_str, group, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
+  *cinf = fastotv::commands_info::VodInfo(sid_str, groups, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
                                           mov, have_video, have_audio, parts, view_count, uinfo.locked);
   return true;
 }  // namespace mongo
@@ -206,6 +220,7 @@ bool MakeCatchupInfo(const bson_t* sdoc,
   std::string group;
   fastotv::commands_info::EpgInfo epg;
   fastotv::commands_info::StreamBaseInfo::parts_t parts;
+  fastotv::commands_info::StreamBaseInfo::groups_t groups;
   fastotv::timestamp_t start;
   fastotv::timestamp_t stop;
   int check_sum = 0;
@@ -222,11 +237,23 @@ bool MakeCatchupInfo(const bson_t* sdoc,
       const bson_oid_t* oid = bson_iter_oid(&iter);
       sid_str = common::ConvertToString(oid);
       check_sum++;
-    } else if (strcmp(key, STREAM_GROUP_FIELD) == 0) {
-      if (!BSON_ITER_HOLDS_UTF8(&iter)) {
+    } else if (strcmp(key, STREAM_GROUPS_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_ARRAY(&iter)) {
         return false;
       }
-      group = bson_iter_utf8(&iter, NULL);
+      uint32_t array_len;
+      const uint8_t* array = nullptr;
+      bson_iter_array(&iter, &array_len, &array);
+      bson_t array_doc;
+      if (bson_init_static(&array_doc, array, array_len)) {
+        bson_iter_t it;
+        if (bson_iter_init(&it, &array_doc)) {
+          while (bson_iter_next(&iter)) {
+            std::string group = bson_iter_utf8(&it, NULL);
+            groups.push_back(group);
+          }
+        }
+      }
       check_sum++;
     } else if (strcmp(key, STREAM_IARC_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_INT32(&iter)) {
@@ -314,7 +341,7 @@ bool MakeCatchupInfo(const bson_t* sdoc,
   }
 
   *cinf =
-      fastotv::commands_info::CatchupInfo(sid_str, group, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
+      fastotv::commands_info::CatchupInfo(sid_str, groups, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
                                           epg, have_video, have_audio, parts, view_count, uinfo.locked, start, stop);
   return true;
 }
@@ -338,6 +365,7 @@ bool MakeChannelInfo(const bson_t* sdoc,
   std::string group;
   fastotv::commands_info::EpgInfo epg;
   fastotv::commands_info::StreamBaseInfo::parts_t parts;
+  fastotv::commands_info::StreamBaseInfo::groups_t groups;
   int check_sum = 0;
   int iarc;
   int view_count;
@@ -352,11 +380,23 @@ bool MakeChannelInfo(const bson_t* sdoc,
       const bson_oid_t* oid = bson_iter_oid(&iter);
       sid_str = common::ConvertToString(oid);
       check_sum++;
-    } else if (strcmp(key, STREAM_GROUP_FIELD) == 0) {
-      if (!BSON_ITER_HOLDS_UTF8(&iter)) {
+    } else if (strcmp(key, STREAM_GROUPS_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_ARRAY(&iter)) {
         return false;
       }
-      group = bson_iter_utf8(&iter, NULL);
+      uint32_t array_len;
+      const uint8_t* array = nullptr;
+      bson_iter_array(&iter, &array_len, &array);
+      bson_t array_doc;
+      if (bson_init_static(&array_doc, array, array_len)) {
+        bson_iter_t it;
+        if (bson_iter_init(&it, &array_doc)) {
+          while (bson_iter_next(&iter)) {
+            std::string group = bson_iter_utf8(&it, NULL);
+            groups.push_back(group);
+          }
+        }
+      }
       check_sum++;
     } else if (strcmp(key, STREAM_IARC_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_INT32(&iter)) {
@@ -434,7 +474,7 @@ bool MakeChannelInfo(const bson_t* sdoc,
   }
 
   *cinf =
-      fastotv::commands_info::ChannelInfo(sid_str, group, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
+      fastotv::commands_info::ChannelInfo(sid_str, groups, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
                                           epg, have_video, have_audio, parts, view_count, uinfo.locked);
   return true;
 }

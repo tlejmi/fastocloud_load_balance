@@ -1770,7 +1770,7 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   epg.ClearPrograms();
   epg.SetDisplayName(title);
 
-  fastotv::commands_info::CatchupInfo copy(based_on.GetStreamID(), based_on.GetGroup(), based_on.GetIARC(),
+  fastotv::commands_info::CatchupInfo copy(based_on.GetStreamID(), based_on.GetGroups(), based_on.GetIARC(),
                                            based_on.GetFavorite(), based_on.GetRecent(), based_on.GetInterruptionTime(),
                                            epg, based_on.IsEnableAudio(), based_on.IsEnableVideo(), based_on.GetParts(),
                                            0, false, start, stop);
@@ -1882,8 +1882,8 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   BSON_APPEND_UTF8(doc.get(), STREAM_CLS_FIELD, CATCHUP_STR);
   bson_append_now_utc(doc.get(), STREAM_CREATE_DATE_FIELD, SIZEOFMASS(STREAM_CREATE_DATE_FIELD) - 1);
   BSON_APPEND_UTF8(doc.get(), STREAM_NAME_FIELD, title.c_str());
-  std::string group = copy.GetGroup();
-  BSON_APPEND_UTF8(doc.get(), STREAM_GROUP_FIELD, group.c_str());
+  const unique_ptr_bson_t bgroups(bson_new());
+  BSON_APPEND_ARRAY(doc.get(), STREAM_GROUPS_FIELD, bgroups.get());
   std::string tvg_id = epg.GetTvgID();
   BSON_APPEND_UTF8(doc.get(), CHANNEL_TVG_ID_FIELD, tvg_id.c_str());
   std::string tvg_name;

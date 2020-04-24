@@ -29,7 +29,7 @@
 // stream base part
 #define STREAM_ID_FIELD "_id"
 #define STREAM_CREATE_DATE_FIELD "created_date"
-#define STREAM_GROUP_FIELD "group"
+#define STREAM_GROUPS_FIELD "groups"
 #define STREAM_IARC_FIELD "iarc"
 #define STREAM_VIEW_COUNT_FIELD "view_count"
 #define STREAM_NAME_FIELD "name"

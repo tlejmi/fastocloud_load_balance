@@ -116,7 +116,7 @@ bool MakeVodInfo(const bson_t* sdoc,
       }
       const char* data = bson_iter_utf8(&iter, NULL);
       if (data) {
-        mov.SetPreviewIcon(common::uri::Url());
+        mov.SetPreviewIcon(common::uri::Url(data));
       }
       check_sum++;
     } else if (strcmp(key, STREAM_OUTPUT_FIELD) == 0) {

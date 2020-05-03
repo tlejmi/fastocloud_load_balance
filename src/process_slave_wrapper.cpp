@@ -70,7 +70,8 @@ ProcessSlaveWrapper::ProcessSlaveWrapper(const Config& config)
   sub_manager->ConnectToDatabase(config.mongodb_url);
   sub_manager_ = sub_manager;
 
-  subscribers_handler_ = new subscribers::SubscribersHandler(this, sub_manager_, config.epg_url);
+  subscribers_handler_ =
+      new subscribers::SubscribersHandler(this, sub_manager_, config.epg_url, config.locked_stream_text);
   subscribers_server_ = new subscribers::SubscribersServer(config.subscribers_host, subscribers_handler_);
   subscribers_server_->SetName("subscribers_server");
 

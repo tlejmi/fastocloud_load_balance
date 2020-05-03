@@ -27,6 +27,7 @@
 #define SERVICE_SUBSCRIBERS_HOST_FIELD "subscribers_host"
 #define SERVICE_MONGODB_URL_FIELD "mongodb_url"
 #define SERVICE_EPG_URL_FIELD "epg_url"
+#define SERVICE_LOCKED_STREAM_TEXT_FIELD "locked_stream_text"
 #define SERVICE_LICENSE_KEY_FIELD "license_key"
 
 #define DUMMY_LOG_FILE_PATH "/dev/null"
@@ -74,6 +75,8 @@ common::ErrnoError ReadConfigFile(const std::string& path, common::HashValue** a
     } else if (pair.first == SERVICE_MONGODB_URL_FIELD) {
       options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
     } else if (pair.first == SERVICE_EPG_URL_FIELD) {
+      options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
+    } else if (pair.first == SERVICE_LOCKED_STREAM_TEXT_FIELD) {
       options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
     } else if (pair.first == SERVICE_LICENSE_KEY_FIELD) {
       options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
@@ -177,6 +180,11 @@ common::ErrnoError load_config_from_file(const std::string& config_absolute_path
   if (!epg_url_field || !epg_url_field->GetAsBasicString(&epg_url_str) ||
       !common::ConvertFromString(epg_url_str, &lconfig.epg_url)) {
     lconfig.epg_url = common::uri::Url(EPG_URL);
+  }
+
+  common::Value* locked_stream_field = slave_config_args->Find(SERVICE_LOCKED_STREAM_TEXT_FIELD);
+  if (!locked_stream_field || !locked_stream_field->GetAsBasicString(&lconfig.locked_stream_text)) {
+    lconfig.locked_stream_text = LOCKED_STREAM_TEXT;
   }
 
   *config = lconfig;

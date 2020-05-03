@@ -36,9 +36,11 @@ namespace subscribers {
 
 SubscribersHandler::SubscribersHandler(ISubscribersHandlerObserver* observer,
                                        base::ISubscribersManager* manager,
-                                       const common::uri::Url& epg_url)
+                                       const common::uri::Url& epg_url,
+                                       const std::string& locked_text)
     : base_class(),
       epg_url_(epg_url),
+      locked_text_(locked_text),
       ping_client_id_timer_(INVALID_TIMER_ID),
       manager_(manager),
       observer_(observer) {}
@@ -333,7 +335,7 @@ common::ErrnoError SubscribersHandler::HandleRequestClientGetServerInfo(Subscrib
     return common::make_errno_error(err->GetDescription(), EINVAL);
   }
 
-  fastotv::commands_info::ServerInfo serv(epg_url_);
+  fastotv::commands_info::ServerInfo serv(epg_url_, locked_text_);
   return client->GetServerInfoSuccess(req->id, serv);
 }
 

@@ -40,6 +40,7 @@ struct Config {
   common::net::HostAndPort http_host;
   std::string mongodb_url;
   common::uri::Url epg_url;
+  std::string locked_stream_text;
   license_t license_key;
 };
 

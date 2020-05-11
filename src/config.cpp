@@ -177,12 +177,11 @@ common::ErrnoError load_config_from_file(const std::string& config_absolute_path
 
   common::Value* epg_url_field = slave_config_args->Find(SERVICE_EPG_URL_FIELD);
   std::string epg_url_str;
-  if (!epg_url_field || !epg_url_field->GetAsBasicString(&epg_url_str)) {
-    common::uri::GURL url(epg_url_str);
-    if (!url.is_valid()) {
-      url = common::uri::GURL(EPG_URL);
-    }
-    lconfig.epg_url = url;
+  if (epg_url_field && epg_url_field->GetAsBasicString(&epg_url_str)) {
+    lconfig.epg_url = common::uri::GURL(epg_url_str);
+  }
+  if (!lconfig.epg_url.is_valid()) {
+    lconfig.epg_url = common::uri::GURL(EPG_URL);
   }
 
   common::Value* locked_stream_field = slave_config_args->Find(SERVICE_LOCKED_STREAM_TEXT_FIELD);

@@ -22,8 +22,8 @@ namespace server {
 namespace mongo {
 
 namespace details {
-std::vector<common::uri::Url> MakeUrlsFromOutput(const std::vector<fastotv::OutputUri>& output) {
-  std::vector<common::uri::Url> result;
+std::vector<common::uri::GURL> MakeUrlsFromOutput(const std::vector<fastotv::OutputUri>& output) {
+  std::vector<common::uri::GURL> result;
   for (size_t i = 0; i < output.size(); ++i) {
     result.push_back(output[i].GetOutput());
   }
@@ -116,7 +116,7 @@ bool MakeVodInfo(const bson_t* sdoc,
       }
       const char* data = bson_iter_utf8(&iter, NULL);
       if (data) {
-        mov.SetPreviewIcon(common::uri::Url(data));
+        mov.SetPreviewIcon(common::uri::GURL(data));
       }
       check_sum++;
     } else if (strcmp(key, STREAM_OUTPUT_FIELD) == 0) {
@@ -158,7 +158,7 @@ bool MakeVodInfo(const bson_t* sdoc,
       if (!BSON_ITER_HOLDS_UTF8(&iter)) {
         return false;
       }
-      mov.SetTrailerUrl(common::uri::Url(bson_iter_utf8(&iter, NULL)));
+      mov.SetTrailerUrl(common::uri::GURL(bson_iter_utf8(&iter, NULL)));
       check_sum++;
     } else if (strcmp(key, VOD_USER_SCORE_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_DOUBLE(&iter)) {
@@ -332,7 +332,7 @@ bool MakeCatchupInfo(const bson_t* sdoc,
       }
       const char* url_data = bson_iter_utf8(&iter, NULL);
       if (url_data) {
-        epg.SetIconUrl(common::uri::Url(url_data));
+        epg.SetIconUrl(common::uri::GURL(url_data));
       }
       check_sum++;
     } else if (strcmp(key, STREAM_OUTPUT_FIELD) == 0) {
@@ -465,7 +465,7 @@ bool MakeChannelInfo(const bson_t* sdoc,
       if (!BSON_ITER_HOLDS_UTF8(&iter)) {
         return false;
       }
-      epg.SetIconUrl(common::uri::Url(bson_iter_utf8(&iter, NULL)));
+      epg.SetIconUrl(common::uri::GURL(bson_iter_utf8(&iter, NULL)));
       check_sum++;
     } else if (strcmp(key, STREAM_OUTPUT_FIELD) == 0) {
       std::vector<fastotv::OutputUri> urls;
@@ -530,7 +530,7 @@ bool GetHttpRootFromStream(const bson_t* sdoc,
   return false;
 }
 
-bool GetUrlFromStream(const bson_t* sdoc, fastotv::StreamType st, fastotv::channel_id_t cid, common::uri::Url* url) {
+bool GetUrlFromStream(const bson_t* sdoc, fastotv::StreamType st, fastotv::channel_id_t cid, common::uri::GURL* url) {
   UNUSED(st);
   if (!sdoc || !url) {
     return false;
@@ -585,7 +585,7 @@ bool GetOutputUrlData(bson_iter_t* iter, std::vector<fastotv::OutputUri>* urls) 
       bson_iter_t burl;
       if (bson_iter_recurse(&ar, &burl) && bson_iter_find(&burl, STREAM_OUTPUT_URLS_URI_FIELD) &&
           BSON_ITER_HOLDS_UTF8(&burl)) {
-        common::uri::Url uri(bson_iter_utf8(&burl, NULL));
+        common::uri::GURL uri(bson_iter_utf8(&burl, NULL));
         fastotv::OutputUri out(lcid, uri);
         bson_iter_t bhttp_root;
         if (bson_iter_recurse(&ar, &bhttp_root) && bson_iter_find(&bhttp_root, STREAM_OUTPUT_URLS_HTTP_ROOT_FIELD) &&

@@ -127,8 +127,8 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
   const char* extra_header = "Access-Control-Allow-Origin: *";
   if (hrequest.GetMethod() == common::http::http_method::HM_GET ||
       hrequest.GetMethod() == common::http::http_method::HM_HEAD) {
-    common::uri::Upath path = hrequest.GetPath();
-    if (!path.IsValid() || path.IsRoot()) {  // for hls
+    auto url_request = hrequest.GetURL();
+    if (!url_request.is_valid()) {  // for hls
       common::ErrnoError err =
           hclient->SendError(protocol, common::http::HS_NOT_FOUND, extra_header, "Invalid request.", IsKeepAlive, hinf);
       if (err) {
@@ -137,8 +137,9 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
       goto finish;
     }
 
+    const std::string full_path = url_request.PathForRequest();
     std::vector<std::string> tokens;
-    const size_t levels = common::Tokenize(path.GetPath(), "/", &tokens);
+    const size_t levels = common::Tokenize(full_path, "/", &tokens);
     if (levels < 6) {
       common::ErrnoError err =
           hclient->SendError(protocol, common::http::HS_NOT_FOUND, extra_header, "Invalid request.", IsKeepAlive, hinf);
@@ -183,8 +184,8 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
     }
 
     base::ISubscribersManager::http_directory_t directory;
-    common::uri::Url url;
-    cerr = manager_->ClientFindHttpDirectoryOrUrlForChannel(maybe_auth, sid, cid, &directory, &url);
+    common::uri::GURL url_for_channel;
+    cerr = manager_->ClientFindHttpDirectoryOrUrlForChannel(maybe_auth, sid, cid, &directory, &url_for_channel);
     if (cerr) {
       const std::string err_desc = cerr->GetDescription();
       common::ErrnoError errn =
@@ -196,8 +197,8 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
     }
 
     if (!directory.IsValid()) {
-      DCHECK(url.IsValid());
-      const std::string url_str = url.GetUrl();
+      DCHECK(url_for_channel.is_valid());
+      const std::string url_str = url_for_channel.spec();
       const std::string redirect_header = common::MemSPrintf("Location: %s\r\n", url_str);
       common::ErrnoError err =
           hclient->SendHeaders(protocol, common::http::HS_PERMANENT_REDIRECT, redirect_header.c_str(), nullptr, nullptr,
@@ -253,7 +254,7 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
       goto finish;
     }
 
-    const std::string mime = path.GetMime();
+    const std::string mime = common::http::get_mime_type(url_request.ExtractFileName());
     common::ErrnoError err = hclient->SendHeaders(protocol, common::http::HS_OK, extra_header, mime.c_str(),
                                                   &sb.st_size, &sb.st_mtime, IsKeepAlive, hinf);
     if (err) {

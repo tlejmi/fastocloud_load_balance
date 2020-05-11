@@ -84,7 +84,7 @@ namespace server {
 namespace mongo {
 
 namespace details {
-std::vector<common::uri::Url> MakeUrlsFromOutput(const std::vector<fastotv::OutputUri>& output);
+std::vector<common::uri::GURL> MakeUrlsFromOutput(const std::vector<fastotv::OutputUri>& output);
 }
 
 struct UserStreamInfo {
@@ -111,7 +111,7 @@ bool GetHttpRootFromStream(const bson_t* sdoc,
                            fastotv::StreamType st,
                            fastotv::channel_id_t cid,
                            common::file_system::ascii_directory_string_path* dir);
-bool GetUrlFromStream(const bson_t* sdoc, fastotv::StreamType st, fastotv::channel_id_t cid, common::uri::Url* url);
+bool GetUrlFromStream(const bson_t* sdoc, fastotv::StreamType st, fastotv::channel_id_t cid, common::uri::GURL* url);
 
 bool GetOutputUrlData(bson_iter_t* iter, std::vector<fastotv::OutputUri>* urls);
 

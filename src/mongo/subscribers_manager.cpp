@@ -131,7 +131,7 @@ void CreateInputUrl(bson_t* result, const std::vector<fastotv::InputUri>& urls) 
     bson_append_document_begin(&child, key, keylen, &url);
     BSON_APPEND_UTF8(&url, "_cls", INPUT_URL_CLS);
     BSON_APPEND_INT32(&url, "id", iurl.GetID());
-    const std::string url_str = iurl.GetInput().GetUrl();
+    const std::string url_str = iurl.GetInput().spec();
     BSON_APPEND_UTF8(&url, "uri", url_str.c_str());
     const auto ua = iurl.GetUserAgent();
     if (ua) {
@@ -169,7 +169,7 @@ void CreateOutputUrl(bson_t* result, const std::vector<fastotv::OutputUri>& urls
     bson_append_document_begin(&child, key, keylen, &url);
     BSON_APPEND_UTF8(&url, "_cls", OUTPUT_URL_CLS);
     BSON_APPEND_INT32(&url, "id", out.GetID());
-    const auto url_str = out.GetOutput().GetUrl();
+    const auto url_str = out.GetOutput().spec();
     BSON_APPEND_UTF8(&url, "uri", url_str.c_str());
     const auto http_root = out.GetHttpRoot();
     if (http_root) {
@@ -197,22 +197,22 @@ std::vector<fastotv::OutputUri> CreateCatchupOutputUrl(
   std::vector<fastotv::OutputUri> patched;
   for (size_t i = 0; i < urls.size(); ++i) {
     fastotv::OutputUri out = urls[i];
-    const common::uri::Url origin_url = out.GetOutput();
+    const auto origin_url = out.GetOutput();
 
     if (origin_type == fastotv::PROXY) {
       const std::string catchup_host_str = common::ConvertToString(catchup_host);
       const std::string postfix_dir = common::MemSPrintf("%d/%s/%u", fastotv::CATCHUP, sid, out.GetID());
       const std::string url_str = common::MemSPrintf("http://%s/%s/master.m3u8", catchup_host_str, postfix_dir);
-      out.SetOutput(common::uri::Url(url_str));
+      out.SetOutput(common::uri::GURL(url_str));
       auto cat_dir = catchups_http_root.MakeDirectoryStringPath(postfix_dir);
       if (cat_dir) {
         out.SetHttpRoot(*cat_dir);
       }
     } else {
       const std::string repl = common::MemSPrintf("/%d/", fastotv::CATCHUP);
-      std::string origin_url_str = origin_url.GetUrl();
+      std::string origin_url_str = origin_url.spec();
       common::ReplaceFirstSubstringAfterOffset(&origin_url_str, 0, from, repl);
-      out.SetOutput(common::uri::Url(origin_url_str));
+      out.SetOutput(common::uri::GURL(origin_url_str));
 
       const auto origin_http_root = out.GetHttpRoot();
       if (!origin_http_root) {
@@ -991,7 +991,7 @@ common::Error SubscribersManager::ClientFindHttpDirectoryOrUrlForChannel(const f
                                                                          fastotv::stream_id_t sid,
                                                                          fastotv::channel_id_t cid,
                                                                          http_directory_t* directory,
-                                                                         common::uri::Url* url) {
+                                                                         common::uri::GURL* url) {
   if (!auth.IsValid() || sid == fastotv::invalid_stream_id || !directory || !url) {
     return common::make_error_inval();
   }
@@ -1043,7 +1043,7 @@ common::Error SubscribersManager::ClientFindHttpDirectoryOrUrlForChannel(const f
                     bool is_proxy = st == fastotv::PROXY;
 
                     if (is_proxy) {
-                      common::uri::Url lurl;
+                      common::uri::GURL lurl;
                       if (GetUrlFromStream(sdoc, st, cid, &lurl)) {
                         *url = lurl;
                         return common::Error();
@@ -1056,7 +1056,7 @@ common::Error SubscribersManager::ClientFindHttpDirectoryOrUrlForChannel(const f
                           return common::Error();
                         }
 
-                        common::uri::Url lurl;
+                        common::uri::GURL lurl;
                         if (GetUrlFromStream(sdoc, st, cid, &lurl)) {
                           *url = lurl;
                           return common::Error();
@@ -1109,7 +1109,7 @@ common::Error SubscribersManager::ClientFindHttpDirectoryOrUrlForChannel(const f
                     bool is_proxy = st == fastotv::VOD_PROXY;
 
                     if (is_proxy) {
-                      common::uri::Url lurl;
+                      common::uri::GURL lurl;
                       if (GetUrlFromStream(sdoc, st, cid, &lurl)) {
                         *url = lurl;
                         return common::Error();
@@ -1122,7 +1122,7 @@ common::Error SubscribersManager::ClientFindHttpDirectoryOrUrlForChannel(const f
                           return common::Error();
                         }
 
-                        common::uri::Url lurl;
+                        common::uri::GURL lurl;
                         if (GetUrlFromStream(sdoc, st, cid, &lurl)) {
                           *url = lurl;
                           return common::Error();
@@ -1175,7 +1175,7 @@ common::Error SubscribersManager::ClientFindHttpDirectoryOrUrlForChannel(const f
                     bool is_proxy = (st == fastotv::PROXY || st == fastotv::VOD_PROXY);
 
                     if (is_proxy) {
-                      common::uri::Url lurl;
+                      common::uri::GURL lurl;
                       if (GetUrlFromStream(sdoc, st, cid, &lurl)) {
                         *url = lurl;
                         return common::Error();
@@ -1192,7 +1192,7 @@ common::Error SubscribersManager::ClientFindHttpDirectoryOrUrlForChannel(const f
                           }
                         }
                       }
-                      common::uri::Url lurl;
+                      common::uri::GURL lurl;
                       if (GetUrlFromStream(sdoc, st, cid, &lurl)) {
                         *url = lurl;
                         return common::Error();
@@ -1898,7 +1898,7 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   BSON_APPEND_UTF8(doc.get(), CHANNEL_TVG_ID_FIELD, tvg_id.c_str());
   std::string tvg_name;
   BSON_APPEND_UTF8(doc.get(), CHANNEL_TVG_NAME_FIELD, tvg_name.c_str());
-  std::string tvg_logo = epg.GetIconUrl().GetUrl();
+  std::string tvg_logo = epg.GetIconUrl().spec();
   BSON_APPEND_UTF8(doc.get(), CHANNEL_TVG_LOGO_FIELD, tvg_logo.c_str());
   double price = 0;
   BSON_APPEND_DOUBLE(doc.get(), STREAM_PRICE_FIELD, price);
@@ -1909,7 +1909,7 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   BSON_APPEND_INT32(doc.get(), STREAM_VIEW_COUNT_FIELD, 0);
   const unique_ptr_bson_t bparts(bson_new());
   BSON_APPEND_ARRAY(doc.get(), STREAM_PARTS_FIELD, bparts.get());
-  std::vector<common::uri::Url> true_catchups_urls = details::MakeUrlsFromOutput(CreateCatchupOutputUrl(
+  std::vector<common::uri::GURL> true_catchups_urls = details::MakeUrlsFromOutput(CreateCatchupOutputUrl(
       doc.get(), output_urls, st, cid_str, catchup_endpoint_.catchups_host, catchup_endpoint_.catchups_http_root));
   int log_level = common::logging::LOG_LEVEL_INFO;
   BSON_APPEND_INT32(doc.get(), STREAM_LOG_LEVEL_FIELD, log_level);

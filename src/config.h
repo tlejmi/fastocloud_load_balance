@@ -19,7 +19,7 @@
 #include <common/error.h>
 #include <common/license/types.h>
 #include <common/net/types.h>
-#include <common/uri/url.h>
+#include <common/uri/gurl.h>
 
 namespace fastocloud {
 namespace server {
@@ -39,7 +39,7 @@ struct Config {
   common::logging::LOG_LEVEL log_level;
   common::net::HostAndPort http_host;
   std::string mongodb_url;
-  common::uri::Url epg_url;
+  common::uri::GURL epg_url;
   std::string locked_stream_text;
   license_t license_key;
 };

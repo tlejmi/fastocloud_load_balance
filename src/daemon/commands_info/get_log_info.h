@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <common/uri/url.h>
+#include <common/uri/gurl.h>
 
 #include <common/serializer/json_serializer.h>
 
@@ -25,7 +25,7 @@ namespace service {
 class GetLogInfo : public common::serializer::JsonSerializer<GetLogInfo> {
  public:
   typedef common::serializer::JsonSerializer<GetLogInfo> base_class;
-  typedef common::uri::Url url_t;
+  typedef common::uri::GURL url_t;
   GetLogInfo();
   explicit GetLogInfo(const url_t& log_path);
 
@@ -36,7 +36,7 @@ class GetLogInfo : public common::serializer::JsonSerializer<GetLogInfo> {
   common::Error SerializeFields(json_object* out) const override;
 
  private:
-  common::uri::Url path_;
+  url_t path_;
 };
 
 }  // namespace service

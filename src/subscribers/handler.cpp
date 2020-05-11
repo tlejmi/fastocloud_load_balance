@@ -36,7 +36,7 @@ namespace subscribers {
 
 SubscribersHandler::SubscribersHandler(ISubscribersHandlerObserver* observer,
                                        base::ISubscribersManager* manager,
-                                       const common::uri::Url& epg_url,
+                                       const common::uri::GURL& epg_url,
                                        const std::string& locked_text)
     : base_class(),
       epg_url_(epg_url),

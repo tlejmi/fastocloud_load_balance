@@ -415,9 +415,8 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientGetLogService(Protoco
     }
 
     const auto remote_log_path = get_log_info.GetLogPath();
-    if (remote_log_path.GetScheme() == common::uri::Url::http) {
+    if (remote_log_path.SchemeIsHTTPOrHTTPS()) {
       common::net::PostHttpFile(common::file_system::ascii_file_string_path(config_.log_path), remote_log_path);
-    } else if (remote_log_path.GetScheme() == common::uri::Url::https) {
     }
 
     return dclient->GetLogServiceSuccess(req->id);

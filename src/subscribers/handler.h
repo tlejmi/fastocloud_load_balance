@@ -16,7 +16,7 @@
 
 #include <string>
 
-#include <common/uri/url.h>
+#include <common/uri/gurl.h>
 
 #include <fastotv/protocol/types.h>
 
@@ -41,7 +41,7 @@ class SubscribersHandler : public base::IServerHandler {
 
   explicit SubscribersHandler(ISubscribersHandlerObserver* observer,
                               base::ISubscribersManager* manager,
-                              const common::uri::Url& epg_url,
+                              const common::uri::GURL& epg_url,
                               const std::string& locked_text);
 
   void PreLooped(common::libev::IoLoop* server) override;
@@ -83,7 +83,7 @@ class SubscribersHandler : public base::IServerHandler {
                                                           fastotv::protocol::response_t* resp);
 
  private:
-  const common::uri::Url epg_url_;
+  const common::uri::GURL epg_url_;
   const std::string locked_text_;
 
   common::libev::timer_id_t ping_client_id_timer_;

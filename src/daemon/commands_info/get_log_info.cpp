@@ -27,7 +27,7 @@ GetLogInfo::GetLogInfo() : base_class(), path_() {}
 GetLogInfo::GetLogInfo(const url_t& path) : path_(path) {}
 
 common::Error GetLogInfo::SerializeFields(json_object* out) const {
-  const std::string path_str = path_.GetUrl();
+  const std::string path_str = path_.spec();
   json_object_object_add(out, GET_LOG_INFO_PATH_FIELD, json_object_new_string(path_str.c_str()));
   return common::Error();
 }

@@ -83,7 +83,7 @@ class ISubscribersManager {
                                                                fastotv::stream_id_t sid,
                                                                fastotv::channel_id_t cid,
                                                                http_directory_t* directory,
-                                                               common::uri::Url* url) WARN_UNUSED_RESULT = 0;
+                                                               common::uri::GURL* url) WARN_UNUSED_RESULT = 0;
 
   virtual common::Error SetFavorite(const base::ServerDBAuthInfo& auth,
                                     const fastotv::commands_info::FavoriteInfo& favorite) WARN_UNUSED_RESULT = 0;

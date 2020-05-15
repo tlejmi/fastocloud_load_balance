@@ -695,6 +695,7 @@ void ProcessSlaveWrapper::CatchupCreated(subscribers::SubscribersHandler* handle
   fastotv::protocol::request_t req;
   common::Error err_ser = CatchupCreatedBroadcast(serverid, chan, &req);
   if (err_ser) {
+    WARNING_LOG() << "Can't create catchup broadcast request";
     return;
   }
 

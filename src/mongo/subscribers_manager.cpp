@@ -1922,15 +1922,15 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   CreateInputUrl(doc.get(), catchup_inputs);
   BSON_APPEND_BOOL(doc.get(), STREAM_HAVE_VIDEO_FIELD, based_on.IsEnableVideo());
   BSON_APPEND_BOOL(doc.get(), STREAM_HAVE_AUDIO_FIELD, based_on.IsEnableAudio());
-  int audio_select = -1;
-  BSON_APPEND_INT32(doc.get(), STREAM_AUDIO_SELECT_FIELD, audio_select);
+  // int audio_select = -1;
+  // BSON_APPEND_INT32(doc.get(), STREAM_AUDIO_SELECT_FIELD, audio_select);
   bool loop = false;
   BSON_APPEND_BOOL(doc.get(), STREAM_LOOP_FIELD, loop);
   int restart_attempts = 10;
   BSON_APPEND_INT32(doc.get(), STREAM_RESTART_ATTEMPTS_FIELD, restart_attempts);
   int auto_exit = (stop - start) / 1000;
   BSON_APPEND_INT32(doc.get(), STREAM_AUTO_EXIT_FIELD, auto_exit);
-  std::string extra_args;
+  std::string extra_args = "{}";
   BSON_APPEND_UTF8(doc.get(), STREAM_EXTRA_CONFIG_ARGS_FIELD, extra_args.c_str());
   std::string video_parser = "h264parse";
   BSON_APPEND_UTF8(doc.get(), STREAM_VIDEO_PARSER_FIELD, video_parser.c_str());

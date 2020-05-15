@@ -1773,7 +1773,7 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   fastotv::commands_info::CatchupInfo copy(based_on.GetStreamID(), based_on.GetGroups(), based_on.GetIARC(),
                                            based_on.GetFavorite(), based_on.GetRecent(), based_on.GetInterruptionTime(),
                                            epg, based_on.IsEnableAudio(), based_on.IsEnableVideo(), based_on.GetParts(),
-                                           0, false, start, stop);
+                                           0, false, based_on.GetMetaUrls(), start, stop);
 
   const auto parts = based_on.GetParts();
   if (!parts.empty()) {

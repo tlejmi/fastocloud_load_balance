@@ -17,6 +17,9 @@
 #include <string>
 #include <vector>
 
+#define META_URL_NAME_FIELD "name"
+#define META_URL_URL_FIELD "url"
+
 namespace fastocloud {
 namespace server {
 namespace mongo {
@@ -56,7 +59,8 @@ bool MakeVodInfo(const bson_t* sdoc,
   int check_sum = 0;
   bool have_audio = true;
   bool have_video = true;
-  while (bson_iter_next(&iter) && check_sum != CHECK_SUM_VOD) {
+  fastotv::commands_info::StreamBaseInfo::meta_urls_t meta;
+  while (bson_iter_next(&iter)) {
     const char* key = bson_iter_key(&iter);
     if (strcmp(key, STREAM_ID_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_OID(&iter)) {
@@ -148,6 +152,46 @@ bool MakeVodInfo(const bson_t* sdoc,
         std::string part_str = common::ConvertToString(oid);
         parts.push_back(part_str);
       }
+    } else if (strcmp(key, STREAM_META_URLS_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_ARRAY(&iter)) {
+        return false;
+      }
+
+      bson_iter_t bmetas;
+      if (!bson_iter_recurse(&iter, &bmetas)) {
+        return false;
+      }
+
+      while (bson_iter_next(&bmetas)) {
+        if (BSON_ITER_HOLDS_DOCUMENT(&bmetas)) {
+          uint32_t len;
+          const uint8_t* buf;
+          bson_iter_document(&bmetas, &len, &buf);
+          bson_t rec;
+          bson_init_static(&rec, buf, len);
+          {
+            bson_iter_t iter;
+            bson_iter_init(&iter, &rec);
+            fastotv::MetaUrl url;
+            if (bson_iter_find(&iter, META_URL_NAME_FIELD)) {
+              const char* name = bson_iter_utf8(&iter, NULL);
+              if (name) {
+                url.SetName(name);
+              }
+            }
+            if (bson_iter_find(&iter, META_URL_URL_FIELD)) {
+              const char* uri = bson_iter_utf8(&iter, NULL);
+              if (uri) {
+                url.SetUrl(common::uri::GURL(uri));
+              }
+            }
+            if (url.IsValid()) {
+              meta.Add(url);
+            }
+          }
+          bson_destroy(&rec);
+        }
+      }
     } else if (strcmp(key, STREAM_HAVE_VIDEO_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_BOOL(&iter)) {
         return false;
@@ -202,7 +246,7 @@ bool MakeVodInfo(const bson_t* sdoc,
   }
 
   *cinf = fastotv::commands_info::VodInfo(sid_str, groups, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
-                                          mov, have_video, have_audio, parts, view_count, uinfo.locked);
+                                          mov, have_video, have_audio, parts, view_count, uinfo.locked, meta);
   return true;
 }  // namespace mongo
 
@@ -226,6 +270,7 @@ bool MakeCatchupInfo(const bson_t* sdoc,
   fastotv::commands_info::EpgInfo epg;
   fastotv::commands_info::StreamBaseInfo::parts_t parts;
   fastotv::commands_info::StreamBaseInfo::groups_t groups;
+  fastotv::commands_info::StreamBaseInfo::meta_urls_t meta;
   fastotv::timestamp_t start;
   fastotv::timestamp_t stop;
   int check_sum = 0;
@@ -233,7 +278,7 @@ bool MakeCatchupInfo(const bson_t* sdoc,
   int view_count;
   bool have_audio = true;
   bool have_video = true;
-  while (bson_iter_next(&iter) && check_sum != CHECK_SUM_CATCHUP) {
+  while (bson_iter_next(&iter)) {
     const char* key = bson_iter_key(&iter);
     if (strcmp(key, STREAM_ID_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_OID(&iter)) {
@@ -307,6 +352,46 @@ bool MakeCatchupInfo(const bson_t* sdoc,
         std::string part_str = common::ConvertToString(oid);
         parts.push_back(part_str);
       }
+    } else if (strcmp(key, STREAM_META_URLS_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_ARRAY(&iter)) {
+        return false;
+      }
+
+      bson_iter_t bmetas;
+      if (!bson_iter_recurse(&iter, &bmetas)) {
+        return false;
+      }
+
+      while (bson_iter_next(&bmetas)) {
+        if (BSON_ITER_HOLDS_DOCUMENT(&bmetas)) {
+          uint32_t len;
+          const uint8_t* buf;
+          bson_iter_document(&bmetas, &len, &buf);
+          bson_t rec;
+          bson_init_static(&rec, buf, len);
+          {
+            bson_iter_t iter;
+            bson_iter_init(&iter, &rec);
+            fastotv::MetaUrl url;
+            if (bson_iter_find(&iter, META_URL_NAME_FIELD)) {
+              const char* name = bson_iter_utf8(&iter, NULL);
+              if (name) {
+                url.SetName(name);
+              }
+            }
+            if (bson_iter_find(&iter, META_URL_URL_FIELD)) {
+              const char* uri = bson_iter_utf8(&iter, NULL);
+              if (uri) {
+                url.SetUrl(common::uri::GURL(uri));
+              }
+            }
+            if (url.IsValid()) {
+              meta.Add(url);
+            }
+          }
+          bson_destroy(&rec);
+        }
+      }
     } else if (strcmp(key, STREAM_HAVE_VIDEO_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_BOOL(&iter)) {
         return false;
@@ -350,9 +435,9 @@ bool MakeCatchupInfo(const bson_t* sdoc,
     return false;
   }
 
-  *cinf =
-      fastotv::commands_info::CatchupInfo(sid_str, groups, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
-                                          epg, have_video, have_audio, parts, view_count, uinfo.locked, start, stop);
+  *cinf = fastotv::commands_info::CatchupInfo(sid_str, groups, iarc, uinfo.favorite, uinfo.recent,
+                                              uinfo.interruption_time, epg, have_video, have_audio, parts, view_count,
+                                              uinfo.locked, meta, start, stop);
   return true;
 }
 
@@ -376,6 +461,7 @@ bool MakeChannelInfo(const bson_t* sdoc,
   fastotv::commands_info::EpgInfo epg;
   fastotv::commands_info::StreamBaseInfo::parts_t parts;
   fastotv::commands_info::StreamBaseInfo::groups_t groups;
+  fastotv::commands_info::StreamBaseInfo::meta_urls_t meta;
   int check_sum = 0;
   int iarc;
   int view_count;
@@ -455,6 +541,46 @@ bool MakeChannelInfo(const bson_t* sdoc,
         std::string part_str = common::ConvertToString(oid);
         parts.push_back(part_str);
       }
+    } else if (strcmp(key, STREAM_META_URLS_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_ARRAY(&iter)) {
+        return false;
+      }
+
+      bson_iter_t bmetas;
+      if (!bson_iter_recurse(&iter, &bmetas)) {
+        return false;
+      }
+
+      while (bson_iter_next(&bmetas)) {
+        if (BSON_ITER_HOLDS_DOCUMENT(&bmetas)) {
+          uint32_t len;
+          const uint8_t* buf;
+          bson_iter_document(&bmetas, &len, &buf);
+          bson_t rec;
+          bson_init_static(&rec, buf, len);
+          {
+            bson_iter_t iter;
+            bson_iter_init(&iter, &rec);
+            fastotv::MetaUrl url;
+            if (bson_iter_find(&iter, META_URL_NAME_FIELD)) {
+              const char* name = bson_iter_utf8(&iter, NULL);
+              if (name) {
+                url.SetName(name);
+              }
+            }
+            if (bson_iter_find(&iter, META_URL_URL_FIELD)) {
+              const char* uri = bson_iter_utf8(&iter, NULL);
+              if (uri) {
+                url.SetUrl(common::uri::GURL(uri));
+              }
+            }
+            if (url.IsValid()) {
+              meta.Add(url);
+            }
+          }
+          bson_destroy(&rec);
+        }
+      }
     } else if (strcmp(key, STREAM_HAVE_VIDEO_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_BOOL(&iter)) {
         return false;
@@ -487,7 +613,7 @@ bool MakeChannelInfo(const bson_t* sdoc,
 
   *cinf =
       fastotv::commands_info::ChannelInfo(sid_str, groups, iarc, uinfo.favorite, uinfo.recent, uinfo.interruption_time,
-                                          epg, have_video, have_audio, parts, view_count, uinfo.locked);
+                                          epg, have_video, have_audio, parts, view_count, uinfo.locked, meta);
   return true;
 }
 

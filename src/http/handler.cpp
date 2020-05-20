@@ -254,9 +254,10 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
       goto finish;
     }
 
-    const std::string mime = common::http::get_mime_type(url_request.ExtractFileName());
-    common::ErrnoError err = hclient->SendHeaders(protocol, common::http::HS_OK, extra_header, mime.c_str(),
-                                                  &sb.st_size, &sb.st_mtime, IsKeepAlive, hinf);
+    const std::string fileName = url_request.ExtractFileName();
+    const char* mime = common::http::MimeTypes::GetType(fileName.c_str());
+    common::ErrnoError err = hclient->SendHeaders(protocol, common::http::HS_OK, extra_header, mime, &sb.st_size,
+                                                  &sb.st_mtime, IsKeepAlive, hinf);
     if (err) {
       DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
       ::close(file);

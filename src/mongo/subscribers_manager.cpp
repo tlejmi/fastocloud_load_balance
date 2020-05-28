@@ -138,10 +138,7 @@ void CreateInputUrl(bson_t* result, const std::vector<fastotv::InputUri>& urls) 
     if (ua) {
       BSON_APPEND_INT32(&url, "user_agent", *ua);
     }
-    const auto stream_link = iurl.GetStreamLink();
-    if (stream_link) {
-      BSON_APPEND_BOOL(&url, "stream_link", *stream_link);
-    }
+    // http_proxy and stream_link
     bson_append_document_end(&child, &url);
   }
   bson_append_array_end(result, &child);

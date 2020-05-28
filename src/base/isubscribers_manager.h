@@ -27,6 +27,7 @@
 #include <fastotv/commands_info/interrupt_stream_time_info.h>
 #include <fastotv/commands_info/notification_text_info.h>
 #include <fastotv/commands_info/recent_stream_time_info.h>
+#include <fastotv/commands_info/series_info.h>
 #include <fastotv/commands_info/vods_info.h>
 
 #include "base/subscriber_info.h"
@@ -78,7 +79,8 @@ class ISubscribersManager {
                                           fastotv::commands_info::VodsInfo* vods,
                                           fastotv::commands_info::ChannelsInfo* pchans,
                                           fastotv::commands_info::VodsInfo* pvods,
-                                          fastotv::commands_info::CatchupsInfo* catchups) WARN_UNUSED_RESULT = 0;
+                                          fastotv::commands_info::CatchupsInfo* catchups,
+                                          fastotv::commands_info::SeriesInfo* series) WARN_UNUSED_RESULT = 0;
   virtual common::Error ClientFindHttpDirectoryOrUrlForChannel(const fastotv::commands_info::AuthInfo& auth,
                                                                fastotv::stream_id_t sid,
                                                                fastotv::channel_id_t cid,

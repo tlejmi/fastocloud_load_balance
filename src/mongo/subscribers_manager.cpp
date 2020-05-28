@@ -33,6 +33,7 @@
 #define SUBSCRIBERS_COLLECTION "subscribers"
 #define SERVERS_COLLECTION "services"
 #define STREAMS_COLLECTION "streams"
+#define SERIES_COLLECTION "series"
 
 #define PROXY_STR "pyfastocloud_models.stream.entry.ProxyStream"
 #define VOD_PROXY_STR "pyfastocloud_models.stream.entry.ProxyVodStream"
@@ -426,14 +427,14 @@ common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mong
   mongoc_collection_t* scollection = mongoc_client_get_collection(client, DB_NAME, SUBSCRIBERS_COLLECTION);
   if (!scollection) {
     mongoc_client_destroy(client);
-    return common::make_errno_error("Can't find subscribers collection.", EAGAIN);
+    return common::make_errno_error("Can't find " SUBSCRIBERS_COLLECTION " collection.", EAGAIN);
   }
 
   mongoc_collection_t* sercollection = mongoc_client_get_collection(client, DB_NAME, SERVERS_COLLECTION);
   if (!sercollection) {
     mongoc_collection_destroy(scollection);
     mongoc_client_destroy(client);
-    return common::make_errno_error("Can't find streams collection.", EAGAIN);
+    return common::make_errno_error("Can't find " SERVERS_COLLECTION " collection.", EAGAIN);
   }
 
   mongoc_collection_t* stcollection = mongoc_client_get_collection(client, DB_NAME, STREAMS_COLLECTION);
@@ -441,20 +442,29 @@ common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mong
     mongoc_collection_destroy(sercollection);
     mongoc_collection_destroy(scollection);
     mongoc_client_destroy(client);
-    return common::make_errno_error("Can't find streams collection.", EAGAIN);
+    return common::make_errno_error("Can't find " STREAMS_COLLECTION " collection.", EAGAIN);
+  }
+
+  mongoc_collection_t* series = mongoc_client_get_collection(client, DB_NAME, SERIES_COLLECTION);
+  if (!series) {
+    mongoc_collection_destroy(sercollection);
+    mongoc_collection_destroy(scollection);
+    mongoc_client_destroy(client);
+    return common::make_errno_error("Can't find " SERIES_COLLECTION " collection.", EAGAIN);
   }
 
   servers_ = sercollection;
   streams_ = stcollection;
   subscribers_ = scollection;
+  series_ = series;
   client_ = client;
   return common::ErrnoError();
 }
 
 common::ErrnoError SubscribersManager::Disconnect() {
-  if (streams_) {
-    mongoc_collection_destroy(streams_);
-    streams_ = nullptr;
+  if (servers_) {
+    mongoc_collection_destroy(servers_);
+    servers_ = nullptr;
   }
 
   if (streams_) {
@@ -465,6 +475,11 @@ common::ErrnoError SubscribersManager::Disconnect() {
   if (subscribers_) {
     mongoc_collection_destroy(subscribers_);
     subscribers_ = nullptr;
+  }
+
+  if (series_) {
+    mongoc_collection_destroy(series_);
+    series_ = nullptr;
   }
 
   if (client_) {
@@ -824,12 +839,13 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
                                                     fastotv::commands_info::VodsInfo* vods,
                                                     fastotv::commands_info::ChannelsInfo* pchans,
                                                     fastotv::commands_info::VodsInfo* pvods,
-                                                    fastotv::commands_info::CatchupsInfo* catchups) {
-  if (!auth.IsValid() || !chans || !vods || !pchans || !pvods || !catchups) {
+                                                    fastotv::commands_info::CatchupsInfo* catchups,
+                                                    fastotv::commands_info::SeriesInfo* series) {
+  if (!auth.IsValid() || !chans || !vods || !pchans || !pvods || !catchups || !series) {
     return common::make_error_inval();
   }
 
-  if (!subscribers_ || !streams_) {
+  if (!subscribers_ || !streams_ || !series_) {
     return common::make_error("Not conencted to DB");
   }
 
@@ -977,13 +993,16 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
     }
   }
 
+  fastotv::commands_info::SeriesInfo lseries;
+
   *vods = lvods;
   *chans = lchans;
   *pchans = lpchans;
   *pvods = lpvods;
   *catchups = lcatchups;
+  *series = lseries;
   DEBUG_LOG() << "Vods: " << lvods.Size() << " Channels: " << lchans.Size() << " PChannels: " << lpchans.Size()
-              << " PVods: " << lpvods.Size() << " Catchups: " << lcatchups.Size();
+              << " PVods: " << lpvods.Size() << " Catchups: " << lcatchups.Size() << " Series: " << lseries.Size();
   return common::Error();
 }
 

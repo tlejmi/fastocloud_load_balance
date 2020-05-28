@@ -67,7 +67,7 @@ ProcessSlaveWrapper::ProcessSlaveWrapper(const Config& config)
   loop_->SetName("client_server");
 
   mongo::SubscribersManager* sub_manager = new mongo::SubscribersManager(this);
-  sub_manager->ConnectToDatabase(config.mongodb_url);
+  ignore_result(sub_manager->ConnectToDatabase(config.mongodb_url));
   sub_manager_ = sub_manager;
 
   subscribers_handler_ =
@@ -108,7 +108,7 @@ common::ErrnoError ProcessSlaveWrapper::SendStopDaemonRequest(const Config& conf
 }
 
 ProcessSlaveWrapper::~ProcessSlaveWrapper() {
-  (static_cast<mongo::SubscribersManager*>(sub_manager_))->Disconnect();
+  ignore_result((static_cast<mongo::SubscribersManager*>(sub_manager_))->Disconnect());
   destroy(&http_server_);
   destroy(&http_handler_);
   destroy(&subscribers_server_);

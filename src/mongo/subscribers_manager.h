@@ -68,7 +68,8 @@ class SubscribersManager : public base::ISubscribersManager {
                                   fastotv::commands_info::VodsInfo* vods,
                                   fastotv::commands_info::ChannelsInfo* pchans,
                                   fastotv::commands_info::VodsInfo* pvods,
-                                  fastotv::commands_info::CatchupsInfo* catchups) override WARN_UNUSED_RESULT;
+                                  fastotv::commands_info::CatchupsInfo* catchups,
+                                  fastotv::commands_info::SeriesInfo* series) override WARN_UNUSED_RESULT;
 
   common::Error ClientFindHttpDirectoryOrUrlForChannel(const fastotv::commands_info::AuthInfo& auth,
                                                        fastotv::stream_id_t sid,
@@ -135,6 +136,7 @@ class SubscribersManager : public base::ISubscribersManager {
   mongoc_collection_t* subscribers_;
   mongoc_collection_t* servers_;
   mongoc_collection_t* streams_;
+  mongoc_collection_t* series_;
 
   base::CatchupEndpointInfo catchup_endpoint_;
 };

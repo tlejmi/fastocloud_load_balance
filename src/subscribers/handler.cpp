@@ -355,13 +355,14 @@ common::ErrnoError SubscribersHandler::HandleRequestClientGetChannels(Subscriber
   fastotv::commands_info::ChannelsInfo pchans;
   fastotv::commands_info::VodsInfo pvods;
   fastotv::commands_info::CatchupsInfo catchups;
-  err = manager_->ClientGetChannels(auth, &chans, &vods, &pchans, &pvods, &catchups);
+  fastotv::commands_info::SeriesInfo series;
+  err = manager_->ClientGetChannels(auth, &chans, &vods, &pchans, &pvods, &catchups, &series);
   if (err) {
-    client->GetChannelsFail(req->id, err);
+    ignore_result(client->GetChannelsFail(req->id, err));
     return common::make_errno_error(err->GetDescription(), EINVAL);
   }
 
-  return client->GetChannelsSuccess(req->id, chans, vods, pchans, pvods, catchups);
+  return client->GetChannelsSuccess(req->id, chans, vods, pchans, pvods, catchups, series);
 }
 
 common::ErrnoError SubscribersHandler::HandleRequestClientGetRuntimeChannelInfo(SubscriberClient* client,

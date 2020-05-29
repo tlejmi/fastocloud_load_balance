@@ -52,7 +52,7 @@ bool MakeVodInfo(const bson_t* sdoc,
   std::string sid_str;
   std::string group;
   int iarc;
-  int view_count;
+  fastotv::commands_info::StreamBaseInfo::view_count_t view_count = 0;
   fastotv::commands_info::MovieInfo mov;
   fastotv::commands_info::StreamBaseInfo::parts_t parts;
   fastotv::commands_info::StreamBaseInfo::groups_t groups;
@@ -275,7 +275,7 @@ bool MakeCatchupInfo(const bson_t* sdoc,
   fastotv::timestamp_t stop;
   int check_sum = 0;
   int iarc;
-  int view_count;
+  fastotv::commands_info::StreamBaseInfo::view_count_t view_count = 0;
   bool have_audio = true;
   bool have_video = true;
   while (bson_iter_next(&iter)) {
@@ -464,7 +464,7 @@ bool MakeChannelInfo(const bson_t* sdoc,
   fastotv::commands_info::StreamBaseInfo::meta_urls_t meta;
   int check_sum = 0;
   int iarc;
-  int view_count;
+  fastotv::commands_info::StreamBaseInfo::view_count_t view_count = 0;
   bool have_audio = true;
   bool have_video = true;
   while (bson_iter_next(&iter) && check_sum != CHECK_SUM_CHANNEL) {
@@ -627,10 +627,10 @@ bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf
     return false;
   }
 
-#define CHECK_SUM_SERIAL 7
+#define CHECK_SUM_SERIAL 6
 
   std::string sid_str;
-  int view_count;
+  fastotv::commands_info::SerialInfo::view_count_t view_count = 0;
   fastotv::commands_info::SerialInfo::groups_t groups;
   fastotv::commands_info::SerialInfo::episodes_t episodes;
   common::uri::GURL icon;
@@ -668,12 +668,6 @@ bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf
         }
       }
 
-      check_sum++;
-    } else if (strcmp(key, SERIAL_VIEW_COUNT_FIELD) == 0) {
-      if (!BSON_ITER_HOLDS_INT32(&iter)) {
-        return false;
-      }
-      view_count = bson_iter_int32(&iter);
       check_sum++;
     } else if (strcmp(key, SERIAL_SEASON_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_INT32(&iter)) {

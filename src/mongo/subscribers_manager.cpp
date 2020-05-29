@@ -997,18 +997,28 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
     bson_iter_t ar;
     if (bson_iter_recurse(&bseries, &ar)) {
       while (bson_iter_next(&ar)) {
-        bson_iter_t sid;
-        if (BSON_ITER_HOLDS_OID(&sid)) {
-          const bson_oid_t* oid = bson_iter_oid(&sid);
-          const unique_ptr_bson_t series_query(BCON_NEW("_id", BCON_OID(oid)));
-          const std::unique_ptr<mongoc_cursor_t, MongoCursorDeleter> stream_cursor(
-              mongoc_collection_find(series_, MONGOC_QUERY_NONE, 0, 0, 0, series_query.get(), NULL, NULL));
-          const bson_t* sdoc;
-          if (stream_cursor && mongoc_cursor_next(stream_cursor.get(), &sdoc)) {
-            fastotv::commands_info::SerialInfo ser;
-            if (MakeSerialInfo(sdoc, &ser)) {
-              lseries.Add(ser);
+        const bson_oid_t* sid = bson_iter_oid(&ar);
+        const unique_ptr_bson_t series_query(BCON_NEW("_id", BCON_OID(sid)));
+        const std::unique_ptr<mongoc_cursor_t, MongoCursorDeleter> stream_cursor(
+            mongoc_collection_find(series_, MONGOC_QUERY_NONE, 0, 0, 0, series_query.get(), NULL, NULL));
+        const bson_t* sdoc;
+        if (stream_cursor && mongoc_cursor_next(stream_cursor.get(), &sdoc)) {
+          fastotv::commands_info::SerialInfo ser;
+          if (MakeSerialInfo(sdoc, &ser)) {
+            // stable views
+            auto episodes = ser.GetEpisodes();
+            auto vods_array = lvods.Get();
+            size_t view_counts = 0;
+            for (auto episode : episodes) {
+              for (auto serial : vods_array) {
+                if (serial.IsSerial() && serial.GetStreamID() == episode) {
+                  view_counts += serial.GetViewCount();
+                  break;
+                }
+              }
             }
+            ser.SetViewCount(view_counts);
+            lseries.Add(ser);
           }
         }
       }

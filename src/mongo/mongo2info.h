@@ -84,7 +84,6 @@
 // serial
 #define SERIAL_ID_FIELD "_id"
 #define SERIAL_GROUPS_FIELD "groups"
-#define SERIAL_VIEW_COUNT_FIELD "view_count"
 #define SERIAL_NAME_FIELD "name"
 #define SERIAL_ICON_FIELD "icon"
 #define SERIAL_SEASON_FIELD "season"

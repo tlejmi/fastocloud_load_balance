@@ -23,6 +23,7 @@
 
 #include <fastotv/commands_info/catchup_info.h>
 #include <fastotv/commands_info/channel_info.h>
+#include <fastotv/commands_info/serial_info.h>
 #include <fastotv/commands_info/vod_info.h>
 #include <fastotv/types/output_uri.h>
 
@@ -80,6 +81,16 @@
 #define CATCHUP_START_FIELD "start"
 #define CATCHUP_STOP_FIELD "stop"
 
+// serial
+#define SERIAL_ID_FIELD "_id"
+#define SERIAL_GROUPS_FIELD "groups"
+#define SERIAL_VIEW_COUNT_FIELD "view_count"
+#define SERIAL_NAME_FIELD "name"
+#define SERIAL_ICON_FIELD "icon"
+#define SERIAL_SEASON_FIELD "season"
+#define SERIAL_EPISODES_FIELD "episodes"
+#define SERIAL_DESCRIPTION_FIELD "description"
+
 namespace fastocloud {
 namespace server {
 namespace mongo {
@@ -108,6 +119,7 @@ bool MakeCatchupInfo(const bson_t* sdoc,
                      fastotv::StreamType st,
                      const UserStreamInfo& uinfo,
                      fastotv::commands_info::CatchupInfo* cinf);
+bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf);
 bool GetHttpRootFromStream(const bson_t* sdoc,
                            fastotv::StreamType st,
                            fastotv::channel_id_t cid,

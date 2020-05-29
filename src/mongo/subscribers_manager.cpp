@@ -57,6 +57,7 @@
 #define USER_STREAMS_FIELD "streams"
 #define USER_VODS_FIELD "vods"
 #define USER_CATCHUPS_FIELD "catchups"
+#define SERIES_FIELD "series"
 
 #define SERVER_STREAMS_FIELD "streams"
 
@@ -991,6 +992,28 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
   }
 
   fastotv::commands_info::SeriesInfo lseries;
+  bson_iter_t bseries;
+  if (bson_iter_init_find(&bseries, doc, SERIES_FIELD) && BSON_ITER_HOLDS_ARRAY(&bseries)) {
+    bson_iter_t ar;
+    if (bson_iter_recurse(&bseries, &ar)) {
+      while (bson_iter_next(&ar)) {
+        bson_iter_t sid;
+        if (BSON_ITER_HOLDS_OID(&sid)) {
+          const bson_oid_t* oid = bson_iter_oid(&sid);
+          const unique_ptr_bson_t series_query(BCON_NEW("_id", BCON_OID(oid)));
+          const std::unique_ptr<mongoc_cursor_t, MongoCursorDeleter> stream_cursor(
+              mongoc_collection_find(series_, MONGOC_QUERY_NONE, 0, 0, 0, series_query.get(), NULL, NULL));
+          const bson_t* sdoc;
+          if (stream_cursor && mongoc_cursor_next(stream_cursor.get(), &sdoc)) {
+            fastotv::commands_info::SerialInfo ser;
+            if (MakeSerialInfo(sdoc, &ser)) {
+              lseries.Add(ser);
+            }
+          }
+        }
+      }
+    }
+  }
 
   *vods = lvods;
   *chans = lchans;

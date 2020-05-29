@@ -617,6 +617,115 @@ bool MakeChannelInfo(const bson_t* sdoc,
   return true;
 }
 
+bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf) {
+  if (!sdoc || !sinf) {
+    return false;
+  }
+
+  bson_iter_t iter;
+  if (!bson_iter_init(&iter, sdoc)) {
+    return false;
+  }
+
+#define CHECK_SUM_SERIAL 16
+
+  std::string sid_str;
+  int view_count;
+  fastotv::commands_info::SerialInfo::groups_t groups;
+  fastotv::commands_info::SerialInfo::episodes_t episodes;
+  common::uri::GURL icon;
+  std::string name;
+  std::string description;
+  size_t season;
+
+  int check_sum = 0;
+  while (bson_iter_next(&iter)) {
+    const char* key = bson_iter_key(&iter);
+    if (strcmp(key, SERIAL_ID_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_OID(&iter)) {
+        return false;
+      }
+      const bson_oid_t* oid = bson_iter_oid(&iter);
+      sid_str = common::ConvertToString(oid);
+      check_sum++;
+    } else if (strcmp(key, SERIAL_GROUPS_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_ARRAY(&iter)) {
+        return false;
+      }
+      uint32_t array_len;
+      const uint8_t* array = nullptr;
+      bson_iter_array(&iter, &array_len, &array);
+      bson_t array_doc;
+      if (bson_init_static(&array_doc, array, array_len)) {
+        bson_iter_t it;
+        if (bson_iter_init(&it, &array_doc)) {
+          while (bson_iter_next(&it)) {
+            const char* group_data = bson_iter_utf8(&it, NULL);
+            if (group_data) {
+              groups.push_back(group_data);
+            }
+          }
+        }
+      }
+
+      check_sum++;
+    } else if (strcmp(key, SERIAL_VIEW_COUNT_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_INT32(&iter)) {
+        return false;
+      }
+      view_count = bson_iter_int32(&iter);
+      check_sum++;
+    } else if (strcmp(key, SERIAL_SEASON_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_INT32(&iter)) {
+        return false;
+      }
+      season = bson_iter_int32(&iter);
+      check_sum++;
+    } else if (strcmp(key, SERIAL_NAME_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_UTF8(&iter)) {
+        return false;
+      }
+      name = bson_iter_utf8(&iter, NULL);
+      check_sum++;
+    } else if (strcmp(key, SERIAL_ICON_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_UTF8(&iter)) {
+        return false;
+      }
+      icon = common::uri::GURL(bson_iter_utf8(&iter, NULL));
+      check_sum++;
+    } else if (strcmp(key, SERIAL_DESCRIPTION_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_UTF8(&iter)) {
+        return false;
+      }
+      description = bson_iter_utf8(&iter, NULL);
+      check_sum++;
+    } else if (strcmp(key, SERIAL_EPISODES_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_ARRAY(&iter)) {
+        return false;
+      }
+
+      bson_iter_t bparts;
+      if (!bson_iter_recurse(&iter, &bparts)) {
+        return false;
+      }
+
+      while (bson_iter_next(&bparts)) {
+        const bson_oid_t* oid = bson_iter_oid(&bparts);
+        std::string part_str = common::ConvertToString(oid);
+        episodes.push_back(part_str);
+      }
+    }
+  }
+
+  if (check_sum != CHECK_SUM_SERIAL) {
+    WARNING_LOG() << "Skipped serial check_sum: " << check_sum << ", id: " << sid_str;
+    return false;
+  }
+
+  *sinf = fastotv::commands_info::SerialInfo(sid_str, name, icon, groups, description, season, episodes, view_count);
+  return true;
+}
+
 bool GetHttpRootFromStream(const bson_t* sdoc,
                            fastotv::StreamType st,
                            fastotv::channel_id_t cid,

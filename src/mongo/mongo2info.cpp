@@ -627,7 +627,7 @@ bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf
     return false;
   }
 
-#define CHECK_SUM_SERIAL 16
+#define CHECK_SUM_SERIAL 7
 
   std::string sid_str;
   int view_count;

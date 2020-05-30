@@ -410,7 +410,7 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientGetLogService(Protoco
     common::Error err_des = get_log_info.DeSerialize(jlog);
     json_object_put(jlog);
     if (err_des) {
-      ignore_result(dclient->SendSubscriberMessageFail(req->id, err_des));
+      ignore_result(dclient->GetLogServiceFail(req->id, err_des));
       const std::string err_str = err_des->GetDescription();
       return common::make_errno_error(err_str, EAGAIN);
     }
@@ -418,13 +418,13 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientGetLogService(Protoco
     const auto remote_log_path = get_log_info.GetLogPath();
     if (!remote_log_path.SchemeIsHTTPOrHTTPS()) {
       common::ErrnoError errn = common::make_errno_error("Not supported protocol", EAGAIN);
-      ignore_result(dclient->SendSubscriberMessageFail(req->id, common::make_error_from_errno(errn)));
+      ignore_result(dclient->GetLogServiceFail(req->id, common::make_error_from_errno(errn)));
       return errn;
     }
     common::Error err =
         common::net::PostHttpFile(common::file_system::ascii_file_string_path(config_.log_path), remote_log_path);
     if (err) {
-      ignore_result(dclient->SendSubscriberMessageFail(req->id, err));
+      ignore_result(dclient->GetLogServiceFail(req->id, err));
       const std::string err_str = err->GetDescription();
       return common::make_errno_error(err_str, EAGAIN);
     }

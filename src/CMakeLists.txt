@@ -120,7 +120,6 @@ SET(SERVER_DAEMON_HEADERS
   ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/state_info.h
   ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/prepare_info.h
   ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/sync_info.h
-  ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/get_log_info.h
   ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/notify_subscriber_info.h
 )
 
@@ -135,7 +134,6 @@ SET(SERVER_DAEMON_SOURCES
   ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/state_info.cpp
   ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/prepare_info.cpp
   ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/sync_info.cpp
-  ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/get_log_info.cpp
   ${CMAKE_SOURCE_DIR}/src/daemon/commands_info/notify_subscriber_info.cpp
 )
 

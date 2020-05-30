@@ -18,6 +18,7 @@
 #include <vector>
 
 #include <common/daemon/commands/activate_info.h>
+#include <common/daemon/commands/get_log_info.h>
 #include <common/daemon/commands/stop_info.h>
 #include <common/license/expire_license.h>
 #include <common/net/http_client.h>
@@ -26,7 +27,6 @@
 #include "daemon/client.h"
 #include "daemon/commands.h"
 #include "daemon/commands_info/details/shots.h"
-#include "daemon/commands_info/get_log_info.h"
 #include "daemon/commands_info/notify_subscriber_info.h"
 #include "daemon/commands_info/prepare_info.h"
 #include "daemon/commands_info/server_info.h"
@@ -406,7 +406,7 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientGetLogService(Protoco
       return common::make_errno_error_inval();
     }
 
-    service::GetLogInfo get_log_info;
+    common::daemon::commands::GetLogInfo get_log_info;
     common::Error err_des = get_log_info.DeSerialize(jlog);
     json_object_put(jlog);
     if (err_des) {

@@ -467,7 +467,7 @@ bool MakeChannelInfo(const bson_t* sdoc,
   fastotv::commands_info::StreamBaseInfo::view_count_t view_count = 0;
   bool have_audio = true;
   bool have_video = true;
-  while (bson_iter_next(&iter) && check_sum != CHECK_SUM_CHANNEL) {
+  while (bson_iter_next(&iter)) {
     const char* key = bson_iter_key(&iter);
     if (strcmp(key, STREAM_ID_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_OID(&iter)) {

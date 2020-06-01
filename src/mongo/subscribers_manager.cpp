@@ -624,7 +624,7 @@ common::Error SubscribersManager::ClientActivate(const fastotv::commands_info::L
               bson_iter_t dname;
               if (bson_iter_recurse(&ar, &dname) && bson_iter_find(&dname, "name") && BSON_ITER_HOLDS_UTF8(&dname)) {
                 const bson_oid_t* oid = bson_iter_oid(&did);
-                std::string str_oid = common::ConvertToString(oid);
+                const fastotv::commands_info::DeviceInfo::device_t str_oid = common::ConvertToString(oid);
                 std::string name_str = bson_iter_utf8(&dname, NULL);
                 devices.Add(fastotv::commands_info::DeviceInfo(str_oid, name_str));
               }

@@ -199,7 +199,7 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
     if (!directory.IsValid()) {
       DCHECK(url_for_channel.is_valid());
       const std::string url_str = url_for_channel.spec();
-      const std::string redirect_header = common::MemSPrintf("Location: %s\r\n", url_str);
+      const std::string redirect_header = common::MemSPrintf("Location: %s", url_str);
       common::ErrnoError err =
           hclient->SendHeaders(protocol, common::http::HS_PERMANENT_REDIRECT, redirect_header.c_str(), nullptr, nullptr,
                                nullptr, IsKeepAlive, hinf);

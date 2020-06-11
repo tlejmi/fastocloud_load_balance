@@ -225,7 +225,7 @@ common::ErrnoError SubscribersHandler::HandleResponceCommand(SubscriberClient* c
 
 common::ErrnoError SubscribersHandler::HandleRequestClientActivate(SubscriberClient* client,
                                                                    fastotv::protocol::request_t* req) {
-  if (req->params) {
+  if (req->IsRequest() && req->params) {
     const char* params_ptr = req->params->c_str();
     json_object* jauth = json_tokener_parse(params_ptr);
     if (!jauth) {
@@ -257,7 +257,7 @@ common::ErrnoError SubscribersHandler::HandleRequestClientActivate(SubscriberCli
 
 common::ErrnoError SubscribersHandler::HandleRequestClientLogin(SubscriberClient* client,
                                                                 fastotv::protocol::request_t* req) {
-  if (req->params) {
+  if (req->IsRequest() && req->params) {
     const char* params_ptr = req->params->c_str();
     json_object* jauth = json_tokener_parse(params_ptr);
     if (!jauth) {
@@ -303,7 +303,7 @@ common::ErrnoError SubscribersHandler::HandleRequestClientPing(SubscriberClient*
     return common::make_errno_error(err->GetDescription(), EINVAL);
   }
 
-  if (req->params) {
+  if (req->IsRequest() && req->params) {
     const char* params_ptr = req->params->c_str();
     json_object* jstop = json_tokener_parse(params_ptr);
     if (!jstop) {
@@ -376,7 +376,7 @@ common::ErrnoError SubscribersHandler::HandleRequestClientGetRuntimeChannelInfo(
     return common::make_errno_error(err->GetDescription(), EINVAL);
   }
 
-  if (req->params) {
+  if (req->IsRequest() && req->params) {
     const char* params_ptr = req->params->c_str();
     json_object* jrun = json_tokener_parse(params_ptr);
     if (!jrun) {
@@ -412,7 +412,7 @@ common::ErrnoError SubscribersHandler::HandleRequestClientSetFavorite(Subscriber
     return common::make_errno_error(err->GetDescription(), EINVAL);
   }
 
-  if (req->params) {
+  if (req->IsRequest() && req->params) {
     const char* params_ptr = req->params->c_str();
     json_object* jfav = json_tokener_parse(params_ptr);
     if (!jfav) {
@@ -429,7 +429,7 @@ common::ErrnoError SubscribersHandler::HandleRequestClientSetFavorite(Subscriber
 
     // write to DB
     auto login = client->GetLogin();
-    manager_->SetFavorite(*login, fav);
+    ignore_result(manager_->SetFavorite(*login, fav));
     return client->GetFavoriteInfoSuccess(req->id);
   }
 
@@ -447,7 +447,7 @@ common::ErrnoError SubscribersHandler::HandleRequestClientSetRecent(SubscriberCl
     return common::make_errno_error(err->GetDescription(), EINVAL);
   }
 
-  if (req->params) {
+  if (req->IsRequest() && req->params) {
     const char* params_ptr = req->params->c_str();
     json_object* jfav = json_tokener_parse(params_ptr);
     if (!jfav) {
@@ -482,7 +482,7 @@ common::ErrnoError SubscribersHandler::HandleRequestInterruptStreamTime(Subscrib
     return common::make_errno_error(err->GetDescription(), EINVAL);
   }
 
-  if (req->params) {
+  if (req->IsRequest() && req->params) {
     const char* params_ptr = req->params->c_str();
     json_object* jinter = json_tokener_parse(params_ptr);
     if (!jinter) {
@@ -517,7 +517,7 @@ common::ErrnoError SubscribersHandler::HandleRequestGenerateCatchup(SubscriberCl
     return common::make_errno_error(err->GetDescription(), EINVAL);
   }
 
-  if (req->params) {
+  if (req->IsRequest() && req->params) {
     const char* params_ptr = req->params->c_str();
     json_object* jcatch = json_tokener_parse(params_ptr);
     if (!jcatch) {
@@ -574,7 +574,7 @@ common::ErrnoError SubscribersHandler::HandleRequestUndoCatchup(SubscriberClient
     return common::make_errno_error(err->GetDescription(), EINVAL);
   }
 
-  if (req->params) {
+  if (req->IsRequest() && req->params) {
     const char* params_ptr = req->params->c_str();
     json_object* jcatch = json_tokener_parse(params_ptr);
     if (!jcatch) {

@@ -106,11 +106,12 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
   std::pair<common::http::http_status, common::Error> result = common::http::parse_http_request(request_str, &hrequest);
   DEBUG_LOG() << "Http request:\n" << request;
 
+  common::http::headers_t extra_headers = {{"Access-Control-Allow-Origin", "*"}};
   if (result.second) {
     const std::string error_text = result.second->GetDescription();
     DEBUG_MSG_ERROR(result.second, common::logging::LOG_LEVEL_ERR);
     common::ErrnoError err =
-        hclient->SendError(common::http::HP_1_1, result.first, {}, error_text.c_str(), false, hinf);
+        hclient->SendError(common::http::HP_1_1, result.first, extra_headers, error_text.c_str(), false, hinf);
     if (err) {
       DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     }
@@ -124,7 +125,6 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
   bool is_find_connection = hrequest.FindHeaderByKey("Connection", false, &connection_field);
   bool IsKeepAlive = is_find_connection ? common::EqualsASCII(connection_field.value, "Keep-Alive", false) : false;
   const common::http::http_protocol protocol = hrequest.GetProtocol();
-  common::http::headers_t extra_headers = {{"Access-Control-Allow-Origin", "*"}};
   if (hrequest.GetMethod() == common::http::http_method::HM_GET ||
       hrequest.GetMethod() == common::http::http_method::HM_HEAD) {
     auto url_request = hrequest.GetURL();
@@ -199,7 +199,7 @@ void HttpHandler::ProcessReceived(HttpClient* hclient, const char* request, size
     if (!directory.IsValid()) {
       DCHECK(url_for_channel.is_valid());
       const std::string url_str = url_for_channel.spec();
-      extra_headers.push_back({"Location:", url_str});
+      extra_headers.push_back({"Location", url_str});
       common::ErrnoError err = hclient->SendHeaders(protocol, common::http::HS_PERMANENT_REDIRECT, extra_headers,
                                                     nullptr, nullptr, nullptr, IsKeepAlive, hinf);
       if (err) {

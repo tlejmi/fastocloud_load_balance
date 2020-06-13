@@ -51,7 +51,7 @@ bool MakeVodInfo(const bson_t* sdoc,
 
   std::string sid_str;
   std::string group;
-  int iarc;
+  int iarc = fastotv::commands_info::StreamBaseInfo::DEFAULT_IARC;
   fastotv::commands_info::StreamBaseInfo::view_count_t view_count = 0;
   fastotv::commands_info::MovieInfo mov;
   fastotv::commands_info::StreamBaseInfo::parts_t parts;
@@ -274,7 +274,7 @@ bool MakeCatchupInfo(const bson_t* sdoc,
   fastotv::timestamp_t start;
   fastotv::timestamp_t stop;
   int check_sum = 0;
-  int iarc;
+  int iarc = fastotv::commands_info::StreamBaseInfo::DEFAULT_IARC;
   fastotv::commands_info::StreamBaseInfo::view_count_t view_count = 0;
   bool have_audio = true;
   bool have_video = true;
@@ -463,7 +463,7 @@ bool MakeChannelInfo(const bson_t* sdoc,
   fastotv::commands_info::StreamBaseInfo::groups_t groups;
   fastotv::commands_info::StreamBaseInfo::meta_urls_t meta;
   int check_sum = 0;
-  int iarc;
+  int iarc = fastotv::commands_info::StreamBaseInfo::DEFAULT_IARC;
   fastotv::commands_info::StreamBaseInfo::view_count_t view_count = 0;
   bool have_audio = true;
   bool have_video = true;

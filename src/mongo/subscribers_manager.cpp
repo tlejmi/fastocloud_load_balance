@@ -1901,8 +1901,6 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
     return common::make_error("Invalid stream");
   }
 
-  fastotv::StreamType st = MongoStreamType2StreamType(bson_iter_utf8(&bcls, NULL));
-
   // create catchup
   bson_oid_t catchupid;
   bson_oid_init(&catchupid, NULL);

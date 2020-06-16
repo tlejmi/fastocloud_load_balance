@@ -187,39 +187,21 @@ void CreateOutputUrl(bson_t* result, const std::vector<fastotv::OutputUri>& urls
 std::vector<fastotv::OutputUri> CreateCatchupOutputUrl(
     bson_t* result,
     const std::vector<fastotv::OutputUri>& urls,
-    fastotv::StreamType origin_type,
     fastotv::stream_id_t sid,
     const common::net::HostAndPort& catchup_host,
     const common::file_system::ascii_directory_string_path& catchups_http_root) {
-  const std::string from = common::MemSPrintf("/%d/", origin_type);
-
   std::vector<fastotv::OutputUri> patched;
   for (size_t i = 0; i < urls.size(); ++i) {
     fastotv::OutputUri out = urls[i];
     const auto origin_url = out.GetOutput();
 
-    if (origin_type == fastotv::PROXY) {
-      const std::string catchup_host_str = common::ConvertToString(catchup_host);
-      const std::string postfix_dir = common::MemSPrintf("%d/%s/%u", fastotv::CATCHUP, sid, out.GetID());
-      const std::string url_str = common::MemSPrintf("http://%s/%s/master.m3u8", catchup_host_str, postfix_dir);
-      out.SetOutput(common::uri::GURL(url_str));
-      auto cat_dir = catchups_http_root.MakeDirectoryStringPath(postfix_dir);
-      if (cat_dir) {
-        out.SetHttpRoot(*cat_dir);
-      }
-    } else {
-      const std::string repl = common::MemSPrintf("/%d/", fastotv::CATCHUP);
-      std::string origin_url_str = origin_url.spec();
-      common::ReplaceFirstSubstringAfterOffset(&origin_url_str, 0, from, repl);
-      out.SetOutput(common::uri::GURL(origin_url_str));
-
-      const auto origin_http_root = out.GetHttpRoot();
-      if (!origin_http_root) {
-        continue;
-      }
-      std::string origin_http_root_str = origin_http_root->GetPath();
-      common::ReplaceFirstSubstringAfterOffset(&origin_http_root_str, 0, from, repl);
-      out.SetHttpRoot(common::file_system::ascii_directory_string_path(origin_http_root_str));
+    const std::string catchup_host_str = common::ConvertToString(catchup_host);
+    const std::string postfix_dir = common::MemSPrintf("%d/%s/%u", fastotv::CATCHUP, sid, out.GetID());
+    const std::string url_str = common::MemSPrintf("http://%s/%s/master.m3u8", catchup_host_str, postfix_dir);
+    out.SetOutput(common::uri::GURL(url_str));
+    auto cat_dir = catchups_http_root.MakeDirectoryStringPath(postfix_dir);
+    if (cat_dir) {
+      out.SetHttpRoot(*cat_dir);
     }
     patched.push_back(out);
   }
@@ -1958,8 +1940,9 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
   BSON_APPEND_INT32(doc.get(), STREAM_VIEW_COUNT_FIELD, 0);
   const unique_ptr_bson_t bparts(bson_new());
   BSON_APPEND_ARRAY(doc.get(), STREAM_PARTS_FIELD, bparts.get());
-  std::vector<common::uri::GURL> true_catchups_urls = details::MakeUrlsFromOutput(CreateCatchupOutputUrl(
-      doc.get(), output_urls, st, cid_str, catchup_endpoint_.catchups_host, catchup_endpoint_.catchups_http_root));
+  const auto caturls = CreateCatchupOutputUrl(doc.get(), output_urls, cid_str, catchup_endpoint_.catchups_host,
+                                              catchup_endpoint_.catchups_http_root);
+  std::vector<common::uri::GURL> true_catchups_urls = details::MakeUrlsFromOutput(caturls);
   int log_level = common::logging::LOG_LEVEL_INFO;
   BSON_APPEND_INT32(doc.get(), STREAM_LOG_LEVEL_FIELD, log_level);
   std::vector<fastotv::InputUri> catchup_inputs;

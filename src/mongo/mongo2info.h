@@ -45,7 +45,7 @@
 #define STREAM_LOOP_FIELD "loop"
 #define STREAM_RESTART_ATTEMPTS_FIELD "restart_attempts"
 #define STREAM_AUTO_EXIT_FIELD "auto_exit_time"
-#define STREAM_EXTRA_CONFIG_ARGS_FIELD "extra_config_fields"
+#define STREAM_EXTRA_CONFIG_ARGS_FIELD "extra_config"
 #define STREAM_VIDEO_PARSER_FIELD "video_parser"
 #define STREAM_AUDIO_PARSER_FIELD "audio_parser"
 #define STREAM_AUDIO_SELECT_FIELD "audio_select"

@@ -81,7 +81,7 @@ void HttpHandler::DataReceived(common::libev::IoClient* client) {
   char buff[BUF_SIZE] = {0};
   size_t nread = 0;
   common::ErrnoError errn = client->SingleRead(buff, BUF_SIZE - 1, &nread);
-  if ((errn && errn->GetErrorCode() != EAGAIN) || nread == 0) {
+  if (errn || nread == 0) {
     ignore_result(client->Close());
     delete client;
     return;

@@ -101,11 +101,7 @@ Config::Config()
       license_key() {}
 
 common::net::HostAndPort Config::GetDefaultHost() {
-  common::net::HostAndPort result;
-  if (common::ConvertFromString(SERVICE_HOST, &result)) {
-    return result;
-  }
-  return result;
+  return common::net::HostAndPort::CreateLocalHostIPV4(CLIENT_PORT);
 }
 
 bool Config::IsValid() const {
@@ -153,14 +149,14 @@ common::ErrnoError load_config_from_file(const std::string& config_absolute_path
   common::Value* host_field = slave_config_args->Find(SERVICE_HOST_FIELD);
   std::string host_str;
   if (!host_field || !host_field->GetAsBasicString(&host_str) || !common::ConvertFromString(host_str, &lconfig.host)) {
-    lconfig.host = common::net::HostAndPort::CreateLocalHost(CLIENT_PORT);
+    lconfig.host = Config::GetDefaultHost();
   }
 
   common::Value* clients_host_field = slave_config_args->Find(SERVICE_SUBSCRIBERS_HOST_FIELD);
   std::string clients_host_str;
   if (!clients_host_field || !clients_host_field->GetAsBasicString(&clients_host_str) ||
       !common::ConvertFromString(clients_host_str, &lconfig.subscribers_host)) {
-    lconfig.subscribers_host = common::net::HostAndPort::CreateLocalHost(SUBSCRIBERS_PORT);
+    lconfig.subscribers_host = common::net::HostAndPort::CreateDefaultRouteIPV4(SUBSCRIBERS_PORT);
   }
 
   common::Value* mongodb_url_field = slave_config_args->Find(SERVICE_MONGODB_URL_FIELD);
@@ -172,7 +168,7 @@ common::ErrnoError load_config_from_file(const std::string& config_absolute_path
   std::string http_host_str;
   if (!http_host_field || !http_host_field->GetAsBasicString(&http_host_str) ||
       !common::ConvertFromString(http_host_str, &lconfig.http_host)) {
-    lconfig.http_host = common::net::HostAndPort::CreateLocalHost(HTTP_PORT);
+    lconfig.http_host = common::net::HostAndPort::CreateDefaultRouteIPV4(HTTP_PORT);
   }
 
   common::Value* epg_url_field = slave_config_args->Find(SERVICE_EPG_URL_FIELD);

@@ -21,6 +21,7 @@
 #include <common/daemon/commands/activate_info.h>
 #include <common/daemon/commands/ping_info.h>
 #include <common/daemon/commands/stop_info.h>
+
 #include "daemon/commands_info/state_info.h"
 
 namespace fastocloud {

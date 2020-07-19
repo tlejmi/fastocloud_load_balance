@@ -79,7 +79,9 @@ ServerInfo::ServerInfo(cpu_load_t cpu_load,
                        fastotv::bandwidth_t net_bytes_send,
                        time_t uptime,
                        fastotv::timestamp_t timestamp,
-                       const OnlineUsers& online_users)
+                       const OnlineUsers& online_users,
+                       size_t net_total_bytes_recv,
+                       size_t net_total_bytes_send)
     : base_class(cpu_load,
                  gpu_load,
                  load_average,
@@ -90,7 +92,9 @@ ServerInfo::ServerInfo(cpu_load_t cpu_load,
                  net_bytes_recv,
                  net_bytes_send,
                  uptime,
-                 timestamp),
+                 timestamp,
+                 net_total_bytes_recv,
+                 net_total_bytes_send),
       online_users_(online_users) {}
 
 common::Error ServerInfo::SerializeFields(json_object* out) const {

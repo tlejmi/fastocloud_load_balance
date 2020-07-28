@@ -22,6 +22,8 @@
 
 #include <fastotv/commands_info/catchups_info.h>
 #include <fastotv/commands_info/channels_info.h>
+#include <fastotv/commands_info/content_request_info.h>
+#include <fastotv/commands_info/content_requests_info.h>
 #include <fastotv/commands_info/devices_info.h>
 #include <fastotv/commands_info/favorite_info.h>
 #include <fastotv/commands_info/interrupt_stream_time_info.h>
@@ -80,7 +82,9 @@ class ISubscribersManager {
                                           fastotv::commands_info::ChannelsInfo* pchans,
                                           fastotv::commands_info::VodsInfo* pvods,
                                           fastotv::commands_info::CatchupsInfo* catchups,
-                                          fastotv::commands_info::SeriesInfo* series) WARN_UNUSED_RESULT = 0;
+                                          fastotv::commands_info::SeriesInfo* series,
+                                          fastotv::commands_info::ContentRequestsInfo* content_requests)
+      WARN_UNUSED_RESULT = 0;
   virtual common::Error ClientFindHttpDirectoryOrUrlForChannel(const fastotv::commands_info::AuthInfo& auth,
                                                                fastotv::stream_id_t sid,
                                                                fastotv::channel_id_t cid,
@@ -127,6 +131,10 @@ class ISubscribersManager {
 
   virtual common::Error RemoveUserCatchup(const base::ServerDBAuthInfo& auth,
                                           fastotv::stream_id_t sid) WARN_UNUSED_RESULT = 0;
+
+  virtual common::Error RequestContent(const base::ServerDBAuthInfo& auth,
+                                       const fastotv::commands_info::ContentRequestInfo& request)
+      WARN_UNUSED_RESULT = 0;
 
   virtual common::Error AddUserCatchup(const base::ServerDBAuthInfo& auth,
                                        fastotv::stream_id_t sid) WARN_UNUSED_RESULT = 0;

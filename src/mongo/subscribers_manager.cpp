@@ -820,8 +820,9 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
                                                     fastotv::commands_info::ChannelsInfo* pchans,
                                                     fastotv::commands_info::VodsInfo* pvods,
                                                     fastotv::commands_info::CatchupsInfo* catchups,
-                                                    fastotv::commands_info::SeriesInfo* series) {
-  if (!auth.IsValid() || !chans || !vods || !pchans || !pvods || !catchups || !series) {
+                                                    fastotv::commands_info::SeriesInfo* series,
+                                                    fastotv::commands_info::ContentRequestsInfo* content_requests) {
+  if (!auth.IsValid() || !chans || !vods || !pchans || !pvods || !catchups || !series || !content_requests) {
     return common::make_error_inval();
   }
 
@@ -1007,14 +1008,18 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
     }
   }
 
+  fastotv::commands_info::ContentRequestsInfo lcreq;
+
   *vods = lvods;
   *chans = lchans;
   *pchans = lpchans;
   *pvods = lpvods;
   *catchups = lcatchups;
   *series = lseries;
+  *content_requests = lcreq;
   DEBUG_LOG() << "Vods: " << lvods.Size() << " Channels: " << lchans.Size() << " PChannels: " << lpchans.Size()
-              << " PVods: " << lpvods.Size() << " Catchups: " << lcatchups.Size() << " Series: " << lseries.Size();
+              << " PVods: " << lpvods.Size() << " Catchups: " << lcatchups.Size() << " Series: " << lseries.Size()
+              << " Content requests: " << lcreq.Size();
   return common::Error();
 }
 
@@ -1788,6 +1793,15 @@ common::Error SubscribersManager::AddUserCatchup(const base::ServerDBAuthInfo& a
   }
 
   return common::Error();
+}
+
+common::Error SubscribersManager::RequestContent(const base::ServerDBAuthInfo& auth,
+                                                 const fastotv::commands_info::ContentRequestInfo& request) {
+  if (!auth.IsValid()) {
+    return common::make_error_inval();
+  }
+
+  return common::make_error("Not implemented");
 }
 
 common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_info::ChannelInfo& based_on,

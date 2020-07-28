@@ -22,6 +22,7 @@
 #include <fastotv/commands/commands.h>
 #include <fastotv/commands_info/catchup_generate_info.h>
 #include <fastotv/commands_info/catchup_undo_info.h>
+#include <fastotv/commands_info/content_request_info.h>
 #include <fastotv/commands_info/favorite_info.h>
 #include <fastotv/commands_info/recent_stream_time_info.h>
 
@@ -194,6 +195,8 @@ common::ErrnoError SubscribersHandler::HandleRequestCommand(SubscriberClient* cl
     return HandleRequestGenerateCatchup(iclient, req);
   } else if (req->method == CLIENT_REQUEST_UNDO_CATCHUP) {
     return HandleRequestUndoCatchup(iclient, req);
+  } else if (req->method == CLIENT_REQUEST_CONTENT) {
+    return HandleRequestContent(iclient, req);
   }
 
   WARNING_LOG() << "Received unknown command: " << req->method;
@@ -356,13 +359,14 @@ common::ErrnoError SubscribersHandler::HandleRequestClientGetChannels(Subscriber
   fastotv::commands_info::VodsInfo pvods;
   fastotv::commands_info::CatchupsInfo catchups;
   fastotv::commands_info::SeriesInfo series;
-  err = manager_->ClientGetChannels(auth, &chans, &vods, &pchans, &pvods, &catchups, &series);
+  fastotv::commands_info::ContentRequestsInfo crequests;
+  err = manager_->ClientGetChannels(auth, &chans, &vods, &pchans, &pvods, &catchups, &series, &crequests);
   if (err) {
     ignore_result(client->GetChannelsFail(req->id, err));
     return common::make_errno_error(err->GetDescription(), EINVAL);
   }
 
-  return client->GetChannelsSuccess(req->id, chans, vods, pchans, pvods, catchups, series);
+  return client->GetChannelsSuccess(req->id, chans, vods, pchans, pvods, catchups, series, crequests);
 }
 
 common::ErrnoError SubscribersHandler::HandleRequestClientGetRuntimeChannelInfo(SubscriberClient* client,
@@ -597,6 +601,45 @@ common::ErrnoError SubscribersHandler::HandleRequestUndoCatchup(SubscriberClient
     }
 
     return client->CatchupUndoSuccess(req->id);
+  }
+
+  return common::make_errno_error_inval();
+}
+
+common::ErrnoError SubscribersHandler::HandleRequestContent(SubscriberClient* client,
+                                                            fastotv::protocol::request_t* req) {
+  base::ServerDBAuthInfo auth;
+  common::Error err = manager_->CheckIsLoginClient(client, &auth);
+  if (err) {
+    ignore_result(client->CheckLoginFail(req->id, err));
+    ignore_result(client->Close());
+    delete client;
+    return common::make_errno_error(err->GetDescription(), EINVAL);
+  }
+
+  if (req->IsRequest() && req->params) {
+    const char* params_ptr = req->params->c_str();
+    json_object* jcont = json_tokener_parse(params_ptr);
+    if (!jcont) {
+      return common::make_errno_error_inval();
+    }
+
+    fastotv::commands_info::ContentRequestInfo cont;
+    common::Error err_des = cont.DeSerialize(jcont);
+    json_object_put(jcont);
+    if (err_des) {
+      const std::string err_str = err_des->GetDescription();
+      return common::make_errno_error(err_str, EAGAIN);
+    }
+
+    err = manager_->RequestContent(auth, cont);
+    if (err) {
+      const std::string err_str = err->GetDescription();
+      client->ContentRequestFail(req->id, err);
+      return common::make_errno_error(err_str, EAGAIN);
+    }
+
+    return client->ContentRequestSuccess(req->id);
   }
 
   return common::make_errno_error_inval();

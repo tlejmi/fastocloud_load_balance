@@ -76,6 +76,7 @@ class SubscribersHandler : public base::IServerHandler {
   common::ErrnoError HandleRequestInterruptStreamTime(SubscriberClient* client, fastotv::protocol::request_t* req);
   common::ErrnoError HandleRequestGenerateCatchup(SubscriberClient* client, fastotv::protocol::request_t* req);
   common::ErrnoError HandleRequestUndoCatchup(SubscriberClient* client, fastotv::protocol::request_t* req);
+  common::ErrnoError HandleRequestContent(SubscriberClient* client, fastotv::protocol::request_t* req);
 
   common::ErrnoError HandleResponceServerPing(SubscriberClient* client, fastotv::protocol::response_t* resp);
   common::ErrnoError HandleResponceServerGetClientInfo(SubscriberClient* client, fastotv::protocol::response_t* resp);

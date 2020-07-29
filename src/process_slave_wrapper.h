@@ -78,6 +78,8 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver,
   void CatchupCreated(subscribers::SubscribersHandler* handler,
                       std::string serverid,
                       const fastotv::commands_info::CatchupInfo& chan) override;
+  void ContentRequestCreated(subscribers::SubscribersHandler* handler,
+                             const fastotv::commands_info::ContentRequestInfo& request) override;
 
  private:
   void StopImpl();

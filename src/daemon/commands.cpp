@@ -44,6 +44,22 @@ common::Error CatchupCreatedBroadcast(std::string serverid,
   return common::Error();
 }
 
+common::Error ContentRequestCreatedBroadcast(const fastotv::commands_info::ContentRequestInfo& params,
+                                             fastotv::protocol::request_t* req) {
+  if (!req) {
+    return common::make_error_inval();
+  }
+
+  std::string content;
+  common::Error err_ser = params.SerializeToString(&content);
+  if (err_ser) {
+    return err_ser;
+  }
+
+  *req = fastotv::protocol::request_t::MakeNotification(DAEMON_SERVER_CONTENT_REQUEST_CREATED, content);
+  return common::Error();
+}
+
 common::Error StatisitcServiceBroadcast(fastotv::protocol::serializet_params_t params,
                                         fastotv::protocol::request_t* req) {
   if (!req) {

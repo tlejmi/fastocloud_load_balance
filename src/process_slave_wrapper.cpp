@@ -712,6 +712,19 @@ void ProcessSlaveWrapper::CatchupCreated(subscribers::SubscribersHandler* handle
   loop_->ExecInLoopThread([this, req]() { BroadcastClients(req); });
 }
 
+void ProcessSlaveWrapper::ContentRequestCreated(subscribers::SubscribersHandler* handler,
+                                                const fastotv::commands_info::ContentRequestInfo& request) {
+  UNUSED(handler);
+  fastotv::protocol::request_t req;
+  common::Error err_ser = ContentRequestCreatedBroadcast(request, &req);
+  if (err_ser) {
+    WARNING_LOG() << "Can't create content broadcast request";
+    return;
+  }
+
+  loop_->ExecInLoopThread([this, req]() { BroadcastClients(req); });
+}
+
 void ProcessSlaveWrapper::CheckLicenseExpired() {
   const auto license = config_.license_key;
   if (!license) {

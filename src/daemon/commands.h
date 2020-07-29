@@ -17,6 +17,7 @@
 #include <string>
 
 #include <fastotv/commands_info/catchups_info.h>
+#include <fastotv/commands_info/content_request_info.h>
 #include <fastotv/protocol/types.h>
 
 #include "base/front_subscriber_info.h"
@@ -37,6 +38,7 @@
 
 // Broadcast
 #define DAEMON_SERVER_CATCHUP_CREATED "catchup_created"
+#define DAEMON_SERVER_CONTENT_REQUEST_CREATED "content_request_created"
 #define STREAM_STATISTIC_SERVICE "statistic_service"
 #define DAEMON_SERVER_SUBSCRIBER_CONNECTED "subscriber_connected"
 #define DAEMON_SERVER_SUBSCRIBER_DISCONNECTED "subscriber_disconnected"
@@ -47,6 +49,8 @@ namespace server {
 common::Error CatchupCreatedBroadcast(std::string serverid,
                                       const fastotv::commands_info::CatchupInfo& params,
                                       fastotv::protocol::request_t* req);
+common::Error ContentRequestCreatedBroadcast(const fastotv::commands_info::ContentRequestInfo& params,
+                                             fastotv::protocol::request_t* req);
 
 common::Error StatisitcServiceBroadcast(fastotv::protocol::serializet_params_t params,
                                         fastotv::protocol::request_t* req);

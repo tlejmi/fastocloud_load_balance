@@ -239,18 +239,18 @@ common::ErrnoError SubscribersHandler::HandleRequestClientActivate(SubscriberCli
     common::Error err = uauth.DeSerialize(jauth);
     json_object_put(jauth);
     if (err) {
-      client->ActivateDeviceFail(req->id, err);
+      ignore_result(client->ActivateDeviceFail(req->id, err));
       return common::make_errno_error(err->GetDescription(), EINVAL);
     }
 
     fastotv::commands_info::DevicesInfo devices;
     err = manager_->ClientActivate(uauth, &devices);
     if (err) {
-      client->ActivateDeviceFail(req->id, err);
+      ignore_result(client->ActivateDeviceFail(req->id, err));
       return common::make_errno_error(err->GetDescription(), EINVAL);
     }
 
-    client->ActivateDeviceSuccess(req->id, devices);
+    ignore_result(client->ActivateDeviceSuccess(req->id, devices));
     INFO_LOG() << "Active registered user: " << uauth.GetLogin();
     return common::ErrnoError();
   }
@@ -271,14 +271,14 @@ common::ErrnoError SubscribersHandler::HandleRequestClientLogin(SubscriberClient
     common::Error err = uauth.DeSerialize(jauth);
     json_object_put(jauth);
     if (err) {
-      client->LoginFail(req->id, err);
+      ignore_result(client->LoginFail(req->id, err));
       return common::make_errno_error(err->GetDescription(), EINVAL);
     }
 
     base::ServerDBAuthInfo ser;
     err = manager_->ClientLogin(uauth, &ser);
     if (err) {
-      client->LoginFail(req->id, err);
+      ignore_result(client->LoginFail(req->id, err));
       return common::make_errno_error(err->GetDescription(), EINVAL);
     }
 
@@ -640,6 +640,9 @@ common::ErrnoError SubscribersHandler::HandleRequestContent(SubscriberClient* cl
       return common::make_errno_error(err_str, EAGAIN);
     }
 
+    if (observer_) {
+      observer_->ContentRequestCreated(this, cont);
+    }
     return client->ContentRequestSuccess(req->id);
   }
 

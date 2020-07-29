@@ -543,14 +543,14 @@ common::ErrnoError SubscribersHandler::HandleRequestGenerateCatchup(SubscriberCl
                                                 cat_gen.GetStop(), &serverid, &chan, &is_created);
     if (err) {
       const std::string err_str = err->GetDescription();
-      client->CatchupGenerateFail(req->id, err);
+      ignore_result(client->CatchupGenerateFail(req->id, err));
       return common::make_errno_error(err_str, EAGAIN);
     }
 
     err = manager_->AddUserCatchup(auth, chan.GetStreamID());
     if (err) {
       const std::string err_str = err->GetDescription();
-      client->CatchupGenerateFail(req->id, err);
+      ignore_result(client->CatchupGenerateFail(req->id, err));
       return common::make_errno_error(err_str, EAGAIN);
     }
 
@@ -596,7 +596,7 @@ common::ErrnoError SubscribersHandler::HandleRequestUndoCatchup(SubscriberClient
     err = manager_->RemoveUserCatchup(auth, cat_undo.GetStreamID());
     if (err) {
       const std::string err_str = err->GetDescription();
-      client->CatchupUndoFail(req->id, err);
+      ignore_result(client->CatchupUndoFail(req->id, err));
       return common::make_errno_error(err_str, EAGAIN);
     }
 
@@ -624,18 +624,19 @@ common::ErrnoError SubscribersHandler::HandleRequestContent(SubscriberClient* cl
       return common::make_errno_error_inval();
     }
 
-    fastotv::commands_info::ContentRequestInfo cont;
-    common::Error err_des = cont.DeSerialize(jcont);
+    fastotv::commands_info::CreateContentRequestInfo request;
+    common::Error err_des = request.DeSerialize(jcont);
     json_object_put(jcont);
     if (err_des) {
       const std::string err_str = err_des->GetDescription();
       return common::make_errno_error(err_str, EAGAIN);
     }
 
-    err = manager_->RequestContent(auth, cont);
+    fastotv::commands_info::ContentRequestInfo cont;
+    err = manager_->CreateRequestContent(auth, request, &cont);
     if (err) {
       const std::string err_str = err->GetDescription();
-      client->ContentRequestFail(req->id, err);
+      ignore_result(client->ContentRequestFail(req->id, err));
       return common::make_errno_error(err_str, EAGAIN);
     }
 

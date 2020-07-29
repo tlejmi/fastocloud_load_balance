@@ -34,6 +34,7 @@
 #define SERVERS_COLLECTION "services"
 #define STREAMS_COLLECTION "streams"
 #define SERIES_COLLECTION "series"
+#define REQUESTS_COLLECTION "requests"
 
 #define PROXY_STR "pyfastocloud_models.stream.entry.ProxyStream"
 #define VOD_PROXY_STR "pyfastocloud_models.stream.entry.ProxyVodStream"
@@ -58,6 +59,7 @@
 #define USER_VODS_FIELD "vods"
 #define USER_CATCHUPS_FIELD "catchups"
 #define SERIES_FIELD "series"
+#define REQUESTS_FIELD "requests"
 
 #define SERVER_STREAMS_FIELD "streams"
 
@@ -256,6 +258,19 @@ common::Error AddStreamToServer(mongoc_collection_t* servers,
   return common::Error();
 }
 
+common::Error AddContentRequestToUserArray(mongoc_collection_t* subscribers,
+                                           const bson_oid_t* user_oid,
+                                           const bson_oid_t* request_oid) {
+  bson_error_t error;
+  const unique_ptr_bson_t query_user(BCON_NEW("_id", BCON_OID(user_oid)));
+  const unique_ptr_bson_t update_query_user(BCON_NEW("$push", "{", REQUESTS_FIELD, BCON_OID(request_oid), "}"));
+  if (!mongoc_collection_update(subscribers, MONGOC_UPDATE_NONE, query_user.get(), update_query_user.get(), NULL,
+                                &error)) {
+    return common::make_error(error.message);
+  }
+  return common::Error();
+}
+
 common::Error AddStreamToUserStreamsArray(mongoc_collection_t* subscribers,
                                           const bson_oid_t* user_oid,
                                           const bson_oid_t* stream_oid) {
@@ -353,6 +368,8 @@ SubscribersManager::SubscribersManager(base::ISubscribersObserver* observer)
       subscribers_(nullptr),
       servers_(nullptr),
       streams_(nullptr),
+      series_(nullptr),
+      requests_(nullptr),
       catchup_endpoint_() {}
 
 void SubscribersManager::SetupCatchupsEndpoint(const base::CatchupEndpointInfo& info) {
@@ -433,10 +450,20 @@ common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mong
     return common::make_errno_error("Can't find " SERIES_COLLECTION " collection.", EAGAIN);
   }
 
+  mongoc_collection_t* requests = mongoc_client_get_collection(client, DB_NAME, REQUESTS_COLLECTION);
+  if (!requests) {
+    mongoc_collection_destroy(sercollection);
+    mongoc_collection_destroy(scollection);
+    mongoc_collection_destroy(series);
+    mongoc_client_destroy(client);
+    return common::make_errno_error("Can't find " REQUESTS_COLLECTION " collection.", EAGAIN);
+  }
+
   servers_ = sercollection;
   streams_ = stcollection;
   subscribers_ = scollection;
   series_ = series;
+  requests_ = requests;
   client_ = client;
   return common::ErrnoError();
 }
@@ -460,6 +487,11 @@ common::ErrnoError SubscribersManager::Disconnect() {
   if (series_) {
     mongoc_collection_destroy(series_);
     series_ = nullptr;
+  }
+
+  if (requests_) {
+    mongoc_collection_destroy(requests_);
+    requests_ = nullptr;
   }
 
   if (client_) {
@@ -826,7 +858,7 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
     return common::make_error_inval();
   }
 
-  if (!subscribers_ || !streams_ || !series_) {
+  if (!subscribers_ || !streams_ || !series_ || !requests_) {
     return common::make_error("Not conencted to DB");
   }
 
@@ -1009,6 +1041,25 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
   }
 
   fastotv::commands_info::ContentRequestsInfo lcreq;
+  bson_iter_t brequests;
+  if (bson_iter_init_find(&brequests, doc, REQUESTS_FIELD) && BSON_ITER_HOLDS_ARRAY(&brequests)) {
+    bson_iter_t ar;
+    if (bson_iter_recurse(&brequests, &ar)) {
+      while (bson_iter_next(&ar)) {
+        const bson_oid_t* sid = bson_iter_oid(&ar);
+        const unique_ptr_bson_t requests_query(BCON_NEW("_id", BCON_OID(sid)));
+        const std::unique_ptr<mongoc_cursor_t, MongoCursorDeleter> stream_cursor(
+            mongoc_collection_find(requests_, MONGOC_QUERY_NONE, 0, 0, 0, requests_query.get(), NULL, NULL));
+        const bson_t* sdoc;
+        if (stream_cursor && mongoc_cursor_next(stream_cursor.get(), &sdoc)) {
+          fastotv::commands_info::ContentRequestInfo cont;
+          if (MakeContentRequestInfo(sdoc, &cont)) {
+            lcreq.Add(cont);
+          }
+        }
+      }
+    }
+  }
 
   *vods = lvods;
   *chans = lchans;
@@ -1795,13 +1846,42 @@ common::Error SubscribersManager::AddUserCatchup(const base::ServerDBAuthInfo& a
   return common::Error();
 }
 
-common::Error SubscribersManager::RequestContent(const base::ServerDBAuthInfo& auth,
-                                                 const fastotv::commands_info::ContentRequestInfo& request) {
-  if (!auth.IsValid()) {
+common::Error SubscribersManager::CreateRequestContent(const base::ServerDBAuthInfo& auth,
+                                                       const fastotv::commands_info::CreateContentRequestInfo& request,
+                                                       fastotv::commands_info::ContentRequestInfo* cont) {
+  if (!auth.IsValid() || !cont) {
     return common::make_error_inval();
   }
 
-  return common::make_error("Not implemented");
+  bson_oid_t oid;
+  if (!common::ConvertFromString(auth.GetUserID(), &oid)) {
+    return common::make_error("Invalid user id");
+  }
+
+  // create request
+  bson_oid_t requestid;
+  bson_oid_init(&requestid, NULL);
+  std::string cid_str = common::ConvertToString(&requestid);
+
+  const unique_ptr_bson_t doc(BCON_NEW("_id", BCON_OID(&requestid)));
+  const std::string title = request.GetText();
+  BSON_APPEND_UTF8(doc.get(), CONTENT_REQUEST_TITLE_FIELD, title.c_str());
+  BSON_APPEND_INT32(doc.get(), CONTENT_REQUEST_STATUS_FIELD, request.GetStatus());
+  BSON_APPEND_INT32(doc.get(), CONTENT_REQUEST_TYPE_FIELD, request.GetType());
+
+  bson_error_t error;
+  if (!mongoc_collection_insert(requests_, MONGOC_INSERT_NONE, doc.get(), NULL, &error)) {
+    DEBUG_LOG() << "Failed create content request error: " << error.message;
+    return common::make_error(error.message);
+  }
+
+  common::Error err = AddContentRequestToUserArray(subscribers_, &oid, &requestid);
+  if (err) {
+    return err;
+  }
+
+  *cont = fastotv::commands_info::ContentRequestInfo(cid_str, request.GetText(), request.GetType(), request.GetStatus());
+  return common::Error();
 }
 
 common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_info::ChannelInfo& based_on,

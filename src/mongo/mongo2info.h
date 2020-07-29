@@ -25,6 +25,7 @@
 #include <fastotv/commands_info/channel_info.h>
 #include <fastotv/commands_info/serial_info.h>
 #include <fastotv/commands_info/vod_info.h>
+#include <fastotv/commands_info/content_request_info.h>
 #include <fastotv/types/output_uri.h>
 
 // stream base part
@@ -90,6 +91,12 @@
 #define SERIAL_EPISODES_FIELD "episodes"
 #define SERIAL_DESCRIPTION_FIELD "description"
 
+// request
+#define CONTENT_REQUEST_ID_FIELD "_id"
+#define CONTENT_REQUEST_TITLE_FIELD "title"
+#define CONTENT_REQUEST_TYPE_FIELD "type"
+#define CONTENT_REQUEST_STATUS_FIELD "status"
+
 namespace fastocloud {
 namespace server {
 namespace mongo {
@@ -119,6 +126,7 @@ bool MakeCatchupInfo(const bson_t* sdoc,
                      const UserStreamInfo& uinfo,
                      fastotv::commands_info::CatchupInfo* cinf);
 bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf);
+bool MakeContentRequestInfo(const bson_t* sdoc, fastotv::commands_info::ContentRequestInfo* cont);
 bool GetHttpRootFromStream(const bson_t* sdoc,
                            fastotv::StreamType st,
                            fastotv::channel_id_t cid,

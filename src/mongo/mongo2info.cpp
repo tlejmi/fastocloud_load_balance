@@ -720,6 +720,63 @@ bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf
   return true;
 }
 
+bool MakeContentRequestInfo(const bson_t* sdoc, fastotv::commands_info::ContentRequestInfo* cont) {
+  if (!sdoc || !cont) {
+    return false;
+  }
+
+  bson_iter_t iter;
+  if (!bson_iter_init(&iter, sdoc)) {
+    return false;
+  }
+
+#define CHECK_SUM_REQUEST 4
+
+  std::string sid_str;
+  std::string title;
+  fastotv::commands_info::ContentRequestInfo::ContentType type;
+  fastotv::commands_info::ContentRequestInfo::RequestStatus status;
+
+  int check_sum = 0;
+  while (bson_iter_next(&iter)) {
+    const char* key = bson_iter_key(&iter);
+    if (strcmp(key, CONTENT_REQUEST_ID_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_OID(&iter)) {
+        return false;
+      }
+      const bson_oid_t* oid = bson_iter_oid(&iter);
+      sid_str = common::ConvertToString(oid);
+      check_sum++;
+    } else if (strcmp(key, CONTENT_REQUEST_TITLE_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_UTF8(&iter)) {
+        return false;
+      }
+      title = bson_iter_utf8(&iter, NULL);
+      check_sum++;
+    } else if (strcmp(key, CONTENT_REQUEST_TYPE_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_INT32(&iter)) {
+        return false;
+      }
+      type = static_cast<fastotv::commands_info::ContentRequestInfo::ContentType>(bson_iter_int32(&iter));
+      check_sum++;
+    } else if (strcmp(key, CONTENT_REQUEST_STATUS_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_INT32(&iter)) {
+        return false;
+      }
+      status = static_cast<fastotv::commands_info::ContentRequestInfo::RequestStatus>(bson_iter_int32(&iter));
+      check_sum++;
+    }
+  }
+
+  if (check_sum != CHECK_SUM_SERIAL) {
+    WARNING_LOG() << "Skipped content request check_sum: " << check_sum << ", id: " << sid_str;
+    return false;
+  }
+
+  *cont = fastotv::commands_info::ContentRequestInfo(sid_str, title, type, status);
+  return true;
+}
+
 bool GetHttpRootFromStream(const bson_t* sdoc,
                            fastotv::StreamType st,
                            fastotv::channel_id_t cid,

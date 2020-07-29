@@ -23,9 +23,9 @@
 
 #include <fastotv/commands_info/catchup_info.h>
 #include <fastotv/commands_info/channel_info.h>
+#include <fastotv/commands_info/content_request_info.h>
 #include <fastotv/commands_info/serial_info.h>
 #include <fastotv/commands_info/vod_info.h>
-#include <fastotv/commands_info/content_request_info.h>
 #include <fastotv/types/output_uri.h>
 
 // stream base part

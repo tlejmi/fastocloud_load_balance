@@ -134,8 +134,7 @@ class ISubscribersManager {
 
   virtual common::Error CreateRequestContent(const base::ServerDBAuthInfo& auth,
                                              const fastotv::commands_info::CreateContentRequestInfo& request,
-                                             fastotv::commands_info::ContentRequestInfo* cont)
-      WARN_UNUSED_RESULT = 0;
+                                             fastotv::commands_info::ContentRequestInfo* cont) WARN_UNUSED_RESULT = 0;
 
   virtual common::Error AddUserCatchup(const base::ServerDBAuthInfo& auth,
                                        fastotv::stream_id_t sid) WARN_UNUSED_RESULT = 0;

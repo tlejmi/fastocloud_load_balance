@@ -1880,7 +1880,8 @@ common::Error SubscribersManager::CreateRequestContent(const base::ServerDBAuthI
     return err;
   }
 
-  *cont = fastotv::commands_info::ContentRequestInfo(cid_str, request.GetText(), request.GetType(), request.GetStatus());
+  *cont =
+      fastotv::commands_info::ContentRequestInfo(cid_str, request.GetText(), request.GetType(), request.GetStatus());
   return common::Error();
 }
 

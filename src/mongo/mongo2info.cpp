@@ -768,7 +768,7 @@ bool MakeContentRequestInfo(const bson_t* sdoc, fastotv::commands_info::ContentR
     }
   }
 
-  if (check_sum != CHECK_SUM_SERIAL) {
+  if (check_sum != CHECK_SUM_REQUEST) {
     WARNING_LOG() << "Skipped content request check_sum: " << check_sum << ", id: " << sid_str;
     return false;
   }

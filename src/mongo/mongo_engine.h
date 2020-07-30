@@ -30,7 +30,7 @@ class MongoEngine : public common::patterns::LazySingleton<MongoEngine> {
  public:
   friend class common::patterns::LazySingleton<MongoEngine>;
 
-  common::ErrnoError Connect(const std::string& url, mongoc_client_t** connection);
+  common::ErrnoError Connect(const std::string& url, bool lazy, mongoc_client_t** connection);
 
  private:
   MongoEngine();

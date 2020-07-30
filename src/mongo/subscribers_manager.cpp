@@ -417,9 +417,9 @@ std::vector<base::FrontSubscriberInfo> SubscribersManager::GetOnlineSubscribers(
   return result;
 }
 
-common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mongodb_url) {
+common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mongodb_url, bool lazy) {
   mongoc_client_t* client = nullptr;
-  common::ErrnoError err = MongoEngine::GetInstance().Connect(mongodb_url, &client);
+  common::ErrnoError err = MongoEngine::GetInstance().Connect(mongodb_url, lazy, &client);
   if (err) {
     return err;
   }

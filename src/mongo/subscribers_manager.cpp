@@ -67,6 +67,8 @@
 #define OUTPUT_URL_CLS "pyfastocloud_models.common_entries.OutputUrl"
 #define CATCHUP_USER_CLS_VALUE "pyfastocloud_models.subscriber.entry.UserStream"
 
+#define CONTENT_REQUEST_CLS "pyfastocloud_models.content_request.entry.ContentRequest"
+
 namespace {
 
 enum UserStatus { USER_NOT_ACTIVE = 0, USER_ACTIVE = 1, USER_DELETED = 2 };
@@ -1866,6 +1868,7 @@ common::Error SubscribersManager::CreateRequestContent(const base::ServerDBAuthI
   const unique_ptr_bson_t doc(BCON_NEW("_id", BCON_OID(&requestid)));
   const std::string title = request.GetText();
   BSON_APPEND_UTF8(doc.get(), CONTENT_REQUEST_TITLE_FIELD, title.c_str());
+  BSON_APPEND_UTF8(doc.get(), CONTENT_REQUEST_CLS_FIELD, CONTENT_REQUEST_CLS);
   BSON_APPEND_INT32(doc.get(), CONTENT_REQUEST_STATUS_FIELD, request.GetStatus());
   BSON_APPEND_INT32(doc.get(), CONTENT_REQUEST_TYPE_FIELD, request.GetType());
 

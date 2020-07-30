@@ -93,6 +93,7 @@
 
 // request
 #define CONTENT_REQUEST_ID_FIELD "_id"
+#define CONTENT_REQUEST_CLS_FIELD "_cls"
 #define CONTENT_REQUEST_TITLE_FIELD "title"
 #define CONTENT_REQUEST_TYPE_FIELD "type"
 #define CONTENT_REQUEST_STATUS_FIELD "status"

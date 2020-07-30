@@ -29,7 +29,6 @@
 #include "mongo/mongo2info.h"
 #include "mongo/mongo_engine.h"
 
-#define DB_NAME "iptv"
 #define SUBSCRIBERS_COLLECTION "subscribers"
 #define SERVERS_COLLECTION "services"
 #define STREAMS_COLLECTION "streams"
@@ -417,27 +416,34 @@ std::vector<base::FrontSubscriberInfo> SubscribersManager::GetOnlineSubscribers(
   return result;
 }
 
-common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mongodb_url, bool lazy) {
+common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mongodb_url,
+                                                         const std::string& db_name,
+                                                         bool lazy) {
+  if (db_name.empty()) {
+    return common::make_errno_error_inval();
+  }
+
   mongoc_client_t* client = nullptr;
   common::ErrnoError err = MongoEngine::GetInstance().Connect(mongodb_url, lazy, &client);
   if (err) {
     return err;
   }
 
-  mongoc_collection_t* scollection = mongoc_client_get_collection(client, DB_NAME, SUBSCRIBERS_COLLECTION);
+  const char* db = db_name.c_str();
+  mongoc_collection_t* scollection = mongoc_client_get_collection(client, db, SUBSCRIBERS_COLLECTION);
   if (!scollection) {
     mongoc_client_destroy(client);
     return common::make_errno_error("Can't find " SUBSCRIBERS_COLLECTION " collection.", EAGAIN);
   }
 
-  mongoc_collection_t* sercollection = mongoc_client_get_collection(client, DB_NAME, SERVERS_COLLECTION);
+  mongoc_collection_t* sercollection = mongoc_client_get_collection(client, db, SERVERS_COLLECTION);
   if (!sercollection) {
     mongoc_collection_destroy(scollection);
     mongoc_client_destroy(client);
     return common::make_errno_error("Can't find " SERVERS_COLLECTION " collection.", EAGAIN);
   }
 
-  mongoc_collection_t* stcollection = mongoc_client_get_collection(client, DB_NAME, STREAMS_COLLECTION);
+  mongoc_collection_t* stcollection = mongoc_client_get_collection(client, db, STREAMS_COLLECTION);
   if (!stcollection) {
     mongoc_collection_destroy(sercollection);
     mongoc_collection_destroy(scollection);
@@ -445,7 +451,7 @@ common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mong
     return common::make_errno_error("Can't find " STREAMS_COLLECTION " collection.", EAGAIN);
   }
 
-  mongoc_collection_t* series = mongoc_client_get_collection(client, DB_NAME, SERIES_COLLECTION);
+  mongoc_collection_t* series = mongoc_client_get_collection(client, db, SERIES_COLLECTION);
   if (!series) {
     mongoc_collection_destroy(sercollection);
     mongoc_collection_destroy(scollection);
@@ -453,7 +459,7 @@ common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mong
     return common::make_errno_error("Can't find " SERIES_COLLECTION " collection.", EAGAIN);
   }
 
-  mongoc_collection_t* requests = mongoc_client_get_collection(client, DB_NAME, REQUESTS_COLLECTION);
+  mongoc_collection_t* requests = mongoc_client_get_collection(client, db, REQUESTS_COLLECTION);
   if (!requests) {
     mongoc_collection_destroy(sercollection);
     mongoc_collection_destroy(scollection);

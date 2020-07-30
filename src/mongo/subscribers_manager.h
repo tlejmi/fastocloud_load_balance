@@ -44,7 +44,9 @@ class SubscribersManager : public base::ISubscribersManager {
 
   std::vector<base::FrontSubscriberInfo> GetOnlineSubscribers() override;
 
-  common::ErrnoError ConnectToDatabase(const std::string& mongodb_url, bool lazy) WARN_UNUSED_RESULT;
+  common::ErrnoError ConnectToDatabase(const std::string& mongodb_url,
+                                       const std::string& db_name,
+                                       bool lazy) WARN_UNUSED_RESULT;
   common::ErrnoError Disconnect() WARN_UNUSED_RESULT;
 
   common::Error RegisterInnerConnectionByHost(base::SubscriberInfo* client,

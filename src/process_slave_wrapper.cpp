@@ -119,7 +119,7 @@ ProcessSlaveWrapper::~ProcessSlaveWrapper() {
 
 int ProcessSlaveWrapper::Exec() {
   common::ErrnoError err =
-      static_cast<mongo::SubscribersManager*>(sub_manager_)->ConnectToDatabase(config_.mongodb_url, true);
+      static_cast<mongo::SubscribersManager*>(sub_manager_)->ConnectToDatabase(config_.mongodb_url, "iptv", true);
   if (err) {
     DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     return EXIT_FAILURE;

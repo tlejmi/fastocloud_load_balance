@@ -67,7 +67,10 @@ ProcessSlaveWrapper::ProcessSlaveWrapper(const Config& config)
   loop_->SetName("client_server");
 
   mongo::SubscribersManager* sub_manager = new mongo::SubscribersManager(this);
-  ignore_result(sub_manager->ConnectToDatabase(config.mongodb_url));
+  common::ErrnoError err = sub_manager->ConnectToDatabase(config.mongodb_url);
+  if (err) {
+    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
+  }
   sub_manager_ = sub_manager;
 
   subscribers_handler_ =

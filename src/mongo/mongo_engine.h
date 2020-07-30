@@ -20,6 +20,8 @@
 
 #include <common/patterns/singleton_pattern.h>
 
+#include <common/error.h>
+
 namespace fastocloud {
 namespace server {
 namespace mongo {
@@ -28,7 +30,7 @@ class MongoEngine : public common::patterns::LazySingleton<MongoEngine> {
  public:
   friend class common::patterns::LazySingleton<MongoEngine>;
 
-  mongoc_client_t* Connect(const std::string& url);
+  common::ErrnoError Connect(const std::string& url, mongoc_client_t** connection);
 
  private:
   MongoEngine();

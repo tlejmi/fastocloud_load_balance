@@ -418,9 +418,10 @@ std::vector<base::FrontSubscriberInfo> SubscribersManager::GetOnlineSubscribers(
 }
 
 common::ErrnoError SubscribersManager::ConnectToDatabase(const std::string& mongodb_url) {
-  mongoc_client_t* client = MongoEngine::GetInstance().Connect(mongodb_url);
-  if (!client) {
-    return common::make_errno_error("Can't create mongodb connection.", EAGAIN);
+  mongoc_client_t* client = nullptr;
+  common::ErrnoError err = MongoEngine::GetInstance().Connect(mongodb_url, &client);
+  if (err) {
+    return err;
   }
 
   mongoc_collection_t* scollection = mongoc_client_get_collection(client, DB_NAME, SUBSCRIBERS_COLLECTION);

@@ -67,10 +67,6 @@ ProcessSlaveWrapper::ProcessSlaveWrapper(const Config& config)
   loop_->SetName("client_server");
 
   mongo::SubscribersManager* sub_manager = new mongo::SubscribersManager(this);
-  common::ErrnoError err = sub_manager->ConnectToDatabase(config.mongodb_url);
-  if (err) {
-    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
-  }
   sub_manager_ = sub_manager;
 
   subscribers_handler_ =
@@ -122,6 +118,13 @@ ProcessSlaveWrapper::~ProcessSlaveWrapper() {
 }
 
 int ProcessSlaveWrapper::Exec() {
+  common::ErrnoError err =
+      static_cast<mongo::SubscribersManager*>(sub_manager_)->ConnectToDatabase(config_.mongodb_url);
+  if (err) {
+    DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
+    return EXIT_FAILURE;
+  }
+
   subscribers::SubscribersServer* subs_server = static_cast<subscribers::SubscribersServer*>(subscribers_server_);
   std::thread subs_thread = std::thread([subs_server] {
     common::ErrnoError err = subs_server->Bind(true);
@@ -160,7 +163,7 @@ int ProcessSlaveWrapper::Exec() {
 
   int res = EXIT_FAILURE;
   DaemonServer* server = static_cast<DaemonServer*>(loop_);
-  common::ErrnoError err = server->Bind(true);
+  err = server->Bind(true);
   if (err) {
     DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     goto finished;

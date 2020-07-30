@@ -18,19 +18,29 @@ namespace fastocloud {
 namespace server {
 namespace mongo {
 
-mongoc_client_t* MongoEngine::Connect(const std::string& url) {
-  if (url.empty()) {
-    return nullptr;
+common::ErrnoError MongoEngine::Connect(const std::string& url, mongoc_client_t** connection) {
+  if (url.empty() || !connection) {
+    return common::make_errno_error_inval();
   }
 
   mongoc_uri_t* uri = mongoc_uri_new(url.c_str());
   if (!uri) {
-    return nullptr;
+    return common::make_errno_error("Invalid uri", EINVAL);
   }
 
   mongoc_client_t* cl = mongoc_client_new_from_uri(uri);
   mongoc_uri_destroy(uri);
-  return cl;
+
+  bson_t reply;
+  bson_error_t error;
+  if (!mongoc_client_get_server_status(cl, nullptr, &reply, &error)) {
+    mongoc_client_destroy(cl);
+    return common::make_errno_error(error.message, EAGAIN);
+  }
+
+  bson_destroy(&reply);
+  *connection = cl;
+  return common::ErrnoError();
 }
 
 MongoEngine::MongoEngine() {

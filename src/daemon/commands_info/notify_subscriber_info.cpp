@@ -14,8 +14,8 @@
 
 #include "daemon/commands_info/notify_subscriber_info.h"
 
-#define NOTIFY_SUBSCRIBER_INFO_UID_FIELD "id"
-#define NOTIFY_SUBSCRIBER_DID_FIELD "device_id"
+#define UID_FIELD "id"
+#define DID_FIELD "device_id"
 
 namespace fastocloud {
 namespace server {
@@ -51,8 +51,8 @@ common::Error NotifySubscriberInfo::SerializeFields(json_object* deserialized) c
     return common::make_error_inval();
   }
 
-  json_object_object_add(deserialized, NOTIFY_SUBSCRIBER_INFO_UID_FIELD, json_object_new_string(uid_.c_str()));
-  json_object_object_add(deserialized, NOTIFY_SUBSCRIBER_DID_FIELD, json_object_new_string(device_id_.c_str()));
+  json_object_object_add(deserialized, UID_FIELD, json_object_new_string(uid_.c_str()));
+  json_object_object_add(deserialized, DID_FIELD, json_object_new_string(device_id_.c_str()));
   return base_class::SerializeFields(deserialized);
 }
 
@@ -64,7 +64,7 @@ common::Error NotifySubscriberInfo::DoDeSerialize(json_object* serialized) {
   }
 
   json_object* jid = nullptr;
-  json_bool jid_exists = json_object_object_get_ex(serialized, NOTIFY_SUBSCRIBER_INFO_UID_FIELD, &jid);
+  json_bool jid_exists = json_object_object_get_ex(serialized, UID_FIELD, &jid);
   if (!jid_exists) {
     return common::make_error_inval();
   }
@@ -72,7 +72,7 @@ common::Error NotifySubscriberInfo::DoDeSerialize(json_object* serialized) {
   inf.uid_ = json_object_get_string(jid);
 
   json_object* jdid = nullptr;
-  json_bool jdid_exists = json_object_object_get_ex(serialized, NOTIFY_SUBSCRIBER_DID_FIELD, &jdid);
+  json_bool jdid_exists = json_object_object_get_ex(serialized, DID_FIELD, &jdid);
   if (!jdid_exists) {
     return common::make_error_inval();
   }

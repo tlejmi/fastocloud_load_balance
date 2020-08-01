@@ -41,6 +41,8 @@
 #include "subscribers/handler.h"
 #include "subscribers/server.h"
 
+#define MONGODB_DATABASE_NAME "iptv"
+
 namespace fastocloud {
 namespace server {
 
@@ -118,8 +120,8 @@ ProcessSlaveWrapper::~ProcessSlaveWrapper() {
 }
 
 int ProcessSlaveWrapper::Exec() {
-  common::ErrnoError err =
-      static_cast<mongo::SubscribersManager*>(sub_manager_)->ConnectToDatabase(config_.mongodb_url, "iptv", true);
+  common::ErrnoError err = static_cast<mongo::SubscribersManager*>(sub_manager_)
+                               ->ConnectToDatabase(config_.mongodb_url, MONGODB_DATABASE_NAME, true);
   if (err) {
     DEBUG_MSG_ERROR(err, common::logging::LOG_LEVEL_ERR);
     return EXIT_FAILURE;
@@ -139,8 +141,7 @@ int ProcessSlaveWrapper::Exec() {
       return;
     }
 
-    int res = subs_server->Exec();
-    UNUSED(res);
+    ignore_result(subs_server->Exec());
   });
 
   http::HttpServer* http_server = static_cast<http::HttpServer*>(http_server_);
@@ -157,8 +158,7 @@ int ProcessSlaveWrapper::Exec() {
       return;
     }
 
-    int res = http_server->Exec();
-    UNUSED(res);
+    ignore_result(http_server->Exec());
   });
 
   int res = EXIT_FAILURE;
@@ -340,7 +340,7 @@ void ProcessSlaveWrapper::DataReceived(common::libev::IoClient* client) {
       delete dclient;
     }
   } else {
-    NOTREACHED();
+    NOTREACHED() << "DataReceived handle only ProtocoledDaemonClient clients";
   }
 }
 
@@ -595,6 +595,7 @@ common::ErrnoError ProcessSlaveWrapper::HandleResponcePingService(ProtocoledDaem
     }
     return common::ErrnoError();
   }
+
   return common::ErrnoError();
 }
 

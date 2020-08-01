@@ -14,7 +14,7 @@
 
 #include "daemon/commands_info/state_info.h"
 
-#define STATE_INFO_CLIENTS_FIELD "online_clients"
+#define CLIENTS_FIELD "online_clients"
 
 namespace fastocloud {
 namespace server {
@@ -40,7 +40,7 @@ common::Error StateInfo::SerializeFields(json_object* deserialized) const {
     }
     json_object_array_add(jclients, jclient);
   }
-  json_object_object_add(deserialized, STATE_INFO_CLIENTS_FIELD, jclients);
+  json_object_object_add(deserialized, CLIENTS_FIELD, jclients);
   return common::Error();
 }
 
@@ -49,7 +49,7 @@ common::Error StateInfo::DoDeSerialize(json_object* serialized) {
 
   StateInfo inf;
   json_object* jclients = nullptr;
-  json_bool jclients_exists = json_object_object_get_ex(serialized, STATE_INFO_CLIENTS_FIELD, &jclients);
+  json_bool jclients_exists = json_object_object_get_ex(serialized, CLIENTS_FIELD, &jclients);
   if (jclients_exists) {
     online_clients_t clients;
     size_t len = json_object_array_length(jclients);

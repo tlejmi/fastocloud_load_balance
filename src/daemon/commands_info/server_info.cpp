@@ -14,13 +14,13 @@
 
 #include "daemon/commands_info/server_info.h"
 
-#define STATISTIC_SERVICE_INFO_ONLINE_USERS_FIELD "online_users"
+#define ONLINE_USERS_FIELD "online_users"
 
-#define FULL_SERVICE_INFO_OS_FIELD "os"
-#define FULL_SERVICE_INFO_VERSION_FIELD "version"
-#define FULL_SERVICE_INFO_PROJECT_FIELD "project"
-#define FULL_SERVICE_INFO_HTTP_HOST_FIELD "http_host"
-#define FULL_SERVICE_INFO_EXPIRATION_TIME_FIELD "expiration_time"
+#define OS_FIELD "os"
+#define VERSION_FIELD "version"
+#define PROJECT_FIELD "project"
+#define HTTP_HOST_FIELD "http_host"
+#define EXPIRATION_TIME_FIELD "expiration_time"
 
 #define ONLINE_USERS_DAEMON_FIELD "daemon"
 #define ONLINE_USERS_HTTP_FIELD "http"
@@ -109,7 +109,7 @@ common::Error ServerInfo::SerializeFields(json_object* out) const {
     return err;
   }
 
-  json_object_object_add(out, STATISTIC_SERVICE_INFO_ONLINE_USERS_FIELD, obj);
+  json_object_object_add(out, ONLINE_USERS_FIELD, obj);
   return common::Error();
 }
 
@@ -121,7 +121,7 @@ common::Error ServerInfo::DoDeSerialize(json_object* serialized) {
   }
 
   json_object* jonline = nullptr;
-  json_bool jonline_exists = json_object_object_get_ex(serialized, STATISTIC_SERVICE_INFO_ONLINE_USERS_FIELD, &jonline);
+  json_bool jonline_exists = json_object_object_get_ex(serialized, ONLINE_USERS_FIELD, &jonline);
   if (jonline_exists) {
     common::Error err = inf.online_users_.DeSerialize(jonline);
     if (err) {
@@ -170,7 +170,7 @@ common::Error FullServiceInfo::DoDeSerialize(json_object* serialized) {
   }
 
   json_object* jos = nullptr;
-  json_bool jos_exists = json_object_object_get_ex(serialized, FULL_SERVICE_INFO_OS_FIELD, &jos);
+  json_bool jos_exists = json_object_object_get_ex(serialized, OS_FIELD, &jos);
   if (jos_exists) {
     common::Error err = inf.os_.DeSerialize(jos);
     if (err) {
@@ -179,7 +179,7 @@ common::Error FullServiceInfo::DoDeSerialize(json_object* serialized) {
   }
 
   json_object* jhttp_host = nullptr;
-  json_bool jhttp_host_exists = json_object_object_get_ex(serialized, FULL_SERVICE_INFO_HTTP_HOST_FIELD, &jhttp_host);
+  json_bool jhttp_host_exists = json_object_object_get_ex(serialized, HTTP_HOST_FIELD, &jhttp_host);
   if (jhttp_host_exists) {
     common::net::HostAndPort host;
     if (common::ConvertFromString(json_object_get_string(jhttp_host), &host)) {
@@ -188,19 +188,19 @@ common::Error FullServiceInfo::DoDeSerialize(json_object* serialized) {
   }
 
   json_object* jexp = nullptr;
-  json_bool jexp_exists = json_object_object_get_ex(serialized, FULL_SERVICE_INFO_EXPIRATION_TIME_FIELD, &jexp);
+  json_bool jexp_exists = json_object_object_get_ex(serialized, EXPIRATION_TIME_FIELD, &jexp);
   if (jexp_exists) {
     inf.exp_time_ = json_object_get_int64(jexp);
   }
 
   json_object* jproj = nullptr;
-  json_bool jproj_exists = json_object_object_get_ex(serialized, FULL_SERVICE_INFO_PROJECT_FIELD, &jproj);
+  json_bool jproj_exists = json_object_object_get_ex(serialized, PROJECT_FIELD, &jproj);
   if (jproj_exists) {
     inf.project_ = json_object_get_string(jproj);
   }
 
   json_object* jproj_ver = nullptr;
-  json_bool jproj_ver_exists = json_object_object_get_ex(serialized, FULL_SERVICE_INFO_VERSION_FIELD, &jproj_ver);
+  json_bool jproj_ver_exists = json_object_object_get_ex(serialized, VERSION_FIELD, &jproj_ver);
   if (jproj_ver_exists) {
     inf.proj_ver_ = json_object_get_string(jproj_ver);
   }
@@ -217,11 +217,11 @@ common::Error FullServiceInfo::SerializeFields(json_object* out) const {
   }
 
   std::string http_host_str = common::ConvertToString(http_host_);
-  json_object_object_add(out, FULL_SERVICE_INFO_HTTP_HOST_FIELD, json_object_new_string(http_host_str.c_str()));
-  json_object_object_add(out, FULL_SERVICE_INFO_EXPIRATION_TIME_FIELD, json_object_new_int64(exp_time_));
-  json_object_object_add(out, FULL_SERVICE_INFO_PROJECT_FIELD, json_object_new_string(project_.c_str()));
-  json_object_object_add(out, FULL_SERVICE_INFO_VERSION_FIELD, json_object_new_string(proj_ver_.c_str()));
-  json_object_object_add(out, FULL_SERVICE_INFO_OS_FIELD, jos);
+  json_object_object_add(out, HTTP_HOST_FIELD, json_object_new_string(http_host_str.c_str()));
+  json_object_object_add(out, EXPIRATION_TIME_FIELD, json_object_new_int64(exp_time_));
+  json_object_object_add(out, PROJECT_FIELD, json_object_new_string(project_.c_str()));
+  json_object_object_add(out, VERSION_FIELD, json_object_new_string(proj_ver_.c_str()));
+  json_object_object_add(out, OS_FIELD, jos);
   return base_class::SerializeFields(out);
 }
 

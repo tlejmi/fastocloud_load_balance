@@ -14,7 +14,7 @@
 
 #include "base/server_auth_info.h"
 
-#define SERVER_AUTH_INFO_UID_FIELD "id"
+#define UID_FIELD "id"
 
 namespace fastocloud {
 namespace server {
@@ -33,7 +33,7 @@ common::Error ServerDBAuthInfo::SerializeFields(json_object* deserialized) const
     return common::make_error_inval();
   }
 
-  json_object_object_add(deserialized, SERVER_AUTH_INFO_UID_FIELD, json_object_new_string(uid_.c_str()));
+  json_object_object_add(deserialized, UID_FIELD, json_object_new_string(uid_.c_str()));
   return base_class::SerializeFields(deserialized);
 }
 
@@ -45,7 +45,7 @@ common::Error ServerDBAuthInfo::DoDeSerialize(json_object* serialized) {
   }
 
   json_object* jid = nullptr;
-  json_bool jid_exists = json_object_object_get_ex(serialized, SERVER_AUTH_INFO_UID_FIELD, &jid);
+  json_bool jid_exists = json_object_object_get_ex(serialized, UID_FIELD, &jid);
   if (!jid_exists) {
     return common::make_error_inval();
   }

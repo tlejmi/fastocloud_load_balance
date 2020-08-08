@@ -28,7 +28,7 @@ namespace details {
 std::vector<common::uri::GURL> MakeUrlsFromOutput(const std::vector<fastotv::OutputUri>& output) {
   std::vector<common::uri::GURL> result;
   for (size_t i = 0; i < output.size(); ++i) {
-    result.push_back(output[i].GetOutput());
+    result.push_back(output[i].GetUrl());
   }
   return result;
 }
@@ -837,7 +837,7 @@ bool GetUrlFromStream(const bson_t* sdoc, fastotv::StreamType st, fastotv::chann
 
       for (size_t i = 0; i < urls.size(); ++i) {
         if (urls[i].GetID() == cid) {
-          *url = urls[i].GetOutput();
+          *url = urls[i].GetUrl();
           return true;
         }
       }

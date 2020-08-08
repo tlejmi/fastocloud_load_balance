@@ -136,7 +136,7 @@ void CreateInputUrl(bson_t* result, const std::vector<fastotv::InputUri>& urls) 
     bson_append_document_begin(&child, key, keylen, &url);
     BSON_APPEND_UTF8(&url, "_cls", INPUT_URL_CLS);
     BSON_APPEND_INT32(&url, "id", iurl.GetID());
-    const std::string url_str = iurl.GetInput().spec();
+    const std::string url_str = iurl.GetUrl().spec();
     BSON_APPEND_UTF8(&url, "uri", url_str.c_str());
     const auto ua = iurl.GetUserAgent();
     if (ua) {

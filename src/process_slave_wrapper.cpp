@@ -43,6 +43,17 @@
 
 #define MONGODB_DATABASE_NAME "iptv"
 
+namespace {
+common::Error PostHttpOrHttpsFile(const common::file_system::ascii_file_string_path& file_path,
+                                  const common::uri::GURL& url) {
+  if (url.SchemeIs("http")) {
+    return common::net::PostHttpFile(file_path, url);
+  }
+  return common::net::PostHttpsFile(file_path, url);
+}
+
+}  // namespace
+
 namespace fastocloud {
 namespace server {
 
@@ -428,7 +439,7 @@ common::ErrnoError ProcessSlaveWrapper::HandleRequestClientGetLogService(Protoco
       return errn;
     }
     common::Error err =
-        common::net::PostHttpFile(common::file_system::ascii_file_string_path(config_.log_path), remote_log_path);
+        PostHttpOrHttpsFile(common::file_system::ascii_file_string_path(config_.log_path), remote_log_path);
     if (err) {
       ignore_result(dclient->GetLogServiceFail(req->id, err));
       const std::string err_str = err->GetDescription();

@@ -117,16 +117,19 @@ struct UserStreamInfo {
 bool MakeVodInfo(const bson_t* sdoc,
                  fastotv::StreamType st,
                  const UserStreamInfo& uinfo,
-                 fastotv::commands_info::VodInfo* cinf);
+                 fastotv::commands_info::VodInfo* cinf,
+                 bool* visible);
 bool MakeChannelInfo(const bson_t* sdoc,
                      fastotv::StreamType st,
                      const UserStreamInfo& uinfo,
-                     fastotv::commands_info::ChannelInfo* cinf);
+                     fastotv::commands_info::ChannelInfo* cinf,
+                     bool* visible);
 bool MakeCatchupInfo(const bson_t* sdoc,
                      fastotv::StreamType st,
                      const UserStreamInfo& uinfo,
-                     fastotv::commands_info::CatchupInfo* cinf);
-bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf);
+                     fastotv::commands_info::CatchupInfo* cinf,
+                     bool* visible);
+bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf, bool* visible);
 bool MakeContentRequestInfo(const bson_t* sdoc, fastotv::commands_info::ContentRequestInfo* cont);
 bool GetHttpRootFromStream(const bson_t* sdoc,
                            fastotv::StreamType st,

@@ -912,7 +912,8 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
                 UserStreamInfo uinf = makeUserStreamInfo(&iter);
                 fastotv::StreamType st = MongoStreamType2StreamType(bson_iter_utf8(&bcls, NULL));
                 fastotv::commands_info::ChannelInfo ch;
-                if (MakeChannelInfo(sdoc, st, uinf, &ch)) {
+                bool visible = false;
+                if (MakeChannelInfo(sdoc, st, uinf, &ch, &visible) && visible) {
                   if (uinf.priv) {
                     lpchans.Add(ch);
                   } else {
@@ -958,7 +959,8 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
                 UserStreamInfo uinf = makeUserStreamInfo(&iter);
                 fastotv::StreamType st = MongoStreamType2StreamType(bson_iter_utf8(&bcls, NULL));
                 fastotv::commands_info::VodInfo ch;
-                if (MakeVodInfo(sdoc, st, uinf, &ch)) {
+                bool visible = false;
+                if (MakeVodInfo(sdoc, st, uinf, &ch, &visible)) {
                   if (uinf.priv) {
                     lpvods.Add(ch);
                   } else {
@@ -1003,7 +1005,8 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
                 UserStreamInfo uinf = makeUserStreamInfo(&iter);
                 fastotv::StreamType st = MongoStreamType2StreamType(bson_iter_utf8(&bcls, NULL));
                 fastotv::commands_info::CatchupInfo ch;
-                if (MakeCatchupInfo(sdoc, st, uinf, &ch)) {
+                bool visible = false;
+                if (MakeCatchupInfo(sdoc, st, uinf, &ch, &visible)) {
                   lcatchups.Add(ch);
                 }
               }
@@ -1028,7 +1031,8 @@ common::Error SubscribersManager::ClientGetChannels(const fastotv::commands_info
         const bson_t* sdoc;
         if (stream_cursor && mongoc_cursor_next(stream_cursor.get(), &sdoc)) {
           fastotv::commands_info::SerialInfo ser;
-          if (MakeSerialInfo(sdoc, &ser)) {
+          bool visible = false;
+          if (MakeSerialInfo(sdoc, &ser, &visible)) {
             // stable views
             auto episodes = ser.GetEpisodes();
             auto vods_array = lvods.Get();
@@ -1546,7 +1550,8 @@ common::Error SubscribersManager::FindStream(const base::ServerDBAuthInfo& auth,
       if (IsVod(st)) {
       } else {
         fastotv::commands_info::ChannelInfo ch;
-        if (MakeChannelInfo(sdoc, st, uinf, &ch)) {
+        bool visible = false;
+        if (MakeChannelInfo(sdoc, st, uinf, &ch, &visible)) {
           *chan = ch;
           return common::Error();
         }
@@ -1598,7 +1603,8 @@ common::Error SubscribersManager::FindVod(const base::ServerDBAuthInfo& auth,
       fastotv::StreamType st = MongoStreamType2StreamType(bson_iter_utf8(&bcls, NULL));
       if (IsVod(st)) {
         fastotv::commands_info::VodInfo ch;
-        if (MakeVodInfo(sdoc, st, uinf, &ch)) {
+        bool visible = false;
+        if (MakeVodInfo(sdoc, st, uinf, &ch, &visible)) {
           *vod = ch;
           return common::Error();
         }
@@ -1651,7 +1657,8 @@ common::Error SubscribersManager::FindCatchup(const base::ServerDBAuthInfo& auth
       if (IsVod(st)) {
       } else {
         fastotv::commands_info::CatchupInfo ch;
-        if (MakeCatchupInfo(sdoc, st, uinf, &ch)) {
+        bool visible = false;
+        if (MakeCatchupInfo(sdoc, st, uinf, &ch, &visible)) {
           *cat = ch;
           return common::Error();
         }
@@ -1949,7 +1956,8 @@ common::Error SubscribersManager::CreateOrFindCatchup(const fastotv::commands_in
       if (stream_name == title && stream_start == start && stop == stream_stop) {
         UserStreamInfo uinf;
         fastotv::commands_info::CatchupInfo orig;
-        if (MakeCatchupInfo(sdoc, fastotv::CATCHUP, uinf, &orig)) {
+        bool visible = false;
+        if (MakeCatchupInfo(sdoc, fastotv::CATCHUP, uinf, &orig, &visible)) {
           INFO_LOG() << "Cached catchup: " << orig.GetStreamID();
           *cat = orig;
           *is_created = false;

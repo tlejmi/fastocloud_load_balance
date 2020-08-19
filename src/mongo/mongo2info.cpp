@@ -37,8 +37,9 @@ std::vector<common::uri::GURL> MakeUrlsFromOutput(const std::vector<fastotv::Out
 bool MakeVodInfo(const bson_t* sdoc,
                  fastotv::StreamType st,
                  const UserStreamInfo& uinfo,
-                 fastotv::commands_info::VodInfo* cinf) {
-  if (!sdoc || !cinf) {
+                 fastotv::commands_info::VodInfo* cinf,
+                 bool* visible) {
+  if (!sdoc || !cinf || !visible) {
     return false;
   }
 
@@ -234,6 +235,11 @@ bool MakeVodInfo(const bson_t* sdoc,
       }
       mov.SetType(static_cast<fastotv::commands_info::MovieInfo::Type>(bson_iter_int32(&iter)));
       check_sum++;
+    } else if (strcmp(key, STREAM_VISIBLE_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_BOOL(&iter)) {
+        return false;
+      }
+      *visible = bson_iter_bool(&iter);
     }
   }
 
@@ -253,8 +259,9 @@ bool MakeVodInfo(const bson_t* sdoc,
 bool MakeCatchupInfo(const bson_t* sdoc,
                      fastotv::StreamType st,
                      const UserStreamInfo& uinfo,
-                     fastotv::commands_info::CatchupInfo* cinf) {
-  if (!sdoc || !cinf) {
+                     fastotv::commands_info::CatchupInfo* cinf,
+                     bool* visible) {
+  if (!sdoc || !cinf || !visible) {
     return false;
   }
 
@@ -427,6 +434,11 @@ bool MakeCatchupInfo(const bson_t* sdoc,
       }
       epg.SetUrls(details::MakeUrlsFromOutput(urls));
       check_sum++;
+    } else if (strcmp(key, STREAM_VISIBLE_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_BOOL(&iter)) {
+        return false;
+      }
+      *visible = bson_iter_bool(&iter);
     }
   }
 
@@ -444,8 +456,9 @@ bool MakeCatchupInfo(const bson_t* sdoc,
 bool MakeChannelInfo(const bson_t* sdoc,
                      fastotv::StreamType st,
                      const UserStreamInfo& uinfo,
-                     fastotv::commands_info::ChannelInfo* cinf) {
-  if (!sdoc || !cinf) {
+                     fastotv::commands_info::ChannelInfo* cinf,
+                     bool* visible) {
+  if (!sdoc || !cinf || !visible) {
     return false;
   }
 
@@ -600,6 +613,11 @@ bool MakeChannelInfo(const bson_t* sdoc,
       }
       epg.SetUrls(details::MakeUrlsFromOutput(urls));
       check_sum++;
+    } else if (strcmp(key, STREAM_VISIBLE_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_BOOL(&iter)) {
+        return false;
+      }
+      *visible = bson_iter_bool(&iter);
     }
   }
 
@@ -617,8 +635,8 @@ bool MakeChannelInfo(const bson_t* sdoc,
   return true;
 }
 
-bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf) {
-  if (!sdoc || !sinf) {
+bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf, bool* visible) {
+  if (!sdoc || !sinf || !visible) {
     return false;
   }
 
@@ -708,6 +726,11 @@ bool MakeSerialInfo(const bson_t* sdoc, fastotv::commands_info::SerialInfo* sinf
         std::string part_str = common::ConvertToString(oid);
         episodes.push_back(part_str);
       }
+    } else if (strcmp(key, STREAM_VISIBLE_FIELD) == 0) {
+      if (!BSON_ITER_HOLDS_BOOL(&iter)) {
+        return false;
+      }
+      *visible = bson_iter_bool(&iter);
     }
   }
 

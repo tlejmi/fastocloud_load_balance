@@ -107,7 +107,7 @@ bool MakeVodInfo(const bson_t* sdoc,
       if (!BSON_ITER_HOLDS_UTF8(&iter)) {
         return false;
       }
-      mov.SetDisplayName(bson_iter_utf8(&iter, NULL));
+      mov.SetName(bson_iter_utf8(&iter, NULL));
       check_sum++;
     } else if (strcmp(key, VOD_DESCRIPTION_FIELD) == 0) {
       if (!BSON_ITER_HOLDS_UTF8(&iter)) {

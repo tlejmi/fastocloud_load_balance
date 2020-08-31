@@ -14,11 +14,11 @@
 
 #include "base/front_subscriber_info.h"
 
-#define FRONT_SUBSCRIBER_INFO_LOGIN_FIELD "login"
-#define FRONT_SUBSCRIBER_INFO_UID_FIELD "id"
-#define FRONT_SUBSCRIBER_INFO_DEVICE_ID_FIELD "device_id"
-#define FRONT_SUBSCRIBER_INFO_EXPIRED_DATE_FIELD "exp_date"
-#define FRONT_SUBSCRIBER_INFO_DEVICE_FIELD "device"
+#define LOGIN_FIELD "login"
+#define UID_FIELD "id"
+#define DEVICE_ID_FIELD "device_id"
+#define EXPIRED_DATE_FIELD "exp_date"
+#define DEVICE_FIELD "device"
 
 namespace fastocloud {
 namespace server {
@@ -70,25 +70,25 @@ void FrontSubscriberInfo::SetExpiredDate(fastotv::timestamp_t date) {
 
 common::Error FrontSubscriberInfo::DoDeSerialize(json_object* serialized) {
   json_object* jid = nullptr;
-  json_bool jid_exists = json_object_object_get_ex(serialized, FRONT_SUBSCRIBER_INFO_UID_FIELD, &jid);
+  json_bool jid_exists = json_object_object_get_ex(serialized, UID_FIELD, &jid);
   if (!jid_exists) {
     return common::make_error_inval();
   }
 
   json_object* jlogin = nullptr;
-  json_bool jlogin_exists = json_object_object_get_ex(serialized, FRONT_SUBSCRIBER_INFO_LOGIN_FIELD, &jlogin);
+  json_bool jlogin_exists = json_object_object_get_ex(serialized, LOGIN_FIELD, &jlogin);
   if (!jlogin_exists) {
     return common::make_error_inval();
   }
 
   json_object* jdevid = nullptr;
-  json_bool jdevid_exists = json_object_object_get_ex(serialized, FRONT_SUBSCRIBER_INFO_DEVICE_ID_FIELD, &jdevid);
+  json_bool jdevid_exists = json_object_object_get_ex(serialized, DEVICE_ID_FIELD, &jdevid);
   if (!jdevid_exists) {
     return common::make_error_inval();
   }
 
   json_object* jexp = nullptr;
-  json_bool jexp_exists = json_object_object_get_ex(serialized, FRONT_SUBSCRIBER_INFO_EXPIRED_DATE_FIELD, &jexp);
+  json_bool jexp_exists = json_object_object_get_ex(serialized, EXPIRED_DATE_FIELD, &jexp);
   if (!jexp_exists) {
     return common::make_error_inval();
   }
@@ -104,11 +104,10 @@ common::Error FrontSubscriberInfo::SerializeFields(json_object* deserialized) co
     return common::make_error_inval();
   }
 
-  json_object_object_add(deserialized, FRONT_SUBSCRIBER_INFO_UID_FIELD, json_object_new_string(uid_.c_str()));
-  json_object_object_add(deserialized, FRONT_SUBSCRIBER_INFO_LOGIN_FIELD, json_object_new_string(login_.c_str()));
-  json_object_object_add(deserialized, FRONT_SUBSCRIBER_INFO_DEVICE_ID_FIELD,
-                         json_object_new_string(device_id_.c_str()));
-  json_object_object_add(deserialized, FRONT_SUBSCRIBER_INFO_EXPIRED_DATE_FIELD, json_object_new_int64(expired_date_));
+  json_object_object_add(deserialized, UID_FIELD, json_object_new_string(uid_.c_str()));
+  json_object_object_add(deserialized, LOGIN_FIELD, json_object_new_string(login_.c_str()));
+  json_object_object_add(deserialized, DEVICE_ID_FIELD, json_object_new_string(device_id_.c_str()));
+  json_object_object_add(deserialized, EXPIRED_DATE_FIELD, json_object_new_int64(expired_date_));
   return common::Error();
 }
 

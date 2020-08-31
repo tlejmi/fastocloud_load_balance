@@ -17,8 +17,8 @@
 #include <string>
 #include <vector>
 
-#define META_URL_NAME_FIELD "name"
-#define META_URL_URL_FIELD "url"
+#define NAME_FIELD "name"
+#define URL_FIELD "url"
 
 namespace fastocloud {
 namespace server {
@@ -174,13 +174,13 @@ bool MakeVodInfo(const bson_t* sdoc,
             bson_iter_t iter;
             bson_iter_init(&iter, &rec);
             fastotv::MetaUrl url;
-            if (bson_iter_find(&iter, META_URL_NAME_FIELD)) {
+            if (bson_iter_find(&iter, NAME_FIELD)) {
               const char* name = bson_iter_utf8(&iter, NULL);
               if (name) {
                 url.SetName(name);
               }
             }
-            if (bson_iter_find(&iter, META_URL_URL_FIELD)) {
+            if (bson_iter_find(&iter, URL_FIELD)) {
               const char* uri = bson_iter_utf8(&iter, NULL);
               if (uri) {
                 url.SetUrl(common::uri::GURL(uri));
@@ -380,13 +380,13 @@ bool MakeCatchupInfo(const bson_t* sdoc,
             bson_iter_t iter;
             bson_iter_init(&iter, &rec);
             fastotv::MetaUrl url;
-            if (bson_iter_find(&iter, META_URL_NAME_FIELD)) {
+            if (bson_iter_find(&iter, NAME_FIELD)) {
               const char* name = bson_iter_utf8(&iter, NULL);
               if (name) {
                 url.SetName(name);
               }
             }
-            if (bson_iter_find(&iter, META_URL_URL_FIELD)) {
+            if (bson_iter_find(&iter, URL_FIELD)) {
               const char* uri = bson_iter_utf8(&iter, NULL);
               if (uri) {
                 url.SetUrl(common::uri::GURL(uri));
@@ -575,13 +575,13 @@ bool MakeChannelInfo(const bson_t* sdoc,
             bson_iter_t iter;
             bson_iter_init(&iter, &rec);
             fastotv::MetaUrl url;
-            if (bson_iter_find(&iter, META_URL_NAME_FIELD)) {
+            if (bson_iter_find(&iter, NAME_FIELD)) {
               const char* name = bson_iter_utf8(&iter, NULL);
               if (name) {
                 url.SetName(name);
               }
             }
-            if (bson_iter_find(&iter, META_URL_URL_FIELD)) {
+            if (bson_iter_find(&iter, URL_FIELD)) {
               const char* uri = bson_iter_utf8(&iter, NULL);
               if (uri) {
                 url.SetUrl(common::uri::GURL(uri));

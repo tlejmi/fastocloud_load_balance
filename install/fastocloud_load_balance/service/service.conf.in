@@ -6,4 +6,5 @@ http_host=@STREAMER_SERVICE_HTTP_HOST@
 mongodb_url=@STREAMER_SERVICE_MONGODB_URL@
 epg_url=@STREAMER_SERVICE_EPG_URL@
 locked_stream_text=@STREAMER_SERVICE_LOCKED_STREAM_TEXT@
+report_node_stats=10
 license_key=

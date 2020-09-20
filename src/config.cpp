@@ -17,6 +17,7 @@
 #include <fstream>
 #include <utility>
 
+#include <common/convert2string.h>
 #include <common/license/expire_license.h>
 #include <common/value.h>
 
@@ -29,8 +30,10 @@
 #define SERVICE_EPG_URL_FIELD "epg_url"
 #define SERVICE_LOCKED_STREAM_TEXT_FIELD "locked_stream_text"
 #define SERVICE_LICENSE_KEY_FIELD "license_key"
+#define SERVICE_REPORT_NODE_STATS_FIELD "report_node_stats"
 
 #define DUMMY_LOG_FILE_PATH "/dev/null"
+#define REPORT_NODE_STATS 10
 
 namespace {
 std::pair<std::string, std::string> GetKeyValue(const std::string& line, char separator) {
@@ -80,6 +83,11 @@ common::ErrnoError ReadConfigFile(const std::string& path, common::HashValue** a
       options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
     } else if (pair.first == SERVICE_LICENSE_KEY_FIELD) {
       options->Insert(pair.first, common::Value::CreateStringValueFromBasicString(pair.second));
+    } else if (pair.first == SERVICE_REPORT_NODE_STATS_FIELD) {
+      time_t report;
+      if (common::ConvertFromString(pair.second, &report)) {
+        options->Insert(pair.first, common::Value::CreateTimeValue(report));
+      }
     }
   }
 
@@ -98,7 +106,8 @@ Config::Config()
       log_level(common::logging::LOG_LEVEL_INFO),
       mongodb_url(MONGODB_URL),
       epg_url(EPG_URL),
-      license_key() {}
+      license_key(),
+      report_node(REPORT_NODE_STATS) {}
 
 common::net::HostAndPort Config::GetDefaultHost() {
   return common::net::HostAndPort::CreateLocalHostIPV4(CLIENT_PORT);
@@ -183,6 +192,11 @@ common::ErrnoError load_config_from_file(const std::string& config_absolute_path
   common::Value* locked_stream_field = slave_config_args->Find(SERVICE_LOCKED_STREAM_TEXT_FIELD);
   if (!locked_stream_field || !locked_stream_field->GetAsBasicString(&lconfig.locked_stream_text)) {
     lconfig.locked_stream_text = LOCKED_STREAM_TEXT;
+  }
+
+  common::Value* report_node_stats_field = slave_config_args->Find(SERVICE_REPORT_NODE_STATS_FIELD);
+  if (!report_node_stats_field || !report_node_stats_field->GetAsTime(&lconfig.report_node)) {
+    lconfig.report_node = REPORT_NODE_STATS;
   }
 
   *config = lconfig;

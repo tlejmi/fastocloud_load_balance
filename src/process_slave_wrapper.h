@@ -40,7 +40,7 @@ class ProcessSlaveWrapper : public common::libev::IoLoopObserver,
                             public subscribers::ISubscribersHandlerObserver,
                             public base::ISubscribersObserver {
  public:
-  enum { ping_timeout_clients_seconds = 60, node_stats_send_seconds = 10, check_license_timeout_seconds = 300 };
+  enum { ping_timeout_clients_seconds = 60, check_license_timeout_seconds = 300 };
   typedef fastotv::protocol::protocol_client_t stream_client_t;
 
   explicit ProcessSlaveWrapper(const Config& config);

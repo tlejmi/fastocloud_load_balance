@@ -84,7 +84,8 @@ ProcessSlaveWrapper::ProcessSlaveWrapper(const Config& config)
 
   subscribers_handler_ =
       new subscribers::SubscribersHandler(this, sub_manager_, config.epg_url, config.locked_stream_text);
-  subscribers_server_ = new subscribers::SubscribersServer(config.subscribers_host, subscribers_handler_);
+  subscribers_server_ = new subscribers::SubscribersServer(
+      config.subscribers_host, subscribers::SubscribersServer::C_STANDART, subscribers_handler_);
   subscribers_server_->SetName("subscribers_server");
 
   http_handler_ = new http::HttpHandler(sub_manager_);

@@ -16,15 +16,22 @@
 
 #include "subscribers/client.h"
 
+#include <common/text_decoders/none_edcoder.h>
+
 namespace fastocloud {
 namespace server {
 namespace subscribers {
 
-SubscribersServer::SubscribersServer(const common::net::HostAndPort& host, common::libev::IoLoopObserver* observer)
-    : base_class(host, false, observer) {}
+SubscribersServer::SubscribersServer(const common::net::HostAndPort& host,
+                                     CompressedType compressed,
+                                     common::libev::IoLoopObserver* observer)
+    : base_class(host, false, observer), compressed_(compressed) {}
 
 common::libev::tcp::TcpClient* SubscribersServer::CreateClient(const common::net::socket_info& info) {
-  return new SubscriberClient(this, info);
+  if (compressed_ == C_STANDART) {
+    return new SubscriberClient(this, info, std::make_shared<fastotv::protocol::FastoTVCompressor>());
+  }
+  return new SubscriberClient(this, info, std::make_shared<common::NoneEDcoder>());
 }
 
 }  // namespace subscribers

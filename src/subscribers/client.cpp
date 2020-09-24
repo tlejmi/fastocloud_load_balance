@@ -45,8 +45,10 @@ namespace fastocloud {
 namespace server {
 namespace subscribers {
 
-SubscriberClient::SubscriberClient(common::libev::IoLoop* server, const common::net::socket_info& info)
-    : base_class(server, info), client_info_() {}
+SubscriberClient::SubscriberClient(common::libev::IoLoop* server,
+                                   const common::net::socket_info& info,
+                                   compressor_t compressor)
+    : base_class(server, info, compressor), client_info_() {}
 
 const char* SubscriberClient::ClassName() const {
   return "SubscriberClient";

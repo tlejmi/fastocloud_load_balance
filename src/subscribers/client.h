@@ -28,7 +28,7 @@ class SubscriberClient : public fastotv::server::Client, public base::Subscriber
   typedef common::Optional<fastotv::commands_info::ClientInfo> client_info_t;
   typedef fastotv::server::Client base_class;
 
-  SubscriberClient(common::libev::IoLoop* server, const common::net::socket_info& info);
+  SubscriberClient(common::libev::IoLoop* server, const common::net::socket_info& info, compressor_t compressor);
 
   const char* ClassName() const override;
 

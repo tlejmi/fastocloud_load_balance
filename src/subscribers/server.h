@@ -22,11 +22,17 @@ namespace subscribers {
 
 class SubscribersServer : public common::libev::tcp::TcpServer {
  public:
+  enum CompressedType { C_NONE = 0, C_STANDART };
+
   typedef common::libev::tcp::TcpServer base_class;
-  explicit SubscribersServer(const common::net::HostAndPort& host, common::libev::IoLoopObserver* observer = nullptr);
+  explicit SubscribersServer(const common::net::HostAndPort& host,
+                             CompressedType compressed,
+                             common::libev::IoLoopObserver* observer = nullptr);
 
  private:
   common::libev::tcp::TcpClient* CreateClient(const common::net::socket_info& info) override;
+
+  const CompressedType compressed_;
 };
 
 }  // namespace subscribers

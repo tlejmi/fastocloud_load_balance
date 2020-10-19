@@ -28,7 +28,7 @@ SubscribersServer::SubscribersServer(const common::net::HostAndPort& host,
     : base_class(host, false, observer), compressed_(compressed) {}
 
 common::libev::tcp::TcpClient* SubscribersServer::CreateClient(const common::net::socket_info& info) {
-  if (compressed_ == C_STANDART) {
+  if (compressed_ == kStandart) {
     return new SubscriberClient(this, info, std::make_shared<fastotv::protocol::FastoTVCompressor>());
   }
   return new SubscriberClient(this, info, std::make_shared<common::NoneEDcoder>());

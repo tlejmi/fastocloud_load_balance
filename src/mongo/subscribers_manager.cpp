@@ -47,6 +47,7 @@
 #define TIMESHIFT_PLAYER_STR "pyfastocloud_models.stream.entry.TimeshiftPlayerStream"
 #define CATCHUP_STR "pyfastocloud_models.stream.entry.CatchupStream"
 #define TEST_LIFE_STR "pyfastocloud_models.stream.entry.TestLifeStream"
+#define CV_DATA_STR "pyfastocloud_models.stream.entry.CvDataStream"
 
 #define FAVORITE_FIELD "favorite"
 #define RECENT_FIELD "recent"
@@ -98,6 +99,8 @@ fastotv::StreamType MongoStreamType2StreamType(const char* data) {
     return fastotv::COD_ENCODE;
   } else if (strcmp(data, TEST_LIFE_STR) == 0) {
     return fastotv::TEST_LIFE;
+  } else if (strcmp(data, CV_DATA_STR) == 0) {
+    return fastotv::CV_DATA;
   }
 
   return fastotv::PROXY;

@@ -22,7 +22,7 @@ namespace subscribers {
 
 class SubscribersServer : public common::libev::tcp::TcpServer {
  public:
-  enum CompressedType { C_NONE = 0, C_STANDART };
+  enum CompressedType { kNone = 0, kStandart };
 
   typedef common::libev::tcp::TcpServer base_class;
   explicit SubscribersServer(const common::net::HostAndPort& host,

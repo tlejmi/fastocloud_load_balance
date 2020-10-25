@@ -14,6 +14,8 @@
 
 #include "base/front_subscriber_info.h"
 
+#include <string>
+
 #define LOGIN_FIELD "login"
 #define UID_FIELD "id"
 #define DEVICE_ID_FIELD "device_id"
@@ -69,33 +71,31 @@ void FrontSubscriberInfo::SetExpiredDate(fastotv::timestamp_t date) {
 }
 
 common::Error FrontSubscriberInfo::DoDeSerialize(json_object* serialized) {
-  json_object* jid = nullptr;
-  json_bool jid_exists = json_object_object_get_ex(serialized, UID_FIELD, &jid);
-  if (!jid_exists) {
-    return common::make_error_inval();
+  std::string sid;
+  common::Error err = GetStringField(serialized, UID_FIELD, &sid);
+  if (err) {
+    return err;
   }
 
-  json_object* jlogin = nullptr;
-  json_bool jlogin_exists = json_object_object_get_ex(serialized, LOGIN_FIELD, &jlogin);
-  if (!jlogin_exists) {
-    return common::make_error_inval();
+  std::string login;
+  err = GetStringField(serialized, LOGIN_FIELD, &login);
+  if (err) {
+    return err;
   }
 
-  json_object* jdevid = nullptr;
-  json_bool jdevid_exists = json_object_object_get_ex(serialized, DEVICE_ID_FIELD, &jdevid);
-  if (!jdevid_exists) {
-    return common::make_error_inval();
+  std::string did;
+  err = GetStringField(serialized, DEVICE_ID_FIELD, &did);
+  if (err) {
+    return err;
   }
 
-  json_object* jexp = nullptr;
-  json_bool jexp_exists = json_object_object_get_ex(serialized, EXPIRED_DATE_FIELD, &jexp);
-  if (!jexp_exists) {
-    return common::make_error_inval();
+  int64_t exp;
+  err = GetInt64Field(serialized, EXPIRED_DATE_FIELD, &exp);
+  if (err) {
+    return err;
   }
 
-  FrontSubscriberInfo ainf(json_object_get_string(jid), json_object_get_string(jlogin), json_object_get_string(jdevid),
-                           json_object_get_int64(jexp));
-  *this = ainf;
+  *this = FrontSubscriberInfo(sid, login, did, exp);
   return common::Error();
 }
 

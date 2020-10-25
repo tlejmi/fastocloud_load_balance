@@ -63,21 +63,21 @@ common::Error NotifySubscriberInfo::DoDeSerialize(json_object* serialized) {
     return err;
   }
 
-  json_object* jid = nullptr;
-  json_bool jid_exists = json_object_object_get_ex(serialized, UID_FIELD, &jid);
-  if (!jid_exists) {
-    return common::make_error_inval();
+  fastotv::user_id_t uid;
+  err = GetStringField(serialized, UID_FIELD, &uid);
+  if (err) {
+    return err;
   }
 
-  inf.uid_ = json_object_get_string(jid);
+  inf.uid_ = uid;
 
-  json_object* jdid = nullptr;
-  json_bool jdid_exists = json_object_object_get_ex(serialized, DID_FIELD, &jdid);
-  if (!jdid_exists) {
-    return common::make_error_inval();
+  fastotv::device_id_t did;
+  err = GetStringField(serialized, DID_FIELD, &did);
+  if (err) {
+    return err;
   }
 
-  inf.device_id_ = json_object_get_string(jdid);
+  inf.device_id_ = did;
 
   *this = inf;
   return common::Error();

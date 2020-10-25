@@ -48,11 +48,11 @@ common::Error StateInfo::DoDeSerialize(json_object* serialized) {
   UNUSED(serialized);
 
   StateInfo inf;
-  json_object* jclients = nullptr;
-  json_bool jclients_exists = json_object_object_get_ex(serialized, CLIENTS_FIELD, &jclients);
-  if (jclients_exists) {
+  size_t len;
+  json_object* jclients;
+  common::Error err = GetArrayField(serialized, CLIENTS_FIELD, &jclients, &len);
+  if (!err) {
     online_clients_t clients;
-    size_t len = json_object_array_length(jclients);
     for (size_t i = 0; i < len; ++i) {
       json_object* jclient = json_object_array_get_idx(jclients, i);
       base::FrontSubscriberInfo client;

@@ -23,12 +23,20 @@ namespace service {
 
 PrepareInfo::PrepareInfo() : base_class(), catchups_host(), catchups_http_root() {}
 
+PrepareInfo::PrepareInfo(const common::net::HostAndPort& host,
+                         const common::file_system::ascii_directory_string_path& catchups_http_root)
+    : base_class(), catchups_host(host), catchups_http_root(catchups_http_root) {}
+
 common::net::HostAndPort PrepareInfo::GetCatchupsHost() const {
   return catchups_host;
 }
 
 common::file_system::ascii_directory_string_path PrepareInfo::GetCatchupsHttpRoot() const {
   return catchups_http_root;
+}
+
+bool PrepareInfo::Equals(const PrepareInfo& info) const {
+  return catchups_host == info.catchups_host && catchups_http_root == info.catchups_http_root;
 }
 
 common::Error PrepareInfo::SerializeFields(json_object* out) const {
@@ -40,25 +48,15 @@ common::Error PrepareInfo::SerializeFields(json_object* out) const {
 }
 
 common::Error PrepareInfo::DoDeSerialize(json_object* serialized) {
-  PrepareInfo inf;
-  json_object* jcatchups_host = nullptr;
-  json_bool jcatchups_host_exists = json_object_object_get_ex(serialized, CATCHUPS_HOST_FIELD, &jcatchups_host);
-  if (jcatchups_host_exists) {
-    common::net::HostAndPort host;
-    if (common::ConvertFromString(json_object_get_string(jcatchups_host), &host)) {
-      inf.catchups_host = host;
-    }
-  }
+  std::string catchups_host;
+  common::net::HostAndPort host;
+  ignore_result(GetStringField(serialized, CATCHUPS_HOST_FIELD, &catchups_host));
+  ignore_result(common::ConvertFromString(catchups_host, &host));
 
-  json_object* jcatchups_http_root = nullptr;
-  json_bool jcatchups_http_root_exists =
-      json_object_object_get_ex(serialized, CATCHUPS_HTTP_ROOT_FIELD, &jcatchups_http_root);
-  if (jcatchups_http_root_exists) {
-    inf.catchups_http_root =
-        common::file_system::ascii_directory_string_path(json_object_get_string(jcatchups_http_root));
-  }
+  std::string http_root;
+  ignore_result(GetStringField(serialized, CATCHUPS_HTTP_ROOT_FIELD, &http_root));
 
-  *this = inf;
+  *this = PrepareInfo(host, common::file_system::ascii_directory_string_path(http_root));
   return common::Error();
 }
 

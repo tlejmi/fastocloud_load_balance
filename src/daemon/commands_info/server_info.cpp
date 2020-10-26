@@ -36,33 +36,23 @@ OnlineUsers::OnlineUsers(size_t daemon, size_t http, size_t subscribers)
     : daemon_(daemon), http_(http), subscribers_(subscribers) {}
 
 common::Error OnlineUsers::DoDeSerialize(json_object* serialized) {
-  OnlineUsers inf;
-  json_object* jdaemon = nullptr;
-  json_bool jdaemon_exists = json_object_object_get_ex(serialized, ONLINE_USERS_DAEMON_FIELD, &jdaemon);
-  if (jdaemon_exists) {
-    inf.daemon_ = json_object_get_int64(jdaemon);
-  }
+  size_t daemon;
+  ignore_result(GetUint64Field(serialized, ONLINE_USERS_DAEMON_FIELD, &daemon));
 
-  json_object* jhttp = nullptr;
-  json_bool jhttp_exists = json_object_object_get_ex(serialized, ONLINE_USERS_HTTP_FIELD, &jhttp);
-  if (jhttp_exists) {
-    inf.http_ = json_object_get_int64(jhttp);
-  }
+  size_t http;
+  ignore_result(GetUint64Field(serialized, ONLINE_USERS_HTTP_FIELD, &http));
 
-  json_object* jsubscribers = nullptr;
-  json_bool jsubscribers_exists = json_object_object_get_ex(serialized, ONLINE_USERS_SUBSCRIBERS_FIELD, &jsubscribers);
-  if (jsubscribers_exists) {
-    inf.subscribers_ = json_object_get_int64(jsubscribers);
-  }
+  size_t subscribers;
+  ignore_result(GetUint64Field(serialized, ONLINE_USERS_SUBSCRIBERS_FIELD, &subscribers));
 
-  *this = inf;
+  *this = OnlineUsers(daemon, http, subscribers);
   return common::Error();
 }
 
 common::Error OnlineUsers::SerializeFields(json_object* out) const {
-  json_object_object_add(out, ONLINE_USERS_DAEMON_FIELD, json_object_new_int64(daemon_));
-  json_object_object_add(out, ONLINE_USERS_HTTP_FIELD, json_object_new_int64(http_));
-  json_object_object_add(out, ONLINE_USERS_SUBSCRIBERS_FIELD, json_object_new_int64(subscribers_));
+  json_object_object_add(out, ONLINE_USERS_DAEMON_FIELD, json_object_new_uint64(daemon_));
+  json_object_object_add(out, ONLINE_USERS_HTTP_FIELD, json_object_new_uint64(http_));
+  json_object_object_add(out, ONLINE_USERS_SUBSCRIBERS_FIELD, json_object_new_uint64(subscribers_));
   return common::Error();
 }
 

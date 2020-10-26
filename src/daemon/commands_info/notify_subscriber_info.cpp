@@ -69,17 +69,13 @@ common::Error NotifySubscriberInfo::DoDeSerialize(json_object* serialized) {
     return err;
   }
 
-  inf.uid_ = uid;
-
   fastotv::device_id_t did;
   err = GetStringField(serialized, DID_FIELD, &did);
   if (err) {
     return err;
   }
 
-  inf.device_id_ = did;
-
-  *this = inf;
+  *this = NotifySubscriberInfo(uid, did);
   return common::Error();
 }
 

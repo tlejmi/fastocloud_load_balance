@@ -30,9 +30,13 @@ class PrepareInfo : public common::serializer::JsonSerializer<PrepareInfo> {
   typedef JsonSerializer<PrepareInfo> base_class;
 
   PrepareInfo();
+  PrepareInfo(const common::net::HostAndPort& host,
+              const common::file_system::ascii_directory_string_path& catchups_http_root);
 
   common::net::HostAndPort GetCatchupsHost() const;
   common::file_system::ascii_directory_string_path GetCatchupsHttpRoot() const;
+
+  bool Equals(const PrepareInfo& info) const;
 
  protected:
   common::Error DoDeSerialize(json_object* serialized) override;
@@ -42,6 +46,14 @@ class PrepareInfo : public common::serializer::JsonSerializer<PrepareInfo> {
   common::net::HostAndPort catchups_host;
   common::file_system::ascii_directory_string_path catchups_http_root;
 };
+
+inline bool operator==(const PrepareInfo& left, const PrepareInfo& right) {
+  return left.Equals(right);
+}
+
+inline bool operator!=(const PrepareInfo& x, const PrepareInfo& y) {
+  return !(x == y);
+}
 
 }  // namespace service
 }  // namespace server

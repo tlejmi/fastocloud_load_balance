@@ -22,6 +22,8 @@ namespace service {
 
 StateInfo::StateInfo() : base_class(), clients_() {}
 
+StateInfo::StateInfo(const online_clients_t& clients) : clients_(clients) {}
+
 void StateInfo::SetOnlineClients(const online_clients_t& clients) {
   clients_ = clients;
 }
@@ -47,12 +49,11 @@ common::Error StateInfo::SerializeFields(json_object* deserialized) const {
 common::Error StateInfo::DoDeSerialize(json_object* serialized) {
   UNUSED(serialized);
 
-  StateInfo inf;
   size_t len;
   json_object* jclients;
   common::Error err = GetArrayField(serialized, CLIENTS_FIELD, &jclients, &len);
+  online_clients_t clients;
   if (!err) {
-    online_clients_t clients;
     for (size_t i = 0; i < len; ++i) {
       json_object* jclient = json_object_array_get_idx(jclients, i);
       base::FrontSubscriberInfo client;
@@ -62,10 +63,9 @@ common::Error StateInfo::DoDeSerialize(json_object* serialized) {
       }
       clients.push_back(client);
     }
-    inf.clients_ = clients;
   }
 
-  *this = inf;
+  *this = StateInfo(clients);
   return common::Error();
 }
 

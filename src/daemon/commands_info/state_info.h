@@ -31,6 +31,7 @@ class StateInfo : public common::serializer::JsonSerializer<StateInfo> {
   typedef std::vector<base::FrontSubscriberInfo> online_clients_t;
 
   StateInfo();
+  StateInfo(const online_clients_t& clients);
 
   void SetOnlineClients(const online_clients_t& clients);
   online_clients_t GetOnlineClients() const;

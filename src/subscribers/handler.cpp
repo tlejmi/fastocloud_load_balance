@@ -208,7 +208,8 @@ common::ErrnoError SubscribersHandler::HandleResponceCommand(SubscriberClient* c
   fastotv::protocol::request_t req;
   SubscriberClient* sclient = static_cast<SubscriberClient*>(client);
   SubscriberClient::callback_t cb;
-  if (sclient->PopRequestByID(resp->id, &req, &cb)) {
+  const auto sid = resp->id;
+  if (sclient->PopRequestByID(sid, &req, &cb)) {
     if (cb) {
       cb(resp);
     }
@@ -219,8 +220,10 @@ common::ErrnoError SubscribersHandler::HandleResponceCommand(SubscriberClient* c
     } else if (req.method == SERVER_TEXT_NOTIFICATION) {
       return HandleResponceServerTextNotification(sclient, resp);
     } else {
-      WARNING_LOG() << "HandleResponceCommand not handled command: " << req.method;
+      WARNING_LOG() << "HandleResponceCommand not handled responce id: " << *sid << ", command: " << req.method;
     }
+  } else {
+    WARNING_LOG() << "HandleResponceCommand not found responce id: " << *sid << ", command: " << req.method;
   }
 
   return common::ErrnoError();

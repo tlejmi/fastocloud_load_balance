@@ -223,7 +223,7 @@ common::ErrnoError SubscribersHandler::HandleResponceCommand(SubscriberClient* c
       WARNING_LOG() << "HandleResponceCommand not handled responce id: " << *sid << ", command: " << req.method;
     }
   } else {
-    WARNING_LOG() << "HandleResponceCommand not found responce id: " << *sid << ", command: " << req.method;
+    WARNING_LOG() << "HandleResponceCommand not found responce id: " << *sid;
   }
 
   return common::ErrnoError();

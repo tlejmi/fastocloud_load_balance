@@ -708,7 +708,8 @@ common::ErrnoError ProcessSlaveWrapper::HandleResponceServiceCommand(ProtocoledD
   }
 
   fastotv::protocol::request_t req;
-  if (dclient->PopRequestByID(resp->id, &req)) {
+  const auto sid = resp->id;
+  if (dclient->PopRequestByID(sid, &req)) {
     if (req.method == DAEMON_SERVER_PING) {
       ignore_result(HandleResponcePingService(dclient, resp));
     } else if (req.method == DAEMON_SERVER_CATCHUP_CREATED) {
@@ -716,8 +717,10 @@ common::ErrnoError ProcessSlaveWrapper::HandleResponceServiceCommand(ProtocoledD
     } else if (req.method == DAEMON_CLIENT_SEND_MESSAGE) {
       ignore_result(HandleResponceSendMessageForSubscriber(dclient, resp));
     } else {
-      WARNING_LOG() << "HandleResponceServiceCommand not handled command: " << req.method;
+      WARNING_LOG() << "HandleResponceServiceCommand not handled responce id: " << *sid << ", command: " << req.method;
     }
+  } else {
+    WARNING_LOG() << "HandleResponceServiceCommand not found responce id: " << *sid;
   }
 
   return common::ErrnoError();

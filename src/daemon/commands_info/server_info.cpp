@@ -170,6 +170,15 @@ common::Error FullServiceInfo::DoDeSerialize(json_object* serialized) {
     }
   }
 
+  std::string http_host;
+  err = GetStringField(serialized, HTTP_HOST_FIELD, &http_host);
+  if (!err) {
+    common::net::HostAndPort host;
+    if (common::ConvertFromString(http_host, &host)) {
+      inf.http_host_ = host;
+    }
+  }
+
   ignore_result(GetInt64Field(serialized, EXPIRATION_TIME_FIELD, &inf.exp_time_));
   ignore_result(GetStringField(serialized, PROJECT_FIELD, &inf.project_));
   ignore_result(GetStringField(serialized, VERSION_FIELD, &inf.proj_ver_));

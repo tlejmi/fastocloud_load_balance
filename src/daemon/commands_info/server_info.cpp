@@ -52,9 +52,9 @@ common::Error OnlineUsers::DoDeSerialize(json_object* serialized) {
 }
 
 common::Error OnlineUsers::SerializeFields(json_object* out) const {
-  json_object_object_add(out, ONLINE_USERS_DAEMON_FIELD, json_object_new_uint64(daemon_));
-  json_object_object_add(out, ONLINE_USERS_HTTP_FIELD, json_object_new_uint64(http_));
-  json_object_object_add(out, ONLINE_USERS_SUBSCRIBERS_FIELD, json_object_new_uint64(subscribers_));
+  ignore_result(SetUInt64Field(out, ONLINE_USERS_DAEMON_FIELD, daemon_));
+  ignore_result(SetUInt64Field(out, ONLINE_USERS_HTTP_FIELD, http_));
+  ignore_result(SetUInt64Field(out, ONLINE_USERS_SUBSCRIBERS_FIELD, subscribers_));
   return common::Error();
 }
 
@@ -101,7 +101,7 @@ common::Error ServerInfo::SerializeFields(json_object* out) const {
     return err;
   }
 
-  json_object_object_add(out, ONLINE_USERS_FIELD, obj);
+  ignore_result(SetObjectField(out, ONLINE_USERS_FIELD, obj));
   return common::Error();
 }
 
@@ -195,11 +195,11 @@ common::Error FullServiceInfo::SerializeFields(json_object* out) const {
   }
 
   std::string http_host_str = common::ConvertToString(http_host_);
-  json_object_object_add(out, HTTP_HOST_FIELD, json_object_new_string(http_host_str.c_str()));
-  json_object_object_add(out, EXPIRATION_TIME_FIELD, json_object_new_int64(exp_time_));
-  json_object_object_add(out, PROJECT_FIELD, json_object_new_string(project_.c_str()));
-  json_object_object_add(out, VERSION_FIELD, json_object_new_string(proj_ver_.c_str()));
-  json_object_object_add(out, OS_FIELD, jos);
+  ignore_result(SetStringField(out, HTTP_HOST_FIELD, http_host_str));
+  ignore_result(SetInt64Field(out, EXPIRATION_TIME_FIELD, exp_time_));
+  ignore_result(SetStringField(out, PROJECT_FIELD, project_));
+  ignore_result(SetStringField(out, VERSION_FIELD, proj_ver_));
+  ignore_result(SetObjectField(out, OS_FIELD, jos));
   return base_class::SerializeFields(out);
 }
 

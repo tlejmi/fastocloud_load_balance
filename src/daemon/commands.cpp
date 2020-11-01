@@ -35,8 +35,8 @@ common::Error CatchupCreatedBroadcast(std::string serverid,
 
   const char* serverid_str = serverid.c_str();
   json_object* notif = json_object_new_object();
-  json_object_object_add(notif, SERVER_ID_FIELD, json_object_new_string(serverid_str));
-  json_object_object_add(notif, CATCHUP_FIELD, catchup_obj);
+  ignore_result(common::serializer::json_set_string(notif, SERVER_ID_FIELD, serverid_str));
+  ignore_result(common::serializer::json_set_object(notif, CATCHUP_FIELD, catchup_obj));
   std::string catchup = json_object_get_string(notif);
   json_object_put(notif);
 

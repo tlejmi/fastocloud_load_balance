@@ -51,8 +51,8 @@ common::Error NotifySubscriberInfo::SerializeFields(json_object* deserialized) c
     return common::make_error_inval();
   }
 
-  json_object_object_add(deserialized, UID_FIELD, json_object_new_string(uid_.c_str()));
-  json_object_object_add(deserialized, DID_FIELD, json_object_new_string(device_id_.c_str()));
+  ignore_result(SetStringField(deserialized, UID_FIELD, uid_));
+  ignore_result(SetStringField(deserialized, DID_FIELD, device_id_));
   return base_class::SerializeFields(deserialized);
 }
 

@@ -41,9 +41,9 @@ bool PrepareInfo::Equals(const PrepareInfo& info) const {
 
 common::Error PrepareInfo::SerializeFields(json_object* out) const {
   std::string catchups_host_str = common::ConvertToString(catchups_host);
-  json_object_object_add(out, CATCHUPS_HOST_FIELD, json_object_new_string(catchups_host_str.c_str()));
+  ignore_result(SetStringField(out, CATCHUPS_HOST_FIELD, catchups_host_str));
   std::string catchups_http_root_str = catchups_http_root.GetPath();
-  json_object_object_add(out, CATCHUPS_HTTP_ROOT_FIELD, json_object_new_string(catchups_http_root_str.c_str()));
+  ignore_result(SetStringField(out, CATCHUPS_HTTP_ROOT_FIELD, catchups_http_root_str));
   return common::Error();
 }
 

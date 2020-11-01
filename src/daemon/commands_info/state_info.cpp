@@ -42,7 +42,7 @@ common::Error StateInfo::SerializeFields(json_object* deserialized) const {
     }
     json_object_array_add(jclients, jclient);
   }
-  json_object_object_add(deserialized, CLIENTS_FIELD, jclients);
+  ignore_result(SetArrayField(deserialized, CLIENTS_FIELD, jclients));
   return common::Error();
 }
 

@@ -104,10 +104,10 @@ common::Error FrontSubscriberInfo::SerializeFields(json_object* deserialized) co
     return common::make_error_inval();
   }
 
-  json_object_object_add(deserialized, UID_FIELD, json_object_new_string(uid_.c_str()));
-  json_object_object_add(deserialized, LOGIN_FIELD, json_object_new_string(login_.c_str()));
-  json_object_object_add(deserialized, DEVICE_ID_FIELD, json_object_new_string(device_id_.c_str()));
-  json_object_object_add(deserialized, EXPIRED_DATE_FIELD, json_object_new_int64(expired_date_));
+  ignore_result(SetStringField(deserialized, UID_FIELD, uid_));
+  ignore_result(SetStringField(deserialized, LOGIN_FIELD, login_));
+  ignore_result(SetStringField(deserialized, DEVICE_ID_FIELD, device_id_));
+  ignore_result(SetInt64Field(deserialized, EXPIRED_DATE_FIELD, expired_date_));
   return common::Error();
 }
 

@@ -35,7 +35,7 @@ common::Error ServerDBAuthInfo::SerializeFields(json_object* deserialized) const
     return common::make_error_inval();
   }
 
-  json_object_object_add(deserialized, UID_FIELD, json_object_new_string(uid_.c_str()));
+  ignore_result(SetStringField(deserialized, UID_FIELD, uid_));
   return base_class::SerializeFields(deserialized);
 }
 
